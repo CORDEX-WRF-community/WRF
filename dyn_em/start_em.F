@@ -2047,6 +2047,38 @@ DEALLOCATE(z_at_q)
                  ,s_pl  = grid%s_pl             &  
                  ,td_pl = grid%td_pl            &
                  ,q_pl = grid%q_pl              &
+#ifdef CORDEXDIAG
+                 ,sina = grid%sina              &
+                 ,cosa = grid%cosa              &
+                 ,psfc = grid%psfc              &
+                 ,topo = grid%ht                &
+                 ,alt = grid%alt                &
+                 ,p_top = config_flags%p_top_requested &
+                 ,iqc=moist(:,:,:,P_QC)         &
+                 ,iqr=moist(:,:,:,P_QR)         &
+                 ,iqs=moist(:,:,:,P_QS)         &
+                 ,iqi=moist(:,:,:,P_QI)         &
+                 ,iqg=moist(:,:,:,P_QG)         &
+                 ,iqh=moist(:,:,:,P_QH)         &
+                 ,hus_pl = grid%hus_pl          &
+                 ,w_pl = grid%w_pl              &
+                 ,uer_pl = grid%uer_pl          &
+                 ,ver_pl = grid%ver_pl          &
+                 ,ws_pl = grid%ws_pl            &
+                 ,qc_pl = grid%qc_pl            &
+                 ,qr_pl = grid%qr_pl            &
+                 ,qs_pl = grid%qs_pl            &
+                 ,qi_pl = grid%qi_pl            &
+                 ,qg_pl = grid%qg_pl            &
+                 ,qh_pl = grid%qh_pl            &
+                 ,qv_pl_mc = grid%qv_pl_mc      &  
+                 ,qc_pl_mc = grid%qc_pl_mc      &  
+                 ,qr_pl_mc = grid%qr_pl_mc      &  
+                 ,qs_pl_mc = grid%qs_pl_mc      &  
+                 ,qi_pl_mc = grid%qi_pl_mc      &  
+                 ,qg_pl_mc = grid%qg_pl_mc      &  
+                 ,qh_pl_mc = grid%qh_pl_mc      & 
+#endif
                  !  Dimension arguments
                  ,IDS=ids,IDE=ide, JDS=jds,JDE=jde, KDS=kds,KDE=kde    &
                  ,IMS=ims,IME=ime, JMS=jms,JME=jme, KMS=kms,KME=kme    &
