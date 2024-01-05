@@ -2595,11 +2595,6 @@ MODULE module_diagvar_cordex
     
     CALL stabfunc_scalar_businger(newz, OL, stabilitynewz)
 
-    PRINT *,' Lluis tast: ', tast, ' kappa', kappa, ' k', k, 'ta', ta(k), ' hgt', hgt, ' newz', newz, ' IF', hgt > newz
-    PRINT *,'     LOG(hgt)', LOG(hgt/newz), ' stabnewz', stabilitynewz, ' stab', stability 
-    PRINT *,'     1/', 1./kappa*( LOG(hgt/newz) - stabilitynewz + stability), ' full',                &
-      tast/kappa*( LOG(hgt/newz) - stabilitynewz + stability)
-
     IF (hgt > newz) THEN
       taznew = ta(k) - tast/kappa*( LOG(hgt/newz) - stabilitynewz + stability)
       qvznew = qv(k) - qvst/kappa*( LOG(hgt/newz) - stabilitynewz + stability)

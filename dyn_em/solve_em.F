@@ -2476,14 +2476,14 @@ BENCH_START(update_scal_tim)
                      !grid%qg_zadv(ims:ime,iz,jms:jme) = advz_t(ims:ime,iz,jms:jme,1)
                    END DO
                  END IF
-                i2 = INT((ime + ims)/2)
-                j2 = INT((jme + jms)/2)
-                 WRITE(message,*)'    Lluis P_QV:', P_QV,' P_QC:',P_QC, ' P_QR:',P_QR,' P_QS:',P_QS,' P_QI:',P_QI,' P_QH:',P_QH,' P_QG:',P_QG
-                 CALL wrf_debug(100,message)
-                 WRITE(message,*)'    Lluis im:', im, ' 2 h_tend:', h_tendency(i2,2,j2), ' v_tend:', z_tendency(i2,2,j2), ' advh_t:', advh_t(i2,2,j2,1), ' advz_t 2:', advz_t(i2,2,j2,1) 
-                 CALL wrf_debug(100,message)
-                 WRITE(message,*)'    Lluis qvh:', grid%qv_hadv(i2,2,j2), ' qch:', grid%qc_hadv(i2,2,j2), ' qrh:', grid%qr_hadv(i2,2,j2), ' qsh:', grid%qs_hadv(i2,2,j2), ' qih:', grid%qh_hadv(i2,2,j2), ' qhh:', grid%qh_hadv(i2,2,j2), ' qgh:', grid%qg_hadv(i2,2,j2)
-                 CALL wrf_debug(100,message)
+!                i2 = INT((ime + ims)/2)
+!                j2 = INT((jme + jms)/2)
+!                 WRITE(message,*)'    Lluis P_QV:', P_QV,' P_QC:',P_QC, ' P_QR:',P_QR,' P_QS:',P_QS,' P_QI:',P_QI,' P_QH:',P_QH,' P_QG:',P_QG
+!                 CALL wrf_debug(100,message)
+!                 WRITE(message,*)'    Lluis im:', im, ' 2 h_tend:', h_tendency(i2,2,j2), ' v_tend:', z_tendency(i2,2,j2), ' advh_t:', advh_t(i2,2,j2,1), ' advz_t 2:', advz_t(i2,2,j2,1) 
+!                 CALL wrf_debug(100,message)
+!                 WRITE(message,*)'    Lluis qvh:', grid%qv_hadv(i2,2,j2), ' qch:', grid%qc_hadv(i2,2,j2), ' qrh:', grid%qr_hadv(i2,2,j2), ' qsh:', grid%qs_hadv(i2,2,j2), ' qih:', grid%qh_hadv(i2,2,j2), ' qhh:', grid%qh_hadv(i2,2,j2), ' qgh:', grid%qg_hadv(i2,2,j2)
+!                 CALL wrf_debug(100,message)
                END IF
 #endif
 #endif
