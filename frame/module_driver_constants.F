@@ -150,8 +150,10 @@ MODULE module_driver_constants
 #ifdef CORDEXDIAG
 #if CDXWRF>=3
    ! 5. CORDEX-WRF diagnostics
+   ! Maximum amount of bins per variable for the simultaneous time of residence
+   INTEGER, PARAMETER                                    :: max_lbins = 50
    ! Maximum amount of bins for the simultaneous time of residence  
-   REAL, PARAMETER                                       :: max_rng = 1500
+   INTEGER, PARAMETER                                    :: max_rng = 1000
 #endif
 #endif
 

@@ -193,7 +193,6 @@ CONTAINS
 #ifdef CDXWRF
 #if CDXWRF==3
       INTEGER                                            :: i
-      REAL , DIMENSION(max_rng)                          :: htasrng, hhursrng, ltasrng, lhursrng
       CHARACTER(len=1024)                                :: msg
 #endif
 #endif
@@ -1337,14 +1336,6 @@ CONTAINS
          !   Trying to imitate what is done for eta_levels in 'dyn_em/module_initialize_real.F'
 ! Removing IF, might it work?
 !         IF (grid%xtime == 0) THEN
-           ! high-resolution tas
-           htasrng = 0.
-           IF ( model_config_rec%nhtasrng > max_rng ) THEN
-              WRITE (diag_message , * ) &
-              "CORDEX: ERROR -- error -- ERROR -- error: reduce amount of bins 'nhtasrng' for the " //&
-                "time residence diagnostic'"
-              CALL wrf_error_fatal ( diag_message )
-           END IF
            IF ( model_config_rec%nhtasrng*model_config_rec%nhhursrng /=                               &
              model_config_rec%nhtashursrng) THEN
              PRINT *, '  nhtasrng: ', model_config_rec%nhtasrng, ' nhhursrng: ',                      &
@@ -1363,67 +1354,11 @@ CONTAINS
                 "and nltashursrng do not coincide! nltashursrng = nltasrng*nlursrng"
               CALL wrf_error_fatal ( diag_message )
            END IF
-
-           IF (model_config_rec%htasrng(1) .NE. -1.0) THEN
-             htasrng(1:model_config_rec%nhtasrng-1) = model_config_rec%htasrng(1:model_config_rec%nhtasrng-1)
-           ELSE
-             ! Default values
-             DO i=1, model_config_rec%nhtasrng-1
-               htasrng(i) = -5. + (i-1)*1. + 273.15
-             END DO
-           END IF
-           grid%htasbins(1:model_config_rec%nhtasrng-1) = htasrng
-           ! high-resolution hurs
-           hhursrng = 0.
-           IF ( model_config_rec%nhhursrng > max_rng ) THEN
-              WRITE (diag_message , * ) &
-              "CORDEX: ERROR -- error -- ERROR -- error: reduce amount of bins 'nhhursrng' for the " //&
-                "time residence diagnostic'"
-              CALL wrf_error_fatal ( diag_message )
-           END IF
-           IF (model_config_rec%hhursrng(1) .NE. -1.0) THEN
-             hhursrng(1:model_config_rec%nhhursrng-1) = model_config_rec%hhursrng(1:model_config_rec%nhhursrng-1)
-           ELSE
-             ! Default values
-             DO i=1, model_config_rec%nhhursrng-1
-               hhursrng(i) = 0. + (i-1)*5. 
-             END DO
-           END IF
-           grid%hhursbins(1:model_config_rec%nhhursrng-1) = hhursrng
-           ! low-resolution tas
-           ltasrng = 0.
-           IF ( model_config_rec%nltasrng > max_rng ) THEN
-              WRITE (diag_message , * ) &
-              "CORDEX: ERROR -- error -- ERROR -- error: reduce amount of bins 'nltasrng' for the " //&
-                "time residence diagnostic'"
-              CALL wrf_error_fatal ( diag_message )
-           END IF
-           IF (model_config_rec%ltasrng(1) .NE. -1.0) THEN
-             ltasrng(1:model_config_rec%nltasrng-1) = model_config_rec%ltasrng(1:model_config_rec%nltasrng-1)
-           ELSE
-             ! Default values
-             DO i=1, model_config_rec%nltasrng-1
-               ltasrng(i) = -25. + (i-1)*5. + 273.15
-             END DO
-           END IF
-           grid%ltasbins(1:model_config_rec%nltasrng-1) = ltasrng
-           ! low-resolution hurs
-           lhursrng = 0.
-           IF ( model_config_rec%nlhursrng > max_rng ) THEN
-              WRITE (diag_message , * ) &
-              "CORDEX: ERROR -- error -- ERROR -- error: reduce amount of bins 'nlhursrng' for the " //&
-                "time residence diagnostic'"
-              CALL wrf_error_fatal ( diag_message )
-           END IF
-           IF (model_config_rec%lhursrng(1) .NE. -1.0) THEN
-             lhursrng(1:model_config_rec%nlhursrng-1) = model_config_rec%lhursrng(1:model_config_rec%nlhursrng-1)
-           ELSE
-             ! Default values
-             DO i=1, model_config_rec%nlhursrng-1
-               lhursrng(i) = 0. + (i-1)*5. 
-             END DO
-           END IF
-           grid%lhursbins(1:model_config_rec%nlhursrng-1) = lhursrng
+           ! Fillling up the bins
+           grid%htasbins(1:model_config_rec%nhtasrng-1) = model_config_rec%htasrng(1:model_config_rec%nhtasrng-1)
+           grid%hhursbins(1:model_config_rec%nhhursrng-1) = model_config_rec%hhursrng(1:model_config_rec%nhhursrng-1)
+           grid%ltasbins(1:model_config_rec%nltasrng-1) = model_config_rec%ltasrng(1:model_config_rec%nltasrng-1)
+           grid%lhursbins(1:model_config_rec%nlhursrng-1) = model_config_rec%lhursrng(1:model_config_rec%nlhursrng-1)
            
            WRITE(msg,*) '  high-res tas bins ', (grid%htasbins(i), i=1, model_config_rec%nhtasrng-1)
            CALL wrf_debug(75,msg)

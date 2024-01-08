@@ -12,7 +12,7 @@ MODULE module_diag_cordex
 
 !! Instantaneous diagnostics (only computed on output times)
 !!! prw: Total water path [kgm-2]
-!!! clwvi: Total liquid water path (QCLOUD + QRAIN) [kgm-2]
+!!! clwvi: Total liquid water path (QCLOUD + QRAIN + QSNOW + QICE) [kgm-2]
 !!! clivi: Total ice water path (QSNOW+QICE+GRAUPEL+QHAIL) [kgm-2]
 !!! clgvi: Total graupel water path (QGRAUPEL) [kgm-2]
 !!! clhvi: Total hail water path (QHAIL) [kgm-2]
