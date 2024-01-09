@@ -3123,6 +3123,8 @@ MODULE module_diagvar_cordex
 !   and rangeM of var2
 
     fname = 'var_residencetime_2var2D'
+    
+    tresidence2D = 0.
 
     ! Looking for the varibale1's bin
     IF (vals1 < rng1(1)) THEN
@@ -3150,7 +3152,7 @@ MODULE module_diagvar_cordex
       END DO
     END IF
 
-    tresidence2D(ir1,ir2) = tresidence2D(ir1,ir2) + dt
+    tresidence2D(ir1,ir2) = dt
 
     RETURN 
 
