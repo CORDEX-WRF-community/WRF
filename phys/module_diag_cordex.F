@@ -1211,29 +1211,6 @@ CONTAINS
         END IF
 
 #endif
-#if CDXWRF==3
-        ! temporal residence
-        ! Avoiding seg faults
-        IF (curr_secs2 > 0. ) THEN
-          WRITE(msg,*) '  ' // TRIM(fname) // ': computing 2-variable temporal residence'
-          IF (ijdbg) CALL wrf_debug(50,msg)
-
-          CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nhtasrng, Nhhursrng, tashrng, hurshrng,dt,&
-            tmptashurstreshighres(:,:))
-          CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nltasrng, Nlhursrng, taslrng, hurslrng,dt,&
-            tmptashurstreslowres(:,:))
-          DO itas=1, Nhtasrng
-            DO ihurs=1, Nhhursrng
-              tashurstreshighres(i,j,(itas-1)*Nhhursrng+ihurs) = tmptashurstreshighres(itas,ihurs)
-            END DO
-          END DO
-          DO itas=1, Nltasrng
-            DO ihurs=1, Nlhursrng
-              tashurstreslowres(i,j,(itas-1)*Nlhursrng+ihurs) = tmptashurstreslowres(itas,ihurs)
-            END DO
-          END DO
-        END IF
-#endif 
 #endif
 
         ijdbg = .FALSE.
@@ -1478,19 +1455,17 @@ CONTAINS
 #endif
 #if CDXWRF==3
           ! temporal residence
-          tmptashurstreshighres = 0.        
           CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nhtasrng, Nhhursrng, tashrng, hurshrng,dt,&
             tmptashurstreshighres)
-          tmptashurstreslowres = 0.
-          CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nltasrng, Nlhursrng, taslrng, hurslrng,dt,&
-            tmptashurstreslowres)
           tashurstreshighres(i,j,:) = 0.        
-          tashurstreslowres(i,j,:) = 0.
           DO itas=1, Nhtasrng
             DO ihurs=1, Nhhursrng
               tashurstreshighres(i,j,(itas-1)*Nhhursrng+ihurs) = tmptashurstreshighres(itas,ihurs)
             END DO
           END DO
+          CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nltasrng, Nlhursrng, taslrng, hurslrng,dt,&
+            tmptashurstreslowres)
+          tashurstreslowres(i,j,:) = 0.            
           DO itas=1, Nltasrng
             DO ihurs=1, Nlhursrng
               tashurstreslowres(i,j,(itas-1)*Nlhursrng+ihurs) = tmptashurstreslowres(itas,ihurs)
@@ -1853,14 +1828,14 @@ CONTAINS
           ! temporal residence
           CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nhtasrng, Nhhursrng, tashrng, hurshrng,dt,&
             tmptashurstreshighres)
-          CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nltasrng, Nlhursrng, taslrng, hurslrng,dt,&
-            tmptashurstreslowres)
           DO itas=1, Nhtasrng
             DO ihurs=1, Nhhursrng
               tashurstreshighres(i,j,(itas-1)*Nhhursrng+ihurs) =                                      &
                 tashurstreshighres(i,j,(itas-1)*Nhhursrng+ihurs) + tmptashurstreshighres(itas,ihurs)
             END DO
           END DO
+          CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nltasrng, Nlhursrng, taslrng, hurslrng,dt,&
+            tmptashurstreslowres)
           DO itas=1, Nltasrng
             DO ihurs=1, Nlhursrng
               tashurstreslowres(i,j,(itas-1)*Nlhursrng+ihurs) =                                       &
