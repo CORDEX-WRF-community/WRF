@@ -1397,7 +1397,7 @@ CONTAINS
 #endif
 #endif
          END IF
-
+         
          CALL cordex_output_calc(                                          &
                      is_restart=config_flags%restart                       &
                     ,is_output_time = is_output_t                          &

@@ -3096,7 +3096,7 @@ MODULE module_diagvar_cordex
 
   END SUBROUTINE var_tws_S11
     
-  SUBROUTINE var_residencetime_2var2D(vals1, vals2, Nrng1, Nrng2, rng1, rng2, dt, tresidence2D)
+  SUBROUTINE var_residencetime_2var2D(vals1, vals2, Nrng1, Nrng2, rng1, rng2, ir1, ir2)
 ! Subroutine to compute the time of residence of two 2D variables for a single time-step
 !  
 !    Time of residence: accumulated time passed within a given range of variables
@@ -3107,11 +3107,10 @@ MODULE module_diagvar_cordex
     REAL, DIMENSION(Nrng1), INTENT(in)                   :: rng1
     REAL, DIMENSION(Nrng2), INTENT(in)                   :: rng2
     REAL, INTENT(in)                                     :: vals1, vals2
-    REAL, INTENT(in)                                     :: dt
-    REAL, DIMENSION(Nrng1,Nrng2), INTENT(inout)          :: tresidence2D
+    INTEGER, INTENT(out)                                 :: ir1, ir2
 
     ! Local
-    INTEGER                                              :: ir, ir1, ir2
+    INTEGER                                              :: ir
     CHARACTER(len=50)                                    :: fname
 
 !!!!!!! Variables
@@ -3123,13 +3122,15 @@ MODULE module_diagvar_cordex
 !   and rangeM of var2
 
     fname = 'var_residencetime_2var2D'
-    
-    tresidence2D = 0.
 
+    ! inicialization
+    ir1 = -1
+    ir2 = -1
+    
     ! Looking for the varibale1's bin
     IF (vals1 < rng1(1)) THEN
       ir1 = 1    
-    ELSE IF (vals1 > rng1(Nrng1-1)) THEN
+    ELSE IF (vals1 >= rng1(Nrng1-1)) THEN
       ir1 = Nrng1 
     ELSE
       DO ir=1, Nrng1-2
@@ -3142,7 +3143,7 @@ MODULE module_diagvar_cordex
     ! Looking for the varibale2's bin
     IF (vals2 < rng2(1)) THEN
       ir2 = 1
-    ELSE IF (vals2 > rng2(Nrng2-1)) THEN
+    ELSE IF (vals2 >= rng2(Nrng2-1)) THEN
       ir2 = Nrng2 
     ELSE
       DO ir=1, Nrng2-2
@@ -3151,8 +3152,18 @@ MODULE module_diagvar_cordex
         END IF
       END DO
     END IF
+    
+    ! Checking consistency
+    ! L. Fita, January 2024. Removed for efficiency
+    !   If you encounter problems with the variable, remove it and re-compile without clean -a
+!    IF (ir1 == -1 .OR. ir2 == -1) THEN
+!      PRINT *,'  ' // TRIM(fname) // ': Unsuccesfull allocation of var1:', vals1,' var2:', vals2
+!      PRINT *,'    resultant ir1=', ir1, ' ir2=', ir2
+!      PRINT 23,'var1 bins: ', rng1
+!      PRINT 23,'var2 bins:', rng2
+!    END IF
 
-    tresidence2D(ir1,ir2) = dt
+ 23 FORMAT(4x,A10,50(F86.2))
 
     RETURN 
 

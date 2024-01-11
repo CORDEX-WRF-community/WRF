@@ -720,9 +720,9 @@ CONTAINS
 !    INTENT(inout)                                        :: tashurstreshighres
 !  REAL, DIMENSION(ims:ime,jms:jme,Nltasrng,Nlhursrng),                                                &
 !    INTENT(inout)                                        :: tashurstreslowres
-  REAL, DIMENSION(ims:ime,jms:jme,Nhtashursrng),                                                      &
+  REAL, DIMENSION(ims:ime,Nhtashursrng,jms:jme),                                                      &
     INTENT(inout)                                        :: tashurstreshighres
-  REAL, DIMENSION(ims:ime,jms:jme,Nltashursrng),                                                      &
+  REAL, DIMENSION(ims:ime,Nltashursrng,jms:jme),                                                      &
     INTENT(inout)                                        :: tashurstreslowres
 #endif
 #else
@@ -793,8 +793,6 @@ CONTAINS
 #endif
 #if CDXWRF>=3
   INTEGER                                                :: itas, ihurs
-  REAL, DIMENSION(Nhtasrng,Nhhursrng)                    :: tmptashurstreshighres
-  REAL, DIMENSION(Nltasrng,Nlhursrng)                    :: tmptashurstreslowres
 #endif
 #endif
 !! End of INSTVALS
@@ -1455,22 +1453,27 @@ CONTAINS
 #endif
 #if CDXWRF==3
           ! temporal residence
-          CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nhtasrng, Nhhursrng, tashrng, hurshrng,dt,&
-            tmptashurstreshighres)
-          tashurstreshighres(i,j,:) = 0.        
-          DO itas=1, Nhtasrng
-            DO ihurs=1, Nhhursrng
-              tashurstreshighres(i,j,(itas-1)*Nhhursrng+ihurs) = tmptashurstreshighres(itas,ihurs)
-            END DO
-          END DO
-          CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nltasrng, Nlhursrng, taslrng, hurslrng,dt,&
-            tmptashurstreslowres)
-          tashurstreslowres(i,j,:) = 0.            
-          DO itas=1, Nltasrng
-            DO ihurs=1, Nlhursrng
-              tashurstreslowres(i,j,(itas-1)*Nlhursrng+ihurs) = tmptashurstreslowres(itas,ihurs)
-            END DO
-          END DO
+          ! Checking consistency
+          ! L. Fita, January 2024. Removed for efficiency
+          !   If you encounter problems with the variable, remove it and re-compile without clean -a
+!          IF (ALL(tashurstreshighres(i,:,j) == 0.)) THEN
+!            PRINT *,'  Empty highres residence time for i,j:', i,j
+!          END IF
+          CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nhtasrng, Nhhursrng, tashrng, hurshrng,   &
+            itas, ihurs)
+          tashurstreshighres(i,:,j) = 0.
+          tashurstreshighres(i,(itas-1)*Nhhursrng+ihurs,j) = dt
+
+          ! Checking consistency
+          ! L. Fita, January 2024. Removed for efficiency
+          !   If you encounter problems with the variable, remove it and re-compile without clean -a
+!          IF (ALL(tashurstreslowres(i,:,j) == 0.)) THEN
+!            PRINT *,'  Empty lowres residence time for i,j:', i,j
+!          END IF
+          CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nltasrng, Nlhursrng, taslrng, hurslrng,   &
+            itas,ihurs)
+          tashurstreslowres(i,:,j) = 0.            
+          tashurstreslowres(i,(itas-1)*Nlhursrng+ihurs,j) = dt
 #endif
 #endif
 
@@ -1589,8 +1592,8 @@ CONTAINS
 #endif
 #if CDXWRF==3
             CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    tashurstreshighres: ',tashurstreshighres(i,j,INT(Nhtasrng/2*Nhhursrng/2)),&
-              ' tashurstreslowres: ', tashurstreslowres(i,j,INT(Nltasrng/2*Nlhursrng/2))
+            WRITE(msg,*)'    tashurstreshighres: ',tashurstreshighres(i,INT(Nhtasrng/2*Nhhursrng/2),j),&
+              ' tashurstreslowres: ', tashurstreslowres(i,INT(Nltasrng/2*Nlhursrng/2),j)
             CALL wrf_debug(75,msg)
 #endif
 #endif
@@ -1826,22 +1829,34 @@ CONTAINS
 #endif
 #if CDXWRF==3
           ! temporal residence
-          CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nhtasrng, Nhhursrng, tashrng, hurshrng,dt,&
-            tmptashurstreshighres)
-          DO itas=1, Nhtasrng
-            DO ihurs=1, Nhhursrng
-              tashurstreshighres(i,j,(itas-1)*Nhhursrng+ihurs) =                                      &
-                tashurstreshighres(i,j,(itas-1)*Nhhursrng+ihurs) + tmptashurstreshighres(itas,ihurs)
-            END DO
-          END DO
-          CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nltasrng, Nlhursrng, taslrng, hurslrng,dt,&
-            tmptashurstreslowres)
-          DO itas=1, Nltasrng
-            DO ihurs=1, Nlhursrng
-              tashurstreslowres(i,j,(itas-1)*Nlhursrng+ihurs) =                                       &
-                tashurstreslowres(i,j,(itas-1)*Nlhursrng+ihurs) + tmptashurstreslowres(itas,ihurs)
-            END DO
-          END DO
+          CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nhtasrng, Nhhursrng, tashrng, hurshrng,   &
+            itas, ihurs)
+          ! Checking consistency
+          ! L. Fita, January 2024. Removed for efficiency
+          !   If you encounter problems with the variable, remove it and re-compile without clean -a
+!          IF (ijdbg) THEN
+!            PRINT *,'  i,j:', i,j
+!            PRINT *,'  highres Nhtasrng:', Nhtasrng, ' Nhhursrng:', Nhhursrng
+!            PRINT *,'  highres itas, ihurs:', itas, ihurs, 'khighrestashurs:', (itas-1)*Nhhursrng+ihurs
+!            PRINT *,'  current value prior dt:', tashurstreshighres(i,(itas-1)*Nhhursrng+ihurs,j)
+!            PRINT *,'  all values:', tashurstreshighres(i,:,j)
+!          END IF
+          tashurstreshighres(i,(itas-1)*Nhhursrng+ihurs,j) =                                          &
+            tashurstreshighres(i,(itas-1)*Nhhursrng+ihurs,j) + dt
+          CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nltasrng, Nlhursrng, taslrng, hurslrng,   &
+            itas, ihurs)
+          ! Checking consistency
+          ! L. Fita, January 2024. Removed for efficiency
+          !   If you encounter problems with the variable, remove it and re-compile without clean -a
+!          IF (ijdbg) THEN
+!            PRINT *,'  i,j:', i,j
+!            PRINT *,'  lowres Nltasrng:', Nltasrng, ' Nlhursrng:', Nlhursrng
+!            PRINT *,'  lowres itas, ihurs:', itas, ihurs, 'klowrestashurs:', (itas-1)*Nlhursrng+ihurs
+!            PRINT *,'  current value prior dt:', tashurstreslowres(i,(itas-1)*Nlhursrng+ihurs,j)
+!            PRINT *,'  all values:', tashurstreslowres(i,:,j)
+!          END IF
+          tashurstreslowres(i,(itas-1)*Nlhursrng+ihurs,j) =                                           &
+            tashurstreslowres(i,(itas-1)*Nlhursrng+ihurs,j) + dt
 #endif
 #endif
 
@@ -1965,8 +1980,8 @@ CONTAINS
             CALL wrf_debug(75,msg)
 #endif
 #if CDXWRF==3
-            WRITE(msg,*)'    tashurstreshighres: ',tashurstreshighres(i,j,INT(Nhtasrng/2*Nhhursrng/2)),&
-              ' tashurstreslowres: ', tashurstreslowres(i,j,INT(Nltasrng/2*Nlhursrng/2))
+            WRITE(msg,*)'    tashurstreshighres: ',tashurstreshighres(i,INT(Nhtasrng/2*Nhhursrng/2),j),&
+              ' tashurstreslowres: ', tashurstreslowres(i,INT(Nltasrng/2*Nlhursrng/2),j)
             CALL wrf_debug(75,msg)
 #endif
 #endif
