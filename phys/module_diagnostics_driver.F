@@ -1442,6 +1442,7 @@ CONTAINS
 #endif
 
          ! Input
+                    ,LON=grid%xlong, LAT=grid%xlat                         &
                     ,CLDFRA=grid%cldfra, p8w=p8w, P=grid%p, PB=grid%pb     &
                     ,PCLT=grid%pclt                                        &
                     ,PCLL=grid%pcll, PCLM=grid%pclm, PCLH=grid%pclh        &

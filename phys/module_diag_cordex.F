@@ -205,6 +205,7 @@ CONTAINS
 #endif
 #endif
                    ! Input
+                      lon, lat,                                                                       &
                       cldfra, p8w, p, pb,                                                             &
                       pclt, pcll, pclm, pclh,                                                         &
                       qv, qc, qr, qs, qi, qg, qh,                                                     &
@@ -390,6 +391,8 @@ CONTAINS
 !   Richardson number [default])
 !
 ! ------- INPUT vars -------
+! lon: longitude
+! lat: latitude
 ! cldfra: cloud fraction [1]
 ! pclt: previous radt call total cloudiness [1]
 ! pcll: previous radt call low level cloudiness (p >= 68000 Pa) [1]
@@ -636,6 +639,7 @@ CONTAINS
   REAL, DIMENSION(Nlhursrng), INTENT(in)                 :: hurslrng
 #endif
 #endif
+  REAL, DIMENSION(ims:ime,jms:jme), INTENT(in)           :: lon, lat
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(in)           :: mu, mub, sina, cosa
   REAL, DIMENSION(kms:kme), INTENT(in)                   :: deta
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(in)           :: u10, v10, q2, t2, th2, ps, qsfc
@@ -1480,6 +1484,8 @@ CONTAINS
           IF (dbg_level >= 75 .AND. ijdbg) THEN
             WRITE(msg,*) '  ' // TRIM(fname) // ' ',i,' ,',j,' : first value checks _______' 
             CALL wrf_debug(75,msg)
+            WRITE(msg,*) '    longitude:', lon(i,j),' latitude:',lat(i,j)
+            CALL wrf_debug(75,msg)
             WRITE(msg,*) '    nsteps:', nsteps
             CALL wrf_debug(75,msg)
             WRITE(msg,*) '    clt:', clt(i,j), ' mean:', cltmean(i,j)
@@ -1834,13 +1840,17 @@ CONTAINS
           ! Checking consistency
           ! L. Fita, January 2024. Removed for efficiency
           !   If you encounter problems with the variable, remove it and re-compile without clean -a
-!          IF (ijdbg) THEN
-!            PRINT *,'  i,j:', i,j
-!            PRINT *,'  highres Nhtasrng:', Nhtasrng, ' Nhhursrng:', Nhhursrng
-!            PRINT *,'  highres itas, ihurs:', itas, ihurs, 'khighrestashurs:', (itas-1)*Nhhursrng+ihurs
-!            PRINT *,'  current value prior dt:', tashurstreshighres(i,(itas-1)*Nhhursrng+ihurs,j)
+          IF (ijdbg) THEN
+            PRINT *,'  longitude:', lon(i,j),' latitude:',lat(i,j)
+            PRINT *,'  highres i,j:', i,j, ' t2:', t2(i,j), ' ps:', ps(i,j), ' q2:', q2(i,j),         &
+              '=> hurs:', hurs(i,j)
+            PRINT *,'  highres tas bin:', tashrng(itas-1), '- ', tashrng(itas)
+            PRINT *,'  highres hurs bin:', hurshrng(ihurs-1), '- ', hurshrng(ihurs)
+            PRINT *,'  highres Nhtasrng:', Nhtasrng, ' Nhhursrng:', Nhhursrng
+            PRINT *,'  highres itas, ihurs:', itas, ihurs, 'khighrestashurs:', (itas-1)*Nhhursrng+ihurs
+            PRINT *,'  current value prior dt:', tashurstreshighres(i,(itas-1)*Nhhursrng+ihurs,j)
 !            PRINT *,'  all values:', tashurstreshighres(i,:,j)
-!          END IF
+          END IF
           tashurstreshighres(i,(itas-1)*Nhhursrng+ihurs,j) =                                          &
             tashurstreshighres(i,(itas-1)*Nhhursrng+ihurs,j) + dt
           CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nltasrng, Nlhursrng, taslrng, hurslrng,   &
@@ -1848,13 +1858,15 @@ CONTAINS
           ! Checking consistency
           ! L. Fita, January 2024. Removed for efficiency
           !   If you encounter problems with the variable, remove it and re-compile without clean -a
-!          IF (ijdbg) THEN
-!            PRINT *,'  i,j:', i,j
-!            PRINT *,'  lowres Nltasrng:', Nltasrng, ' Nlhursrng:', Nlhursrng
-!            PRINT *,'  lowres itas, ihurs:', itas, ihurs, 'klowrestashurs:', (itas-1)*Nlhursrng+ihurs
-!            PRINT *,'  current value prior dt:', tashurstreslowres(i,(itas-1)*Nlhursrng+ihurs,j)
+          IF (ijdbg) THEN
+            PRINT *,'  lowres i,j:', i,j, ' t2:', t2(i,j),' hurs:', hurs(i,j)
+            PRINT *,'  lowres tas bin:', taslrng(itas-1), '- ', taslrng(itas)
+            PRINT *,'  lowres hurs bin:', hurslrng(ihurs-1), '- ', hurslrng(ihurs)
+            PRINT *,'  lowres Nltasrng:', Nltasrng, ' Nlhursrng:', Nlhursrng
+            PRINT *,'  lowres itas, ihurs:', itas, ihurs, 'klowrestashurs:', (itas-1)*Nlhursrng+ihurs
+            PRINT *,'  current value prior dt:', tashurstreslowres(i,(itas-1)*Nlhursrng+ihurs,j)
 !            PRINT *,'  all values:', tashurstreslowres(i,:,j)
-!          END IF
+          END IF
           tashurstreslowres(i,(itas-1)*Nlhursrng+ihurs,j) =                                           &
             tashurstreslowres(i,(itas-1)*Nlhursrng+ihurs,j) + dt
 #endif
@@ -1862,6 +1874,8 @@ CONTAINS
 
           IF (dbg_level >= 75 .AND. ijdbg) THEN
             WRITE(msg,*) '  ' // TRIM(fname) // ' ',i,' ,',j,' : intermediate checks _______' 
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*) '    longitude:', lon(i,j),' latitude:',lat(i,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*) '    nsteps:', nsteps
             CALL wrf_debug(75,msg)
