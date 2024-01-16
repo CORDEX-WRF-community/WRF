@@ -874,6 +874,7 @@ CONTAINS
     i2(ij) = INT(0.5*(i_start(ij) + i_end(ij)))
     j2(ij) = INT(0.5*(j_start(ij) + j_end(ij)))
   END DO
+  !$OMP END PARALLEL DO
   k2 = 0.5*(kms+kme)
 
   ! Computing accumulative variables 
@@ -1219,6 +1220,7 @@ CONTAINS
       END DO
     END DO
   END DO
+  !$OMP END PARALLEL DO
 
   ! cloud fraction is only updated when the radiative scheme is called !
   ijdbg = .FALSE.
@@ -1247,6 +1249,8 @@ CONTAINS
         ijdbg = .FALSE.
       END DO
     END DO
+    !$OMP END PARALLEL DO
+    
   ELSE
     clt = pclt
     cll = pcll
@@ -1610,6 +1614,8 @@ CONTAINS
         ENDDO
       ENDDO
     ENDDO
+    !$OMP END PARALLEL DO
+
   ELSE
     xtimep = xtime + dt/60.   ! value at end of timestep for time info
     nsteps=nsteps+1
@@ -2006,6 +2012,7 @@ CONTAINS
         ENDDO
       ENDDO
     ENDDO
+    !$OMP END PARALLEL DO
 
   END IF 
 
@@ -2390,6 +2397,8 @@ CONTAINS
         ENDDO
       ENDDO
     ENDDO
+    !$OMP END PARALLEL DO
+
   END IF
 
   END SUBROUTINE cordex_output_calc
