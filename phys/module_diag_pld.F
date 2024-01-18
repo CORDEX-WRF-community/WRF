@@ -709,7 +709,7 @@ CONTAINS
     Nrightlevs = 0
     hgts(1) = topo
     DO k=1, dpres
-      DO ko = 1, dz
+      DO ko = 1, dz-1
         ! Filtering to avoid 'below ground' and 'above atmos top' interpolation values
         IF (oripres(ko) >= despressv(k) .AND. oripres(ko+1) < despressv(k) .AND.                      &
             psfc > despressv(k) .AND. ptop < despressv(k)) THEN
