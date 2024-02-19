@@ -813,7 +813,7 @@ CONTAINS
   REAL                                                   :: hus_kts, zg_kts, huss_hm 
   REAL                                                   :: taz2, qcs
   REAL, DIMENSION(3)                                     :: cllmh, varlmh
-  REAL, DIMENSION(ims:ime,kms:kme,jms:jme)               :: unu, unv, th
+  REAL, DIMENSION(ims:ime,kms:kme,jms:jme)               :: unu, unv, th, geopoth
   REAL, DIMENSION(ims:ime,jms:jme)                       :: mutot
   REAL, DIMENSION(kms:kme)                               :: qvar, zagl, ri, qsolid
   REAL, DIMENSION(ims:ime,kms:kme+1,jms:jme)             :: stzg
@@ -894,6 +894,8 @@ CONTAINS
 
         ! geopotential height
         CALL var_zg(ph(i,:,j), phb(i,:,j), dimz1, dimz, stzg(i,:,j), zg(i,:,j))
+        ! geopotential height as [m2s-2]
+        geopoth = zg(i,:,j)*g
 
         ! air-temperature
         CALL var_ta(thp(i,:,j), press(i,:,j), dimz, ta(i,:,j))
@@ -912,7 +914,7 @@ CONTAINS
 
           IF (ijdbg) CALL wrf_debug(50,msg)
           ! Brasseur methodology 
-          CALL gustwind_Brasseur01(dimz, zg(i,:,j), qv(i,:,j), qc(i,:,j), th(i,:,j), tke(i,:,j),      &
+          CALL gustwind_Brasseur01(dimz, geopoth(i,:,j), qv(i,:,j), qc(i,:,j), th(i,:,j), tke(i,:,j), &
             unu(i,:,j), unv(i,:,j), pblh(i,j), hgt(i,j), sina(i,j), cosa(i,j), ugustwind(i,j),        &
             vgustwind(i,j), gustpoint(i,j))
           ugustwindb01(i,j) = ugustwind(i,j)
@@ -2136,7 +2138,7 @@ CONTAINS
           hus_kts = qv(i,kts,j)/(1.0+qv(i,kts,j))
           
           ! zg_kts = zg(i,kts,j)/g (It should be gravity maybe from model_constants)
-          zg_kts = zg(i,kts,j)/9.81
+          zg_kts = zg(i,kts,j)
           CALL SFCDIAGS_ORCHIDEE1D( u(i,kms:kme,j), v(i,kms:kme,j), t(i,kms:kme,j), hus_kts,          &
             zg_kts, p_phy(i,kms:kme,j),                                                               &
             ts(i,j), qsfc(i,j), znt(i,j), ps(i,j),                                                    &
