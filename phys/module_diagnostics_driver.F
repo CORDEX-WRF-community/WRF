@@ -1477,7 +1477,12 @@ CONTAINS
                     ,TS=grid%tsk, ALBEDO=grid%albedo                       &
                     ,EMISS=grid%emiss                                      &
                     ,SR=grid%sr                                            &
-                    ,CHS=grid%ch, CDA=grid%cda, BR=grid%br, ZOL=grid%zol   &
+                    ! we are going to assume that drag coefficients for momentum and heat are the same 
+                    ! it is scheme dependent, but at his level we are going simple
+                    !   CHS = CDM
+                    ! From Registry/Regisyty,EM_COMMON
+                    !   "ch"                "surface exchange coeff for heat"    "m s-1"
+                    ,CHS=grid%ch, CDM=grid%ch, BR=grid%br, ZOL=grid%zol    &
 #ifdef CDXWRF
 #if CDXWRF==1
 
