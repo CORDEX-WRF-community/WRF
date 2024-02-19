@@ -895,7 +895,7 @@ CONTAINS
         ! geopotential height
         CALL var_zg(ph(i,:,j), phb(i,:,j), dimz1, dimz, stzg(i,:,j), zg(i,:,j))
         ! geopotential height as [m2s-2]
-        geopoth = zg(i,:,j)*g
+        geopoth(i,:,j) = zg(i,:,j)*g
 
         ! air-temperature
         CALL var_ta(thp(i,:,j), press(i,:,j), dimz, ta(i,:,j))
