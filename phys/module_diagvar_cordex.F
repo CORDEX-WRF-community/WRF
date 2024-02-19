@@ -3764,7 +3764,7 @@ MODULE module_diagvar_cordex
                            kms, kme, kts, kte,                                                        &
                            t_2m, q_2m)
 
-     ! Surface diagnostics of t2 and q2 from the ORCHIDEE land model
+     ! Surface diagnostics of t2 and q2 from the LMDZ GCM (old version)
 
      IMPLICIT NONE
       
@@ -3802,6 +3802,23 @@ MODULE module_diagvar_cordex
 !conversion humidite specifique
      REAL                                                :: qs
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!!!!!! Variables
+! u1: eastward wind speed at the first atmospheric layer [ms-1]
+! v1: northward wind speed at the first atmospheric layer [ms-1]
+! t1: air temperature at the first atmospheric layer [K]
+! q1: water vapour mixing ratio at the first atmospheric layer [kgkg-1]
+! z1: geopotential at the first atmospheric layer [m]
+! ps1: air pressure at the first atmospheric layer [Pa]
+! ts1: surface temperature [K]
+! qsurf: surface water vapour [kgkg-1]
+! rugos: rugossity [-]
+! psol: surface pressure [Pa]
+! cdrah: drag coefficien for heat [-]
+! cdram: drag coefficient for momentum [-]
+! ri1: Richardson number at the first atmospheric layer [-]
+! ustar: U* in similarity theroy [ms-1]
+! lmon: Monin-Obukhov length [-]
 
      speed=SQRT(u1(kts)**2+v1(kts)**2)
 !
