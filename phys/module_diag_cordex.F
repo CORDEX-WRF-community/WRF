@@ -227,7 +227,7 @@ CONTAINS
                       swdnt, swupt, lwupt,                                                            &
                       ts, albedo, emiss,                                                              &
                       sr,                                                                             &
-                      chs, cda, br, zol,                                                              &
+                      chs, cdm, br, zol,                                                              &
 #ifdef CDXWRF
 #if CDXWRF>=1
 #endif
@@ -467,8 +467,8 @@ CONTAINS
 ! albedo: surface land albedo [1]
 ! emiss: surface emissivity [1]
 ! sr: fraction of frozen precipitation [1]
-! chs: surface exchange coeeficient for heat [ms-1]
-! cda: Drag coefficient at the lowest model level [-]
+! chs: surface exchange coeeficient for heat [-]
+! cdm: surface exchange coefficient for momentum [-]
 ! br: Bulk Richardson number [-]
 ! zol: Characteristic length (z/L) [-]
 
@@ -656,7 +656,7 @@ CONTAINS
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(in)           :: swdnt, swupt, lwupt
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(in)           :: ts, albedo, emiss
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(in)           :: sr
-  REAL, DIMENSION(ims:ime,jms:jme), INTENT(in)           :: chs, cda, br, zol
+  REAL, DIMENSION(ims:ime,jms:jme), INTENT(in)           :: chs, cdm, br, zol
 
   REAL, INTENT(in)                                       :: DT, XTIME
   REAL, INTENT(in)                                       :: curr_secs2, radt
@@ -2142,7 +2142,7 @@ CONTAINS
           CALL SFCDIAGS_ORCHIDEE1D( u(i,kms:kme,j), v(i,kms:kme,j), t(i,kms:kme,j), hus_kts,          &
             zg_kts, p_phy(i,kms:kme,j),                                                               &
             ts(i,j), qsfc(i,j), znt(i,j), ps(i,j),                                                    &
-            chs(i,j), cda(i,j), br(i,j), ust(i,j), zol(i,j),                                          &
+            chs(i,j), cdm(i,j), br(i,j), ust(i,j), zol(i,j),                                          &
             kms, kme, kts, kte,                                                                       &
             tas_hm(i,j), huss_hm)
           qvs_hm(i,j) = huss_hm/(1.0-huss_hm)
