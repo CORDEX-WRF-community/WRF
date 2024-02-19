@@ -440,51 +440,58 @@ CONTAINS
             ! density
             rho(1:dzstag-1) = 1. / alt(i,kts:kte-2,j)
             CALL massconserv_vinterp1D(dzstag-1, ohgts(1:dzstag-1), dzstag, obthgts(1:dzstag),        &
-              rho(1:dzstag-1), Nright, rightdespressv, Nright+1, bthgts(1:num_press_levels+1), rhodes)
+              rho(1:dzstag-1), Nright, rightdespressv(1:Nright), Nright+1,                            &
+              bthgts(1:num_press_levels+1), rhodes(1:Nright))
 
             ! qv: Water vapour 
             massv(1:dzstag-1) = qv(i,kts:kte-2,j) * rho(1:dzstag-1)
             CALL massconserv_vinterp1D(dzstag-1, ohgts(1:dzstag-1), dzstag, obthgts(1:dzstag),        &
-              massv, Nright, rightdespressv, Nright+1, bthgts(1:num_press_levels+1), valsdes)
-
+              massv(1:dzstag-1), Nright, rightdespressv, Nright+1, bthgts(1:num_press_levels+1),      &
+              valsdes(1:Nright))
             ! There is no way to perform extrapolatoin below ground, so, fill since the first right level
-            qv_pl_mc(i,fstrightlevel:fstrightlevel+Nright,j) = valsdes(1:Nright) / rhodes(1:Nright)
+            qv_pl_mc(i,fstrightlevel:fstrightlevel+Nright-1,j) = valsdes(1:Nright) / rhodes(1:Nright)
 
             ! qc: cloud
             massv(1:dzstag-1) = iqc(i,kts:kte-2,j) * rho(1:dzstag-1)
             CALL massconserv_vinterp1D(dzstag-1, ohgts(1:dzstag-1), dzstag, obthgts(1:dzstag),        &
-              massv, Nright, rightdespressv(1:Nright), Nright+1, bthgts(1:num_press_levels+1), valsdes)
-            qc_pl_mc(i,fstrightlevel:fstrightlevel+Nright,j) = valsdes(1:Nright) / rhodes(1:Nright)
+              massv(1:dzstag-1), Nright, rightdespressv(1:Nright), Nright+1,                          &
+              bthgts(1:num_press_levels+1), valsdes(1:Nright))
+            qc_pl_mc(i,fstrightlevel:fstrightlevel+Nright-1,j) = valsdes(1:Nright) / rhodes(1:Nright)
 
             ! qr: rain
             massv(1:dzstag-1) = iqr(i,kts:kte-2,j) * rho(1:dzstag-1)
             CALL massconserv_vinterp1D(dzstag-1, ohgts(1:dzstag-1), dzstag, obthgts(1:dzstag),        &
-              massv, Nright, rightdespressv, Nright+1, bthgts(1:num_press_levels+1), valsdes)
-            qr_pl_mc(i,fstrightlevel:fstrightlevel+Nright,j) = valsdes(1:Nright) / rhodes(1:Nright)
+              massv(1:dzstag-1), Nright, rightdespressv(1:Nright), Nright+1,                          &
+              bthgts(1:num_press_levels+1), valsdes(1:Nright))
+            qr_pl_mc(i,fstrightlevel:fstrightlevel+Nright-1,j) = valsdes(1:Nright) / rhodes(1:Nright)
 
             ! qs: snow
             massv(1:dzstag-1) = iqs(i,kts:kte-2,j) * rho(1:dzstag-1)
             CALL massconserv_vinterp1D(dzstag-1, ohgts(1:dzstag-1), dzstag, obthgts(1:dzstag),        &
-              massv, Nright, rightdespressv, Nright+1, bthgts(1:num_press_levels+1), valsdes)
-            qs_pl_mc(i,fstrightlevel:fstrightlevel+Nright,j) = valsdes(1:Nright) / rhodes(1:Nright)
+              massv(1:dzstag-1), Nright, rightdespressv(1:Nright), Nright+1,                          &
+              bthgts(1:num_press_levels+1), valsdes(1:Nright))
+            qs_pl_mc(i,fstrightlevel:fstrightlevel+Nright-1,j) = valsdes(1:Nright) / rhodes(1:Nright)
 
             ! qi: ice
             massv(1:dzstag-1) = iqi(i,kts:kte-2,j) * rho(1:dzstag-1)
             CALL massconserv_vinterp1D(dzstag-1, ohgts(1:dzstag-1), dzstag, obthgts(1:dzstag),        &
-              massv, Nright, rightdespressv, Nright+1, bthgts(1:num_press_levels+1), valsdes)
-            qi_pl_mc(i,fstrightlevel:fstrightlevel+Nright,j) = valsdes(1:Nright) / rhodes(1:Nright)
+              massv(1:dzstag-1), Nright, rightdespressv(1:Nright), Nright+1,                          &
+              bthgts(1:num_press_levels+1), valsdes(1:Nright))
+            qi_pl_mc(i,fstrightlevel:fstrightlevel+Nright-1,j) = valsdes(1:Nright) / rhodes(1:Nright)
 
             ! qg: graupel
             massv(1:dzstag-1) = iqg(i,kts:kte-2,j) * rho(1:dzstag-1)
             CALL massconserv_vinterp1D(dzstag-1, ohgts(1:dzstag-1), dzstag, obthgts(1:dzstag),        &
-              massv, Nright, rightdespressv, Nright+1, bthgts(1:num_press_levels+1), valsdes)
-            qg_pl_mc(i,fstrightlevel:fstrightlevel+Nright,j) = valsdes(1:Nright) / rhodes(1:Nright)
+              massv(1:dzstag-1), Nright, rightdespressv(1:Nright), Nright+1,                          &
+              bthgts(1:num_press_levels+1), valsdes(1:Nright))
+            qg_pl_mc(i,fstrightlevel:fstrightlevel+Nright-1,j) = valsdes(1:Nright) / rhodes(1:Nright)
 
             ! qh: hail
             massv(1:dzstag-1) = iqh(i,kts:kte-2,j) * rho(1:dzstag-1)
             CALL massconserv_vinterp1D(dzstag-1, ohgts(1:dzstag-1), dzstag, obthgts(1:dzstag),        &
-              massv, Nright, rightdespressv, Nright+1, bthgts(1:num_press_levels+1), valsdes)
-            qh_pl_mc(i,fstrightlevel:fstrightlevel+Nright,j) = valsdes(1:Nright) / rhodes(1:Nright)
+              massv(1:dzstag-1), Nright, rightdespressv(1:Nright), Nright+1,                          &
+              bthgts(1:num_press_levels+1), valsdes(1:Nright))
+            qh_pl_mc(i,fstrightlevel:fstrightlevel+Nright-1,j) = valsdes(1:Nright) / rhodes(1:Nright)
 
 #endif
 
@@ -709,7 +716,7 @@ CONTAINS
     Nrightlevs = 0
     hgts(1) = topo
     DO k=1, dpres
-      DO ko = 1, dz-1
+      DO ko = 1, dz
         ! Filtering to avoid 'below ground' and 'above atmos top' interpolation values
         IF (oripres(ko) >= despressv(k) .AND. oripres(ko+1) < despressv(k) .AND.                      &
             psfc > despressv(k) .AND. ptop < despressv(k)) THEN
