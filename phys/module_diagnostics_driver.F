@@ -1482,7 +1482,7 @@ CONTAINS
                     !   CHS = CDM
                     ! From Registry/Regisyty,EM_COMMON
                     !   "ch"                "surface exchange coeff for heat"    "m s-1"
-                    ,CHS=grid%ch, CDM=grid%ch, BR=grid%br, ZOL=grid%zol    &
+                    ,CHS=grid%ch, CDM=grid%cd, BR=grid%br, ZOL=grid%zol    &
 #ifdef CDXWRF
 #if CDXWRF==1
 
