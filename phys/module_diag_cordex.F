@@ -2142,7 +2142,7 @@ CONTAINS
           CALL SFCDIAGS_ORCHIDEE1D( u(i,kms:kme,j), v(i,kms:kme,j), t(i,kms:kme,j), hus_kts,          &
             zg_kts, p_phy(i,kms:kme,j),                                                               &
             ts(i,j), qsfc(i,j), znt(i,j), ps(i,j),                                                    &
-            chs(i,j), cd_gen(i,j), br(i,j), ust(i,j), zol(i,j),                                       &
+            chs(i,j), cdgen(i,j), br(i,j), ust(i,j), zol(i,j),                                        &
             kms, kme, kts, kte,                                                                       &
             tas_hm(i,j), huss_hm)
           qvs_hm(i,j) = huss_hm/(1.0-huss_hm)
