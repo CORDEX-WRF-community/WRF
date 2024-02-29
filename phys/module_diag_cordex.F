@@ -31,7 +31,7 @@ MODULE module_diag_cordex
 !!! huss: 2m specific humidty [1]
 !!! psl: sea level pressure [Pa]
 !!! tas_hm: 2-m air temperature using corrector-calculator (Hess-McAvaney, 1995) method [K]
-!!! qv_or: 2-m water vapour mixing ratio using corrector-calculator (Hess-McAvaney, 1995) method [kgkg-1]
+!!! qv_hm: 2-m water vapour mixing ratio using corrector-calculator (Hess-McAvaney, 1995) method [kgkg-1]
 !!! cape: CAPE [Jkg-1]
 !!! cin: CIN [Jkg-1]
 !!! zlfc: Height at LFC [m]
@@ -111,7 +111,7 @@ MODULE module_diag_cordex
 !!! rsut: mean top of the Atmosphere (TOA) outgoing shortwave radiation [kgm-2]
 !!! rlut: mean top of the Atmosphere (TOA) outgoing Longwave radiation [kgm-2]
 !!! tas_hm: 2-m air temperature using corrector-calculator (Hess-McAvaney, 1995) method [K]
-!!! qv_or: 2-m water vapour mixing ratio using corrector-calculator (Hess-McAvaney, 1995) method [kgkg-1]
+!!! qv_hm: 2-m water vapour mixing ratio using corrector-calculator (Hess-McAvaney, 1995) method [kgkg-1]
 !!! capemin: minimum CAPE [Jkg-1]
 !!! cinmin: minimum CIN [Jkg-1]
 !!! zlfcmin: minimum height at LFC [m]
@@ -996,7 +996,7 @@ CONTAINS
           WRITE(msg,*) '  ' // TRIM(fname) // ': computing z-wind at:', zhgtzw, ' m'
           IF (ijdbg) CALL wrf_debug(50,msg)
 
-          ! Height abovce surface at half-mass levels
+          ! Height above surface at half-mass levels
           zsfc = zg(i,:,j)-hgt(i,j)
           wsz100diag: SELECT CASE (wsz100_diag)
             CASE (dwsz100powerlaw)
@@ -2142,7 +2142,7 @@ CONTAINS
           CALL SFCDIAGS_ORCHIDEE1D( u(i,kms:kme,j), v(i,kms:kme,j), t(i,kms:kme,j), hus_kts,          &
             zg_kts, p_phy(i,kms:kme,j),                                                               &
             ts(i,j), qsfc(i,j), znt(i,j), ps(i,j),                                                    &
-            chs(i,j), cdgen(i,j), br(i,j), ust(i,j), zol(i,j),                                        &
+            chs(i,j)/(uas(i,j)**2+vas(i,j)**2), cdgen(i,j), br(i,j), ust(i,j), zol(i,j),              &
             kms, kme, kts, kte,                                                                       &
             tas_hm(i,j), huss_hm)
           qvs_hm(i,j) = huss_hm/(1.0-huss_hm)
