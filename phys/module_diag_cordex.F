@@ -1082,6 +1082,10 @@ CONTAINS
 #if CDXWRF>=1
         ! relative humidity
         CALL var_hur(t(i,:,j), press(i,:,j), qv(i,:,j), dimz, hur(i,:,j))
+        ! Diagnostics of relative humidity from AFWA's module
+        !DO k=kms, kme
+        !  hur(i,k,j) = calc_rh ( p_phy(i,k,j), t(i,k,j), qv(i,k,j) ) / 100.
+        !END DO
 
         ! Extremes of convection indices
         IF (convxtrm_diag == 1) THEN
@@ -1092,7 +1096,7 @@ CONTAINS
             WRITE(msg,*) '  ' // TRIM(fname) // ': computing CAPE diagnostic'
             IF (ijdbg) CALL wrf_debug(50,msg)
 
-            CALL var_cape_afwa(dz1, t(i,1:dz1,j), hur(i,1:dz1,j), press(i,1:dz1,j), zg(i,1:dz1,j),    &
+            CALL var_cape_afwa(dz1, t(i,1:dz1,j), hur(i,1:dz1,j)*100., p_phy(i,1:dz1,j), z(i,1:dz1,j),&
               1, cape(i,j), cin(i,j), zlfc(i,j), plfc(i,j), lidx(i,j), 3)
             ! Giving it as height above ground
             IF (zlfc(i,j) /= -1.) zlfc(i,j) = zlfc(i,j) - hgt(i,j)
@@ -2226,7 +2230,7 @@ CONTAINS
 ! L. Fita, January 2018. CIMA
 !! Changing to subroutine
           IF (convxtrm_diag == 0) THEN
-            CALL var_cape_afwa(dz1, t(i,1:dz1,j), hur(i,1:dz1,j), press(i,1:dz1,j), zg(i,1:dz1,j),    &
+            CALL var_cape_afwa(dz1, t(i,1:dz1,j), hur(i,1:dz1,j)*100., press(i,1:dz1,j), z(i,1:dz1,j),&
               1, cape(i,j), cin(i,j), zlfc(i,j), plfc(i,j), lidx(i,j), 3)
             ! Giving it as height above ground
             IF (zlfc(i,j) /= -1.) zlfc(i,j) = zlfc(i,j) - hgt(i,j)

@@ -169,7 +169,48 @@ MODULE module_diagvar_cordex
 
 !
 ! L. Fita, CIMA. Jan 2018
-! ---- BEGIN modified from module_diag_afwa.F ---- !
+! ---- BEGIN modified from module_diag_afwa.F / module_diag_functions.F ---- !
+
+  !!!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!!!
+  !~ 
+  !~ Name:
+  !~    calc_rh
+  !~
+  !~ Description:
+  !~    This function calculates relative humidity given pressure, 
+  !~    temperature, and water vapor mixing ratio.
+  !~ 
+  !!!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!!!
+  FUNCTION calc_rh ( p, t, qv ) result ( rh )
+    
+    IMPLICIT NONE
+ 
+    REAL, INTENT(IN) :: p, t, qv
+    REAL :: rh
+
+    ! Local
+    ! -----
+    REAL, PARAMETER :: pq0=379.90516
+    REAL, PARAMETER :: a2=17.2693882
+    REAL, PARAMETER :: a3=273.16
+    REAL, PARAMETER :: a4=35.86
+    REAL, PARAMETER :: rhmin=1.
+    REAL :: q, qs
+    INTEGER :: i,j,k
+  
+    ! Following algorithms adapted from WRFPOST
+    ! May want to substitute with another later
+    ! -----------------------------------------
+      q=qv/(1.0+qv)
+      qs=pq0/p*exp(a2*(t-a3)/(t-a4))
+      rh=100.*q/qs
+      IF (rh .gt. 100.) THEN
+        rh=100.
+      ELSE IF (rh .lt. rhmin) THEN
+        rh=rhmin
+      ENDIF
+
+  END FUNCTION calc_rh
 
   !!!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!!!
   !~
@@ -3772,7 +3813,7 @@ MODULE module_diagvar_cordex
 
 
      REAL , DIMENSION(kms:kme) , INTENT(in)              :: u1, v1, t1, ps1
-     REAL , INTENT(in)                                   :: z1, q1, ts1, qsurf, rugos, cdrah, cdram 
+     REAL , INTENT(in)                                   :: q1, z1, ts1, qsurf, rugos, cdrah, cdram 
      REAL , INTENT(in)                                   :: ri1, psol, ustar, lmon
 !
      REAL , INTENT(inout)                                :: t_2m, q_2m
@@ -3891,6 +3932,12 @@ MODULE module_diagvar_cordex
      q_2m = q_zref_p * ok_pred + q_zref_c * ok_corr
      qs = pq0/psol*exp(a2*(t_2m-a3)/(t_2m-a4))         
      q_2m = MIN(qs, q_2m)
+     
+     ! Capping the diagnostics to prevent large values
+     t_2m = MIN(t_2m, t1(kts))
+     t_2m = MIN(t_2m, ts1)
+     q_2m = MIN(q_2m, q1)
+     q_2m = MAX(q_2m, qsurf)
 
      RETURN
 
