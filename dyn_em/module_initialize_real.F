@@ -1420,6 +1420,25 @@ integer::oops1,oops2
                             ims , ime , jms , jme , 1   , num_metgrid_levels , &
                             its , ite , jts , jte , 1   , num_metgrid_levels )
 
+         ! L. Fita. CIMA, Ene 2024. Checking for missing values
+         DO j = jts, MIN(jte,jde-1)
+           DO k = num_metgrid_levels-1 , 1 , -1
+             DO i = its, MIN(ite,ide-1)
+               IF (grid%pd_gc(i,k,j) /= grid%pd_gc(i,k,j)) THEN
+                 PRINT *, ' NaN values of dry pressure at surface pd_gc at point i,j,k', i,j,k
+                 PRINT *, '     values of ght_gc:', grid%ght_gc(i,k,j)
+                 PRINT *, '     values of p_gc:', grid%p_gc(i,k,j)
+                 PRINT *, '     values of ht:', grid%ht(i,j)
+                 PRINT *, '     values of pslv_qc:', grid%pslv_gc(i,j)
+                 PRINT *, '     values of qv_gc:', grid%qv_gc(i,k,j)
+                 PRINT *, '     values of t_gc:', grid%t_gc(i,k,j)
+                 PRINT *, '     values of psfc:',  grid%psfc(i,j)
+                 PRINT *, '     values of intq_gc:', grid%intq_gc(i,j)
+               END IF
+             END DO
+           END DO
+         END DO
+
          !  If this is UM data, the same moisture removed from the "theta" level pressure data can
          !  be removed from the "rho" level pressures.  This is an approximation.  We'll revisit to
          !  see if this is a bad idea.
@@ -1428,6 +1447,7 @@ integer::oops1,oops2
             DO j = jts, MIN(jte,jde-1)
                DO k = num_metgrid_levels-1 , 1 , -1
                   DO i = its, MIN(ite,ide-1)
+
                      IF ( skip_middle_points_t ( ids , ide , jds , jde , i , j , em_width , hold_ups ) ) CYCLE
                      ptemp = ((grid%p_gc(i,k,j) - grid%pd_gc(i,k,j)) + (grid%p_gc(i,k+1,j) - grid%pd_gc(i,k+1,j)))/2
                      grid%pdrho_gc(i,k,j) = grid%prho_gc(i,k,j) - ptemp
