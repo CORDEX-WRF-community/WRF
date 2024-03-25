@@ -3825,6 +3825,7 @@ MODULE module_diagvar_cordex
      INTEGER                                             :: i, j, n
      REAL                                                :: zref
      REAL                                                :: speed
+     REAL                                                :: tasmin, qvsmin, tasmax, qvsmax
 ! tpot : temperature potentielle
      REAL                                                :: tpot
      REAL                                                :: zri1
@@ -3934,11 +3935,16 @@ MODULE module_diagvar_cordex
      q_2m = MIN(qs, q_2m)
      
      ! Capping the diagnostics to prevent large values
-     t_2m = MIN(t_2m, t1(kts))
-     t_2m = MIN(t_2m, ts1)
-     q_2m = MIN(q_2m, q1)
-     q_2m = MAX(q_2m, qsurf)
-
+     tasmin = MIN(t1(kts), ts1)
+     qvsmin = MIN(q1, qsurf)
+     tasmax = MAX(t1(kts), ts1)
+     qvsmax = MAX(q1, qsurf)
+     
+     IF (t_2m < tasmin) t_2m = tasmin
+     IF (q_2m < qvsmin) q_2m = qvsmin
+     IF (t_2m > tasmax) t_2m = tasmin
+     IF (q_2m > qvsmax) q_2m = qvsmax
+     
      RETURN
 
    END subroutine SFCDIAGS_ORCHIDEE1D
