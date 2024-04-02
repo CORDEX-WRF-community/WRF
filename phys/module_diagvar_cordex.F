@@ -2512,9 +2512,8 @@ MODULE module_diagvar_cordex
       ! Stable (0 < zL < 1)
       univ_func = 0.74 + 4.7*zL
     ELSE
-      ! Undefined (zL < 2. .OR. zL > 1.)
-      PRINT *,'  ' // TRIM(fname) // ': undefined regime zL < 2. .OR. zL > 1. !!'
-      PRINT *,'     zL=', zL
+      ! Undefined (zL < -2. .OR. zL > 1.)
+      PRINT *,'  ' // TRIM(fname) // ': undefined regime zL < -2. .OR. zL > 1. !!, zL=', zL
       univ_func = 0.
     END IF
     
@@ -2555,8 +2554,11 @@ MODULE module_diagvar_cordex
     END IF
     
     CALL univ_func_scal_Businger71(zL, ufunc)
+    IF (ufunc == 0.) THEN
+      PRINT *,'    ' // TRIM(fname) // ': Monin-Obukhov length L', L, ' z', z
+    END IF
 
-    IF (zL > 0.) THEN
+    IF (zL >= 0.) THEN
       ! Stable case
       stabfunc_busingerv = 1.- ufunc
     ELSE IF (zL < 0.) THEN
@@ -2564,8 +2566,6 @@ MODULE module_diagvar_cordex
       X = 1./ufunc
       !stabfunc_busingerv = -2.*LOG((1.+X)/2.)-LOG((1.+X**2)/2.)+2.*ATAN(X)-piconst/2.
       stabfunc_busingerv = LOG( ((1.+X)/2.)**2. )
-    ELSE
-      stabfunc_busingerv = 0.
     END IF
 
     RETURN
@@ -2620,15 +2620,15 @@ MODULE module_diagvar_cordex
 !! NOT SURE if it should be z0 instead?
 ! znt: thermal time-varying roughness length [m]
 ! rmol: inverse of Obukhov length [m-1]
-! topo: topographical height
+! topo: topographical height [m]
 ! 
     sfname = 'var_ztaqv_MOtheor'
 
     ! 1.- /\ta' = ta(k+1) - ta(k)
     
     k = 1
-    hgt = z(k)-hgt
-    hgtp1 = z(k+1)-hgt
+    hgt = z(k)-topo
+    hgtp1 = z(k+1)-topo
     
     delta_ta = ta(k+1)-ta(k)
     delta_qv = qv(k+1)-qv(k)
@@ -2641,7 +2641,7 @@ MODULE module_diagvar_cordex
     !   OL: Obukhov length, stab.: stability
 
     ! Obukhov Length (using the Boussinesq approximation)
-    OL = 1/rmol
+    OL = 1./rmol
 
     ! Stability function
     CALL stabfunc_scalar_businger(hgt, OL, stability)
