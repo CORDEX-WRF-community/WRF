@@ -2501,6 +2501,11 @@ MODULE module_diagvar_cordex
     IF (zL > -2. .AND. zL < 0.) THEN
       ! Unstable 
       univ_func = 0.74*(1. - 9.*zL)**(-0.5)
+    ELSE IF (zL == 0.) THEN
+      ! Neutral
+      !! From table 2.7 after T. Foken, 2008, 'Micrometeorology', ed. Springer, 
+      !   ISBN: 978-3-540-74665-2, e-ISBN: 978-3-540-74666-9
+      univ_func = 1.
     ELSE
       ! Stable
       univ_func = 0.74 + 4.7*zL
