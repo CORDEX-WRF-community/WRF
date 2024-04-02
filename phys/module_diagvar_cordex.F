@@ -2505,10 +2505,17 @@ MODULE module_diagvar_cordex
       ! Neutral
       !! From table 2.7 after T. Foken, 2008, 'Micrometeorology', ed. Springer, 
       !   ISBN: 978-3-540-74665-2, e-ISBN: 978-3-540-74666-9
-      univ_func = 1.
-    ELSE
-      ! Stable
+      ! univ_func = 1.
+      ! Although in Businger et al. 1971
+      univ_func = 0.74
+    ELSE IF (zL > 0. .AND. zL < 1.) THEN
+      ! Stable (0 < zL < 1)
       univ_func = 0.74 + 4.7*zL
+    ELSE
+      ! Undefined (zL < 2. .OR. zL > 1.)
+      PRINT *,'  ' // TRIM(fname) // ': undefined regime zL < 2. .OR. zL > 1. !!'
+      PRINT *,'     zL=', zL
+      univ_func = 0.
     END IF
     
     RETURN
@@ -2517,6 +2524,12 @@ MODULE module_diagvar_cordex
 
   SUBROUTINE stabfunc_scalar_businger(z, L, stabfunc_busingerv)
   ! Subroutine of the stability function after Businger et al. (1971), JAS, 28(2), 181-189
+  !   NOTE: In Businger's article is said in page 185 right column after equation 18 
+  !    "... In the atmosphere, the temperature gradient usually vanishes at 100 m or so under
+  !    unstable conditions, and there is a tendency for this height to decrease with increasing 
+  !    instability... Therefore if Eq. (16) describes the correct height dependence for conditions
+  !    approaching and incluing free convection, a new scale has to be introduced to replace u*."
+  !  Therefore, ther is an inherent potential missbehaour of this approximation (L. Fita)
 
     IMPLICIT NONE
 
@@ -2543,7 +2556,7 @@ MODULE module_diagvar_cordex
     
     CALL univ_func_scal_Businger71(zL, ufunc)
 
-    IF (zL >= 0.) THEN
+    IF (zL > 0.) THEN
       ! Stable case
       stabfunc_busingerv = 1.- ufunc
     ELSE IF (zL < 0.) THEN
@@ -2584,7 +2597,7 @@ MODULE module_diagvar_cordex
     REAL, INTENT(out)                                    :: taznew, qvznew
 
 ! Local
-    INTEGER                                              :: k
+    INTEGER                                              :: k, kclosest
     REAL, PARAMETER                                      :: kappa = 0.35
     REAL                                                 :: hgt, hgtp1
     REAL                                                 :: delta_ta, delta_ta2
@@ -2593,6 +2606,7 @@ MODULE module_diagvar_cordex
     REAL                                                 :: stability, stabilityp1, stabilitynewz
     REAL                                                 :: tast, qvst
     REAL                                                 :: wsz, alpha
+    REAL                                                 :: minta, minqv, maxta, maxqv
     REAL, DIMENSION(2)                                   :: uvnewz
 
 !!!!!!! Variables
@@ -2649,8 +2663,23 @@ MODULE module_diagvar_cordex
       qvznew = qvst/kappa*( LOG(hgt/newz) - stabilitynewz + stability) + qv(k)
     ELSE
       taznew = ta(k)
-      qvznew = qv(k) 
+      qvznew = qv(k)
     END IF
+    
+    ! Checking for consistency, limiting the extrapolated value to the range of values at k, k+1
+    minta = MIN(ta(k), ta(k+1))
+    minqv = MIN(qv(k), qv(k+1))
+    maxta = MAX(ta(k), ta(k+1))
+    maxqv = MAX(qv(k), qv(k+1))
+    IF (ABS(hgt - newz) < ABS(hgtp1 - newz)) THEN
+      kclosest = k
+    ELSE
+      kclosest = k+1    
+    END IF
+    IF (taznew < minta) taznew = ta(kclosest)
+    IF (qvznew < minqv) qvznew = qv(kclosest)
+    IF (taznew > maxta) taznew = ta(kclosest)
+    IF (qvznew > maxta) qvznew = qv(kclosest)
     
     RETURN
 
