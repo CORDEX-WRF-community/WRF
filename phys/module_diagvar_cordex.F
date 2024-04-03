@@ -2513,7 +2513,7 @@ MODULE module_diagvar_cordex
       univ_func = 0.74 + 4.7*zL
     ELSE
       ! Undefined (zL < -2. .OR. zL > 1.)
-      PRINT *,'  ' // TRIM(fname) // ': undefined regime zL < -2. .OR. zL > 1. !!, zL=', zL
+      !PRINT *,'  ' // TRIM(fname) // ': undefined regime zL < -2. .OR. zL > 1. !!, zL=', zL
       univ_func = 0.
     END IF
     
@@ -2630,57 +2630,66 @@ MODULE module_diagvar_cordex
     hgt = z(k)-topo
     hgtp1 = z(k+1)-topo
     
-    delta_ta = ta(k+1)-ta(k)
-    delta_qv = qv(k+1)-qv(k)
+    ! We can only apply the technique within Monin-Obukhov range, therfore
+    IF (hgt*rmol > -2. .AND. hgt*rmol < 1. .AND. hgtp1*rmol > -2. .AND. hgtp1*rmol < 1.) THEN
+
+      delta_ta = ta(k+1)-ta(k)
+      delta_qv = qv(k+1)-qv(k)
     
-    ! 2.- infer ta*
-    !  ta* = kappa*(delta_ta) / (ln(hgtp1/hgt) - Psi_scalar(hgt/OL) +  Psi_scalar(hgtp1/OL))
-    !
-    !  Psi_scalar: stability functions for scalars, Psi=func(phi(z,OL,stab.)), phi: universal function
-    !     (Businger, 19671)
-    !   OL: Obukhov length, stab.: stability
+      ! 2.- infer ta*
+      !  ta* = kappa*(delta_ta) / (ln(hgtp1/hgt) - Psi_scalar(hgt/OL) +  Psi_scalar(hgtp1/OL))
+      !
+      !  Psi_scalar: stability functions for scalars, Psi=func(phi(z,OL,stab.)), phi: universal function
+      !     (Businger, 19671)
+      !   OL: Obukhov length, stab.: stability
 
-    ! Obukhov Length (using the Boussinesq approximation)
-    OL = 1./rmol
+      ! Obukhov Length (using the Boussinesq approximation)
+      OL = 1./rmol
 
-    ! Stability function
-    CALL stabfunc_scalar_businger(hgt, OL, stability)
-    CALL stabfunc_scalar_businger(hgtp1, OL, stabilityp1)
+      ! Stability function
+      CALL stabfunc_scalar_businger(hgt, OL, stability)
+      CALL stabfunc_scalar_businger(hgtp1, OL, stabilityp1)
 
-    tast = kappa*(delta_ta)/(LOG(hgtp1/hgt) - stability + stabilityp1)
-    qvst = kappa*(delta_qv)/(LOG(hgtp1/hgt) - stability + stabilityp1)
+      tast = kappa*(delta_ta)/(LOG(hgtp1/hgt) - stability + stabilityp1)
+      qvst = kappa*(delta_qv)/(LOG(hgtp1/hgt) - stability + stabilityp1)
     
-    ! 3.+4.- /\ta' = ta(k) - ta(kd)
-    !   ta(kd) = ta(hgt) - ta*/kappa*(ln(hgt/newz) - Psi_scalar(hgt/OL) + Psi_scalar(newz/OL)) 
+      ! 3.+4.- /\ta' = ta(k) - ta(kd)
+      !   ta(kd) = ta(hgt) - ta*/kappa*(ln(hgt/newz) - Psi_scalar(hgt/OL) + Psi_scalar(newz/OL)) 
     
-    CALL stabfunc_scalar_businger(newz, OL, stabilitynewz)
+      CALL stabfunc_scalar_businger(newz, OL, stabilitynewz)
 
-    IF (hgt > newz) THEN
-      taznew = ta(k) - tast/kappa*( LOG(hgt/newz) - stabilitynewz + stability)
-      qvznew = qv(k) - qvst/kappa*( LOG(hgt/newz) - stabilitynewz + stability)
-    ELSE IF (hgt < newz) THEN
-      taznew = tast/kappa*( LOG(hgt/newz) - stabilitynewz + stability) + ta(k)
-      qvznew = qvst/kappa*( LOG(hgt/newz) - stabilitynewz + stability) + qv(k)
+      IF (hgt > newz) THEN
+        taznew = ta(k) - tast/kappa*( LOG(hgt/newz) - stabilitynewz + stability)
+        qvznew = qv(k) - qvst/kappa*( LOG(hgt/newz) - stabilitynewz + stability)
+      ELSE IF (hgt < newz) THEN
+        taznew = tast/kappa*( LOG(hgt/newz) - stabilitynewz + stability) + ta(k)
+        qvznew = qvst/kappa*( LOG(hgt/newz) - stabilitynewz + stability) + qv(k)
+      ELSE
+        taznew = ta(k)
+        qvznew = qv(k)
+      END IF
+
+      ! Checking for consistency, limiting the extrapolated value to the range of values at k, k+1
+      minta = MIN(ta(k), ta(k+1))
+      minqv = MIN(qv(k), qv(k+1))
+      maxta = MAX(ta(k), ta(k+1))
+      maxqv = MAX(qv(k), qv(k+1))
+      IF (ABS(hgt - newz) < ABS(hgtp1 - newz)) THEN
+        kclosest = k
+      ELSE
+        kclosest = k+1    
+      END IF
+      IF (taznew < minta) taznew = ta(kclosest)
+      IF (qvznew < minqv) qvznew = qv(kclosest)
+      IF (taznew > maxta) taznew = ta(kclosest)
+      IF (qvznew > maxta) qvznew = qv(kclosest)
+
     ELSE
-      taznew = ta(k)
-      qvznew = qv(k)
+      ! Linear interpolation. Something better?
+      taznew = interpolate1D(dz, z-topo, ta, 50.)
+      qvznew = interpolate1D(dz, z-topo, qv, 50.)
     END IF
-    
-    ! Checking for consistency, limiting the extrapolated value to the range of values at k, k+1
-    minta = MIN(ta(k), ta(k+1))
-    minqv = MIN(qv(k), qv(k+1))
-    maxta = MAX(ta(k), ta(k+1))
-    maxqv = MAX(qv(k), qv(k+1))
-    IF (ABS(hgt - newz) < ABS(hgtp1 - newz)) THEN
-      kclosest = k
-    ELSE
-      kclosest = k+1    
-    END IF
-    IF (taznew < minta) taznew = ta(kclosest)
-    IF (qvznew < minqv) qvznew = qv(kclosest)
-    IF (taznew > maxta) taznew = ta(kclosest)
-    IF (qvznew > maxta) qvznew = qv(kclosest)
-    
+        
     RETURN
 
   END SUBROUTINE var_ztaqv_MOtheor
