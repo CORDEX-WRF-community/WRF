@@ -2554,9 +2554,9 @@ MODULE module_diagvar_cordex
     END IF
     
     CALL univ_func_scal_Businger71(zL, ufunc)
-    IF (ufunc == 0.) THEN
-      PRINT *,'    ' // TRIM(fname) // ': Monin-Obukhov length L', L, ' z', z
-    END IF
+    !IF (ufunc == 0.) THEN
+    !  PRINT *,'    ' // TRIM(fname) // ': Monin-Obukhov length L', L, ' z', z
+    !END IF
 
     IF (zL >= 0.) THEN
       ! Stable case
