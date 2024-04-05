@@ -1010,8 +1010,9 @@ CONTAINS
             CASE (dwsz100MO)
               WRITE(msg,*) '  ' // TRIM(fname) // ': wsz100 diagnostic= ', wsz100_diag,               &
                ' Monin-Obukhov theory'
-              CALL var_zwind_MOtheor(ust(i,j), znt(i,j), rol(i,j), u10(i,j), v10(i,j), sina(i,j),     &
-                cosa(i,j), zhgtzw, uz100wind(i,j), vz100wind(i,j))
+              CALL var_zwind_MOtheor(dimz, unu(i,:,j), unv(i,:,j), zg(i,:,j), hgt(i,j), ust(i,j),     &
+                znt(i,j), rol(i,j), u10(i,j), v10(i,j), sina(i,j), cosa(i,j), zhgtzw, uz100wind(i,j), &
+                vz100wind(i,j))
             CASE DEFAULT
               WRITE (msg,*) '  ' // TRIM(fname) // ": ERROR -- error -- ERROR -- error : type " //    &
                  "of z-wind diagnostic 'wsz100_diag=", wsz100_diag, "' not ready !! " // CHAR(10) //  &
@@ -1022,8 +1023,9 @@ CONTAINS
           wsz100(i,j) = SQRT(uz100wind(i,j)*uz100wind(i,j) + vz100wind(i,j)*vz100wind(i,j))
 
           ! 50 m
-          CALL var_zwind_MOtheor(ust(i,j), znt(i,j), rol(i,j), u10(i,j), v10(i,j), sina(i,j),         &
-            cosa(i,j), z50_diag, uz50wind(i,j), vz50wind(i,j))
+          CALL var_zwind_MOtheor(dimz, unu(i,:,j), unv(i,:,j), zg(i,:,j), hgt(i,j), ust(i,j),         &
+            znt(i,j), rol(i,j), u10(i,j), v10(i,j), sina(i,j), cosa(i,j), z50_diag, uz50wind(i,j),    &
+            vz50wind(i,j))
           wsz50(i,j) = SQRT(uz50wind(i,j)*uz50wind(i,j) + vz50wind(i,j)*vz50wind(i,j))
 
           CALL var_ztaqv_MOtheor(dimz, t(i,:,j), qv(i,:,j), zg(i,:,j), ust(i,j), znt(i,j), rol(i,j),  &

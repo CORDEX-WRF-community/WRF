@@ -2694,15 +2694,19 @@ MODULE module_diagvar_cordex
 
   END SUBROUTINE var_ztaqv_MOtheor
 
-  SUBROUTINE var_zwind_MOtheor(ust, znt, rmol, u10, v10, sa, ca, newz, uznew, vznew)
+  SUBROUTINE var_zwind_MOtheor(dz, ua, va, z, topo, ust, znt, rmol, u10, v10, sa, ca, newz, uznew,    &
+    vznew)
   ! Subroutine of wind extrapolation following Moin-Obukhov theory R. B. Stull, 1988, 
   !   Springer (p376-383)
-  ! NOTE only usefull for newz < 80. m
+  ! NOTE only usefull for newz < 80. m and within turbelence driven layer
+  !     newz/L > -2. & newz/L < 1.
 
     IMPLICIT NONE
 
-    REAL, INTENT(in)                                     :: ust, znt, rmol, u10, v10, sa, ca
+    INTEGER, INTENT(in)                                  :: dz
+    REAL, INTENT(in)                                     :: topo, ust, znt, rmol, u10, v10, sa, ca
     REAL, INTENT(in)                                     :: newz
+    REAL, DIMENSION(dz), INTENT(in)                      :: ua, va, z
     REAL, INTENT(out)                                    :: uznew, vznew
 
 ! Local
@@ -2712,6 +2716,10 @@ MODULE module_diagvar_cordex
     REAL, DIMENSION(2)                                   :: uvnewz
 
 !!!!!!! Variables
+! dz: amount of vertical layers
+! ua,va: 3D wind speed [ms-1]
+! z: height of the levels [m]
+! topo: topography [m]
 ! ust: u* in similarity theory [ms-1]
 ! z0: roughness length [m]
 !!! L. Fita, CIMA. Feb. 2018
@@ -2724,19 +2732,29 @@ MODULE module_diagvar_cordex
 ! 
     sfname = 'var_zwind_MOtheor'
 
-    ! Obukhov Length (using the Boussinesq approximation giving Tv from t2)
-    OL = 1/rmol
+        ! We can only apply the technique within Monin-Obukhov range, therfore
+    IF (newz*rmol > -2. .AND. newz*rmol < 1.) THEN
 
-    ! Wind speed at desired height
-    CALL stabfunc_businger(newz,OL,stability)
-    wsz = ust/karman*( LOG(newz/znt) + stability)
+      ! Obukhov Length (using the Boussinesq approximation giving Tv from t2)
+      OL = 1/rmol
 
-    ! Without taking into account rotation of winds due to Ekman pumping, etc... redistributed by 
-    !   components unsing 10-m wind as reference...
-    alpha = ATAN2(v10,u10)
-    uvnewz(1) = wsz*COS(alpha)
-    uvnewz(2) = wsz*SIN(alpha)
+      ! Wind speed at desired height
+      CALL stabfunc_businger(newz,OL,stability)
+      wsz = ust/karman*( LOG(newz/znt) + stability)
 
+      ! Without taking into account rotation of winds due to Ekman pumping, etc... redistributed by 
+      !   components unsing 10-m wind as reference...
+      alpha = ATAN2(v10,u10)
+      uvnewz(1) = wsz*COS(alpha)
+      uvnewz(2) = wsz*SIN(alpha)
+      
+    ELSE
+      ! Linear interpolation. Something better?
+      uznew = interpolate1D(dz, z-topo, ua, 50.)
+      vznew = interpolate1D(dz, z-topo, va, 50.)
+    
+    END IF
+    
     ! Earth-rotation
     uznew = uvnewz(1)*ca - uvnewz(2)*sa
     vznew = uvnewz(1)*sa + uvnewz(2)*ca
