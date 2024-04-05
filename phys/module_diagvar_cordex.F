@@ -2686,8 +2686,8 @@ MODULE module_diagvar_cordex
 
     ELSE
       ! Linear interpolation. Something better?
-      taznew = interpolate1D(dz, z-topo, ta, 50.)
-      qvznew = interpolate1D(dz, z-topo, qv, 50.)
+      taznew = interpolate1D(dz, z-topo, ta, newz)
+      qvznew = interpolate1D(dz, z-topo, qv, newz)
     END IF
         
     RETURN
@@ -2750,8 +2750,8 @@ MODULE module_diagvar_cordex
       
     ELSE
       ! Linear interpolation. Something better?
-      uznew = interpolate1D(dz, z-topo, ua, 50.)
-      vznew = interpolate1D(dz, z-topo, va, 50.)
+      uvnewz(1) = interpolate1D(dz, z-topo, ua, newz)
+      uvnewz(2) = interpolate1D(dz, z-topo, va, newz)
     
     END IF
     
