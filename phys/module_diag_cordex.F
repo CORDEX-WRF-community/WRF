@@ -275,7 +275,7 @@ CONTAINS
 
 #endif
 #if CDXWRF==1
-                      lidxmin, lidxmax, lidxmean                                                      &
+                      lidxmin, lidxmax, lidxmean,                                                     &
 #endif
 #if CDXWRF>=2
                       lidxmin, lidxmax, lidxmean,                                                     &
@@ -2221,8 +2221,8 @@ CONTAINS
             IF (ijdbg) CALL wrf_debug(50,msg)
             !   here is used qcs = from Monin-Obukhov similarity theory 
             qsolid = qs(i,:,j) + qi(i,:,j) + qg(i,:,j) + qh(i,:,j)
-            CALL var_bulk_Ri(dimz, th(i,:,j), qv(i,:,j), qc(i,:,j), qsolid, z(i,:,j), ua(i,:,j),      &
-              va(i,:,j), t(i,:,j), ust(i,j), ri)
+            CALL var_bulk_Ri(dimz, th(i,:,j), qv(i,:,j), qc(i,:,j), qsolid, z(i,:,j), unu(i,:,j),     &
+              unv(i,:,j), t(i,:,j), ust(i,j), ri)
             CALL var_zmla_RIgen(dimz, ri, zg(i,:,j), hgt(i,j), 0.25, zmla(i,j))
           END IF
 
