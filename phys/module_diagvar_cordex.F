@@ -3549,8 +3549,10 @@ MODULE module_diagvar_cordex
     REAL, INTENT(in)                                     :: xpos
     
     ! Local
-    INTEGER                                              :: i
+    INTEGER                                              :: i, ip, iclosest
+    REAL(r_k)                                            :: mindist, avi, avip
     REAL                                                 :: vi, vip, dx, dy, a, b
+    LOGICAL                                              :: found
     CHARACTER(len=50)                                    :: fname
     
 !!!!!!! Variables
@@ -3563,18 +3565,51 @@ MODULE module_diagvar_cordex
 
     interpolate1D = 1.e20
   
+    found = .FALSE.
+    iclosest = -1
+    mindist = 1000000.
+  
     DO i=1, Nvals-1
+      ip = i + 1
       vi = xvals(i) - xpos
-      vip = xvals(i+1) - xpos
+      vip = xvals(ip) - xpos
+      avi = ABS(vi)
+      avip = ABS(vip)      
+      IF (avi < mindist) THEN
+        mindist = avi
+        iclosest = i
+      END IF
+      IF (avip < mindist) THEN
+        mindist = avip
+        iclosest = ip
+      END IF
+      
       IF (vi*vip <= 0.) THEN
-        dx = xvals(i+1)-xvals(i)
-        dy = yvals(i+1)-yvals(i)
-        a = (xvals(i+1)*yvals(i)-xvals(i)*yvals(i+1))/dx
+        dx = xvals(ip)-xvals(i)
+        dy = yvals(ip)-yvals(i)
+        a = (xvals(ip)*yvals(i)-xvals(i)*yvals(ip))/dx
         b = dy/dx
         interpolate1D = a + xpos*b
+        found = .TRUE.
         EXIT
       END IF
     END DO
+    
+    ! Case where xpos does not lay within 2 consecutive xvals
+    IF (.NOT.found) THEN
+      IF (iclosest == Nvals) THEN
+        i = Nvals-1
+        ip = Nvals
+      ELSE
+        i = iclosest
+        ip = iclosest + 1
+      END IF
+      dx = xvals(ip)-xvals(i)
+      dy = yvals(ip)-yvals(i)
+      a = (xvals(ip)*yvals(i)-xvals(i)*yvals(ip))/dx
+      b = dy/dx
+      interpolate1D = a + xpos*b
+    END IF
 
     RETURN
 
