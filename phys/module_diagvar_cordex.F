@@ -3566,19 +3566,15 @@ MODULE module_diagvar_cordex
     interpolate1D = 1.e20
   
     found = .FALSE.
-    iclosest = -1
-    mindist = 1000000.
   
+    avi = ABS(xvals(1) - xpos)
+    iclosest = 1    
+    mindist = avi
     DO i=1, Nvals-1
       ip = i + 1
       vi = xvals(i) - xpos
       vip = xvals(ip) - xpos
-      avi = ABS(vi)
       avip = ABS(vip)      
-      IF (avi < mindist) THEN
-        mindist = avi
-        iclosest = i
-      END IF
       IF (avip < mindist) THEN
         mindist = avip
         iclosest = ip
