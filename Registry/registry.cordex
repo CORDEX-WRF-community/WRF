@@ -25,8 +25,8 @@ rconfig   integer zmlagen_diag            namelist,cordex       1              2
 ##CDXWRF3##rconfig   integer nltasrng                namelist,cordex       1              21      rh    "nltasrng"                 "amount + 1 of low-resolution bins for temporal residence of tas"   ""
 ##CDXWRF3##rconfig   integer nlhursrng               namelist,cordex       1              25      rh    "nlhursrng"                "amount + 1 of low-resolution bins for temporal residence of hurs"  ""
 ## L. Fita, so, WRF output will provide a (n[h/l]tasrng*n[h/l]hursrng) 3D variable instead
-##CDXWRF3##rconfig   integer nhtashursrng                namelist,cordex       1              950      rh    "nhtashursrng"                 "amount + 1 of high-resolution bins for temporal residence of tas and hurs (nhtas+1)*(nhhurs+1)"   ""
-##CDXWRF3##rconfig   integer nltashursrng                namelist,cordex       1              525      rh    "nltashursrng"                 "amount + 1 of low-resolution bins for temporal residence of tas and hurs (nltas+1)*(nlhurs+1)"   ""
+##CDXWRF3##rconfig   integer nhtashursrng            namelist,cordex       1              950      rh    "nhtashursrng"                 "amount + 1 of high-resolution bins for temporal residence of tas and hurs (nhtas+1)*(nhhurs+1)"   ""
+##CDXWRF3##rconfig   integer nltashursrng            namelist,cordex       1              525      rh    "nltashursrng"                 "amount + 1 of low-resolution bins for temporal residence of tas and hurs (nltas+1)*(nlhurs+1)"   ""
 ### This is not working, but I left it here for reference
 ##CDXWRF3##rconfig   real    htasrng                namelist,cordex       max_lbins      (/173.15,268.15,269.15,270.15,271.15,272.15,273.15,274.15,275.15,276.15,277.15,278.15,279.15,280.15,281.15,282.15,283.15,284.15,285.15,286.15,287.15,288.15,289.15,290.15,291.15,292.15,293.15,294.15,295.15,296.15,297.15,298.15,299.15,300.15,301.15,302.15,303.15,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00/) rh    "htasrng"                  "high-resolution bins for temporal residence of tas"   ""
 ##CDXWRF3##rconfig   real    hhursrng               namelist,cordex       max_lbins      (/0.00,0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50,0.55,0.60,0.65,0.70,0.75,0.80,0.85,0.90,0.95,1.00,1.05,1.10,1.15,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00/)      rh    "hhursrng"                 "high-resolution bins for temporal residence of hurs"  ""
@@ -35,8 +35,9 @@ rconfig   integer zmlagen_diag            namelist,cordex       1              2
 
 # CORDEX variables
 state    integer  cdxnsteps      -      misc        -         -       r       "cdxnsteps"             "CORDEX Time Step Counter"                                ""
-state    real  CDXLON           ij      misc        1         -      h9       "lon"                   "LONGITUDE"                                               "degrees_east"
-state    real  CDXLAT           ij      misc        1         -      h9       "lat"                   "LATITUDE"                                                "degrees_north"
+state    integer  cdxhfnsteps    -      misc        -         -       r       "cdxhfnsteps"           "CORDEX High-Frequemcy Time Step Counter"                 ""
+state    real  CDXLON           ij      misc        1         -      h89      "lon"                   "LONGITUDE"                                               "degrees_east"
+state    real  CDXLAT           ij      misc        1         -      h89      "lat"                   "LATITUDE"                                                "degrees_north"
 state    real  PCLT             ij      misc        1         -      r        "pclt"                  "PREVIOUS TOTAL CLOUDINESS"                               "%"
 state    real  PCLL             ij      misc        1         -      r        "pcll"                  "PREVIOUS LOW-LEVEL CLOUDINESS (p >= 68000 Pa)"           "%"
 state    real  PCLM             ij      misc        1         -      r        "pclm"                  "PREVIOUS MID-LEVEL CLOUDINESS (44000 <= p < 68000 Pa)"   "%"
@@ -101,6 +102,7 @@ state    real  MRROS            ij      misc        1         -      rh9      "m
 state    real  MRRO             ij      misc        1         -      rh9      "mrro"                  "mean total Runoff"                                       "kgm-2s-1" 
 state    real  MRSOL            ij      misc        1         -      rh9      "mrsol"                 "mean total water content of soil layer"                  "kgm-2"
 state    real  pr               ij      misc        1         -      rh9      "pr"                    "precipitation flux"                                      "kgm-2s-1"
+state    real  prhf             ij      misc        1         -      rh8      "prhf"                  "precipitation flux"                                      "kgm-2s-1"
 state    real  prl              ij      misc        1         -      rh9      "prl"                   "large scale precipitation flux"                          "kgm-2s-1"
 state    real  prc              ij      misc        1         -      rh9      "prc"                   "convective precipitation flux"                           "kgm-2s-1"
 state    real  prsh             ij      misc        1         -      rh9      "prsh"                  "shallow-cumulus precipitation flux"                           "kgm-2s-1"
@@ -141,6 +143,7 @@ state    real  qvs_hm           ij      misc        1         -      rh9      "q
 ##CDXWRF1##state    real  IUTMEAN          ij      misc        1         -      rh9      "iutmean"               "mean vertically integrated eastward transport of water vapour"                             "kgm-1s-1"
 ##CDXWRF1##state    real  IVTMEAN          ij      misc        1         -      rh9      "ivtmean"               "mean vertically integrated northward transport of water vapour"                             "kgm-1s-1"
 ##CDXWRF1##state    real  ZEROISOTHERM     ij      misc        1         -       h9      "zeroisotherm"          "height above ground of the 0-isotherm"                                      "m"
+##CDXWRF1##state    real  COLMAX           ij      misc        1         -       h8      "colmax"                "instantaneous maximum radar reflectivity in the column"                     "dBz"
 
 # Instantaneous values. If one require them into the output, modify the second '-' by 'h9'
 ##CDXWRF1##state    real  IUT              ij      misc        1         -      -        "iut"                   "instantaneous vertically integrated eastward transport of water vapour"                              "kgm-1s-1"
