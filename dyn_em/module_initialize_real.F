@@ -3101,7 +3101,7 @@ integer::oops1,oops2
               ENDIF
 
               IF ( grid%FRC_URB2D(i,j) == 0. ) THEN
-                 IF ( (MMINLU == 'NLCD40' .OR. MMINLU == 'MODIFIED_IGBP_MODIS_NOAH') .AND. &
+                 IF ( (MMINLU == 'NLCD40') .AND. &
                    (grid%ivgtyp(i,j)==24 .OR. grid%ivgtyp(i,j)==25 .OR. grid%ivgtyp(i,j)==26 .OR. grid%ivgtyp(i,j)==13) ) grid%FRC_URB2D(i,j) = 0.9
                  IF ( MMINLU == 'USGS' .AND. grid%ivgtyp(i,j)==1 ) grid%FRC_URB2D(i,j) = 0.9
               ENDIF
