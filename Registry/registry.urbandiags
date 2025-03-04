@@ -1,13 +1,68 @@
+# Dimensions
+dimspec    umap_1   2     namelist=num_urban_nz            z     num_urban_nz
+dimspec    umap_2   2     namelist=num_urban_types         z     num_urban_types
+dimspec    umap_3   2     namelist=num_urban_ng            z     num_urban_ng
+
+
 # Diagnostics for urban studies
 
-state    real     tasupav        ij     misc        -         -       h12     "tasupav"          "Near-surface temperature urban pavements"     "K"
-state    real     tasuroof       ij     misc        -         -       h12     "tasuroof"         "Near-surface temperature urban roof"          "K"
-state    real     tasugreen      ij     misc        -         -       h12     "tasugreen"        "Near-surface temperature urban green spaces"  "K"
-state    real     tasublue       ij     misc        -         -       h12     "tasublue"         "Near-surface temperature urban blue spaces"   "K"
-state    real     antropohfx     ij     misc        -         -       h12     "antropohfx"       "Anthropogenic urban heat flux"                "Jkg-2s-1"
-state    real     tsku           ij     misc        -         -       h12     "utsk"             "urban skin temperature"                       "K"
-state    real     tskupav        ij     misc        -         -       h12     "tskupav"          "Surface temperature urban pavements"          "K"
-state    real     tskuroof       ij     misc        -         -       h12     "tskuroof"         "Surface temperature urban roof"               "K"
-state    real     tskugreen      ij     misc        -         -       h12     "tskugreen"        "Surface temperature urban green spaces"       "K"
-state    real     tskublue       ij     misc        -         -       h12     "tskublue"         "Surface temperature urban blue spaces"        "K"
+state    real     tasupav        ij     misc        -         -       h{12}     "tasupav"          "Near-surface temperature urban pavements"     "K"
+state    real     tasuroof       ij     misc        -         -       h{12}     "tasuroof"         "Near-surface temperature urban roof"          "K"
+state    real     tasugreen      ij     misc        -         -       h{12}     "tasugreen"        "Near-surface temperature urban green spaces"  "K"
+state    real     tasublue       ij     misc        -         -       h{12}     "tasublue"         "Near-surface temperature urban blue spaces"   "K"
+state    real     antropohfx     ij     misc        -         -       h{12}     "antropohfx"       "Anthropogenic urban heat flux"                "Jkg-2s-1"
+state    real     tsku           ij     misc        -         -       h{12}     "utsk"             "urban skin temperature"                       "K"
+state    real     tskupav        ij     misc        -         -       h{12}     "tskupav"          "Surface temperature urban pavements"          "K"
+state    real     tskuroof       ij     misc        -         -       h{12}     "tskuroof"         "Surface temperature urban roof"               "K"
+state    real     tskugreen      ij     misc        -         -       h{12}     "tskugreen"        "Surface temperature urban green spaces"       "K"
+state    real     tskublue       ij     misc        -         -       h{12}     "tskublue"         "Surface temperature urban blue spaces"        "K"
+
+# Masks along compressed urban dimensions (1: value, 0: no value)
+state    integer urban_map_zrd_mask    i{umap1}j   misc       1         Z     rh{12}      "urban_map_zrd_mask"       "urban_map_zrd MASK (1: value, 0: no value)"        "1"
+state    integer urban_map_zwd_mask    i{umap2}j   misc       1         Z     rh{12}      "urban_map_zwd_mask"       "urban_map_zwd MASK (1: value, 0: no value)"        "1"
+state    integer urban_map_gd_mask     i{umap3}j   misc       1         Z     rh{12}      "urban_map_gd_mask"        "urban_map_gd MASK (1: value, 0: no value)"         "1"
+state    integer urban_map_zd_mask     i{umap4}j   misc       1         Z     rh{12}      "urban_map_zd_mask"        "urban_map_zd MASK (1: value, 0: no value)"         "1"
+state    integer urban_map_zdf_mask    i{umap5}j   misc       1         Z     rh{12}      "urban_map_zdf_mask"       "urban_map_zdf MASK (1: value, 0: no value)"        "1"
+state    integer urban_map_bd_mask     i{umap6}j   misc       1         Z     rh{12}      "urban_map_bd_mask"        "urban_map_bd MASK (1: value, 0: no value)"         "1"
+state    integer urban_map_wd_mask     i{umap7}j   misc       1         Z     rh{12}      "urban_map_wd_mask"        "urban_map_wd MASK (1: value, 0: no value)"         "1"
+state    integer urban_map_gbd_mask    i{umap8}j   misc       1         Z     rh{12}      "urban_map_gbd_mask"       "urban_map_gbd MASK (1: value, 0: no value)"        "1"
+state    integer urban_map_fbd_mask    i{umap9}j   misc       1         Z     rh{12}      "urban_map_fbd_mask"       "urban_map_fbd MASK (1: value, 0: no value)"        "1"
+state    integer urban_map_zgrd_mask   i{umap10}j  misc       1         Z     rh{12}      "urban_map_zgrd_mask"      "urban_map_zgrd MASK (1: value, 0: no value)"       "1"
+
+# Diagnostics from urban modules outputs with some colapsed dimensions
+#   Choose between:
+#       urban_nz: amount of urban vertical layers, remove ##urban_nz## and introduce in configure.wrf -DURBANCOLAPSE="urban_nz"
+#       urban_ndm: amount of street directions, remove ##urban_ndm## and introduce in configure.wrf -DURBANCOLAPSE="urban_ndm"
+##urban_nz##state    real   SFG_URB3D_colapsed     i{umap_1}j   misc       1         Z     rh{12}      "SFG_URB3D_colapsed"       "URBAN LEVELS COLAPSED SENSIBLE HEAT FLUX FROM URBAN SFC"        "W m{-2}"
+##urban_nz##state    real   DG_URB3D_colapsed      i{umap_1}j   misc       1         Z     rh{12}      "DG_URB4D_colapsed"        "URBAN LEVELS COLAPSED ROOF LAYER DEPTH WATER RETENTION"         "mm"
+##urban_nz##state    real   LFG_URB3D_colapsed     i{umap_1}j   misc       1         Z     rh{12}      "LFG_URB3D_colapsed"       "URBAN LEVELS COLAPSED LATENT HEAT FLUX FROM URBAN SFC"          "W m{-2}"
+##urban_nz##state    real   TRB_URB4D_colapsed     i{umap_1}j   misc       1         Z     rh{12}      "TRB_URB4D_colapsed"       "URBAN LEVELS COLAPSED ROOF LAYER TEMPERATURE"                   "K"
+##urban_nz##state    real   TW1_URB4D_colapsed     i{umap_1}j   misc       1         Z     rh{12}      "TW1_URB4D_colapsed"       "URBAN LEVELS COLAPSED WALL LAYER TEMPERATURE"                   "K"
+##urban_nz##state    real   TW2_URB4D_colapsed     i{umap_1}j   misc       1         Z     rh{12}      "TW2_URB4D_colapsed"       "URBAN LEVELS COLAPSED WALL LAYER TEMPERATURE"                   "K"
+##urban_nz##state    real   TGB_URB4D_colapsed     i{umap_3}j   misc       1         Z     rh{12}      "TGB_URB4D_colapsed"       "URBAN LEVELS COLAPSED ROAD LAYER TEMPERATURE"                   "K"
+##urban_nz##state    real   SFW1_URB3D_colapsed    i{umap_1}j   misc       1         Z     rh{12}      "SFW1_URB3D_colapsed"      "SURBAN LEVELS COLAPSED ENSIBLE HEAT FLUX FROM URBAN SFC"        "W m{-2}"
+##urban_nz##state    real   SFW2_URB3D_colapsed    i{umap_1}j   misc       1         Z     rh{12}      "SFW2_URB3D_colapsed"      "URBAN LEVELS COLAPSED SENSIBLE HEAT FLUX FROM URBAN SFC"        "W m{-2}"
+##urban_nz##state    real   SFR_URB3D_colapsed     i{umap_1}j   misc       1         Z     rh{12}      "SFR_URB3D_colapsed"       "URBAN LEVELS COLAPSED SENSIBLE HEAT FLUX FROM URBAN SFC"        "W m{-2}"
+##urban_nz##state    real   T_PV_URB3D_colapsed    i{umap_1}j   misc       1         -     rh{12}      "T_PV_URB3D_colapsed"      "URBAN LEVELS COLAPSED PHOTOVOLTAIC PANELS TEMPERATURE "         "K" !PVP
+##urban_nz##state    real   DRAIN_URB4D_colapsed   i{umap_1}j   misc       1         Z     rh{12}      "DRAIN_URB4D_colapsed"     "URBAN LEVELS COLAPSED GREEN ROOF DRAINAGE"                      "mm"
+##urban_nz##state    real   SFRV_URB3D_colapsed    i{umap_1}j   misc       1         Z     rh{12}      "SFRV_URB3D_colapsed"      "URBAN LEVELS COLAPSED SENSIBLE HEAT FLUX FROM GREEN ROOF"       "W m{-2}"
+##urban_nz##state    real   LFRV_URB3D_colapsed    i{umap_1}j   misc       1         Z     rh{12}      "LFRV_URB3D_colapsed"      "URBAN LEVELS COLAPSED LATENT HEAT FLUX FROM GREEN ROOF"         "W m{-2}"
+##urban_nz##state    real   DGR_URB3D_colapsed     i{umap_1}j   misc       1         Z     rh{12}      "DGR_URB3D_colapsed"       "URBAN LEVELS COLAPSED ROOF LAYER DEPTH WATER RETENTION"          "mm"
+##urban_nz##state    real   LFR_URB3D_colapsed     i{umap_1}j   misc       1         Z     rh{12}      "LFR_URB3D_colapsed"       "URBAN LEVELS COLAPSED LATENT HEAT FLUX FROM URBAN SFC"          "W m{-2}"
+##urban_nz##state    real   TW1LEV_URB3D_colapsed  i{umap_1}j   misc       1         Z     rh{12}      "TW1LEV_URB3D_colapsed"    "URBAN LEVELS COLAPSED WINDOW TEMPERATURE"                       "K"
+##urban_nz##state    real   TW2LEV_URB3D_colapsed  i{umap_1}j   misc       1         Z     rh{12}      "TW2LEV_URB3D_colapsed"    "URBAN LEVELS COLAPSED WINDOW TEMPERATURE"                       "K"
+##urban_nz##state    real   SFWIN1_URB3D_colapsed  i{umap_1}j   misc       1         Z     rh{12}      "SFWIN1_URB3D_colapsed"    "URBAN LEVELS COLAPSED SENSIBLE HEAT FLUX FROM URBAN SFC WINDOW" "W m{-2}"
+##urban_nz##state    real   SFWIN2_URB3D_colapsed  i{umap_1}j   misc       1         Z     rh{12}      "SFWIN2_URB3D_colapsed"    "URBAN LEVELS COLAPSED SENSIBLE HEAT FLUX FROM URBAN SFC WINDOW" "W m{-2}"
+##urban_nz##state    real   TFLEV_URB3D_colapsed   i{umap_1}j   misc       1         Z     rh{12}      "TFLEV_URB3D_colapsed"     "URBAN LEVELS COLAPSED FLOOR TEMPERATURE"                        "K"
+##urban_nz##state    real   TRV_URB4D_colapsed     i{umap_1}j   misc       1         Z     rh{12}      "TRV_URB4D_colapsed"       "URBAN LEVELS COLAPSED GREEN ROOF LAYER TEMPERATURE"             "K"
+##urban_nz##state    real   QR_URB4D_colapsed      i{umap_1}j   misc       1         Z     rh{12}      "QR_URB4D_colapsed"        "URBAN LEVELS COLAPSED GREEN ROOF LAYER MOISTURE"                "-"
+
+
+# Street direction collapsed
+##urban_ndm##state    real   TRB_URB4D_colapsed    i{umap0}j    misc       1         Z     rh{12}      "TRB_URB4D_colapsed"       "STREET DIRECTIONS COLAPSED ROOF LAYER TEMPERATURE"  
+
+
+# All collapsed urban variables
+state    real   TLEV_URB3D_colapsed      ij   misc       1         Z     rh{12}      "TLEV_URB3D_colapsed" "COLAPSED INDOOR TEMPERATURE"             "K"
+state    real   QLEV_URB3D_colapsed      ij   misc       1         Z     rh{12}      "QLEV_URB3D_colapsed" "COLAPSED SPECIFIC HUMIDITY"              "dimensionless"
 
