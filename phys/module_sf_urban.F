@@ -2502,6 +2502,42 @@ ENDIF
                              A_E_BEP,B_U_BEP,B_V_BEP,                      & ! inout multi-layer urban
                              B_T_BEP,B_Q_BEP,B_E_BEP,DLG_BEP,              & ! inout multi-layer urban
                              DL_U_BEP,SF_BEP,VL_BEP,                       & ! inout multi-layer urban
+#ifdef URBANCOLAPSE                      
+                             urban_map_zrd_mask, urban_map_zwd_mask,       &
+                             urban_map_gd_mask, urban_map_zd_mask,         &
+                             urban_map_zdf_mask, urban_map_bd_mask,        &
+                             urban_map_wd_mask, urban_map_gbd_mask,        &
+                             urban_map_fbd_mask, num_urban_ndm_mask,       &
+
+                             urban_map_zrd_Nvals, urban_map_zwd_Nvals,     &
+                             urban_map_gd_Nvals, urban_map_zd_Nvals,       &
+                             urban_map_zdf_Nvals, urban_map_bd_Nvals,      &
+                             urban_map_wd_Nvals, urban_map_gbd_Nvals,      &
+                             urban_map_fbd_Nvals, urban_map_zgrd_Nvals,    &
+                      
+                             urban_map_zrd_wgt, urban_map_zwd_wgt,         &
+                             urban_map_gd_wgt, urban_map_zd_wgt,           &
+                             urban_map_zdf_wgt, urban_map_bd_wgt,          &
+                             urban_map_wd_wgt, urban_map_gbd_wgt,          &
+                             urban_map_fbd_wgt, num_urban_ndm_wgt,         &
+                      
+                             TGB_URB4D_clpd,                               &
+                      
+                             SFG_URB3D_clpd, DG_URB3D_clpd,                &
+                             LFG_URB3D_clpd, TRB_URB4D_clpd,               &
+                             TW1_URB4D_clpd, TW2_URB4D_clpd,               &
+                             SFW1_URB3D_clpd, SFW2_URB3D_clpd,             &
+                             SFR_URB3D_clpd, T_PV_URB3D_clpd,              &
+                             DRAIN_URB4D_clpd, SFRV_URB3D_clpd,            &
+                             LFRV_URB3D_clpd, DGR_URB3D_clpd,              &
+                             LFR_URB3D_clpd, TLEV_URB3D_clpd,              &
+                             QLEV_URB3D_clpd,                              &
+                             TW1LEV_URB3D_clpd, TW2LEV_URB3D_clpd,         &
+                             SFWIN1_URB3D_clpd, SFWIN2_URB3D_clpd,         &
+                             TFLEV_URB3D_clpd,                             &
+                             TRV_URB4D_clpd, QR_URB4D_clpd,                &
+#endif
+
                              FRC_URB2D, UTYPE_URB2D,USE_WUDAPT_LCZ)                         ! inout
    IMPLICIT NONE
 
@@ -2623,6 +2659,105 @@ ENDIF
 !
    REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: FRC_URB2D
    INTEGER, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: UTYPE_URB2D
+
+#ifdef URBANCOLAPSE
+! L. Fita, CIMA, UBA-CONICET-CRNS-IRD IFAECI
+!    Mean averaged collapsed values
+
+   ! Mask for each urban dimension (1: with value, 0:without)
+   INTEGER,                                                                                           &
+     DIMENSION(ims:ime,1:urban_map_zrd,jms:jme),                                                      &
+     INTENT(inout)                                       :: urban_map_zrd_mask
+   INTEGER,                                                                                           &
+     DIMENSION(ims:ime,1:urban_map_zwd,jms:jme),                                                      &
+     INTENT(inout)                                       :: urban_map_zwd_mask
+   INTEGER,                                                                                           &
+     DIMENSION(ims:ime,1:urban_map_gd,jms:jme),                                                       &
+     INTENT(inout)                                       :: urban_map_gd_mask
+   INTEGER,                                                                                           &
+     DIMENSION(ims:ime,1:urban_map_zd,jms:jme),                                                       &
+     INTENT(inout)                                       :: urban_map_zd_mask
+   INTEGER,                                                                                           &
+     DIMENSION(ims:ime,1:urban_map_zdf,jms:jme),                                                      &
+     INTENT(inout)                                       :: urban_map_zdf_mask
+   INTEGER,                                                                                           &
+     DIMENSION(ims:ime,1:urban_map_bd,jms:jme),                                                       &
+     INTENT(inout)                                       :: urban_map_bd_mask
+   INTEGER,                                                                                           &
+     DIMENSION(ims:ime,1:urban_map_wd,jms:jme),                                                       &
+     INTENT(inout)                                       :: urban_map_wd_mask
+   INTEGER,                                                                                           &
+     DIMENSION(ims:ime,1:urban_map_gbd,jms:jme),                                                      &
+     INTENT(inout)                                       :: urban_map_gbd_mask
+   INTEGER,                                                                                           &
+     DIMENSION(ims:ime,1:urban_map_fbd,jms:jme),                                                      &
+     INTENT(inout)                                       :: urban_map_fbd_mask
+   INTEGER,                                                                                           &
+     DIMENSION(ims:ime,1:urban_map_ndm,jms:jme),                                                      &
+     INTENT(inout)                                       :: num_urban_ndm_mask
+
+   ! Amount of values for each urban dimension
+   INTEGER, DIMENSION(ims:ime, jms:jme),                                                              &
+     INTENT(inout)                                       :: urban_map_zrd_Nvals, urban_map_zwd_Nvals, &
+     urban_map_gd_Nvals, urban_map_zd_Nvals, urban_map_zdf_Nvals, urban_map_bd_Nvals,                 &
+     urban_map_wd_Nvals, urban_map_gbd_Nvals, urban_map_fbd_Nvals, urban_map_zgrd_Nvals
+
+   ! Weights for each urban dimension
+   REAL,                                                                                              &
+     DIMENSION(ims:ime,1:urban_map_zrd,jms:jme),                                                      &
+     INTENT(inout)                                       :: urban_map_zrd_wgt
+   REAL,                                                                                              &
+     DIMENSION(ims:ime,1:urban_map_zwd,jms:jme),                                                      &
+     INTENT(inout)                                       :: urban_map_zwd_wgt
+   REAL,                                                                                              &
+     DIMENSION(ims:ime,1:urban_map_gd,jms:jme),                                                       &
+     INTENT(inout)                                       :: urban_map_gd_wgt
+   REAL,                                                                                              &
+     DIMENSION(ims:ime,1:urban_map_zd,jms:jme),                                                       &
+     INTENT(inout)                                       :: urban_map_zd_wgt
+   REAL,                                                                                              &
+     DIMENSION(ims:ime,1:urban_map_zdf,jms:jme),                                                      &
+     INTENT(inout)                                       :: urban_map_zdf_wgt
+   REAL,                                                                                              &
+     DIMENSION(ims:ime,1:urban_map_bd,jms:jme),                                                       &
+     INTENT(inout)                                       :: urban_map_bd_wgt
+   REAL,                                                                                              &
+     DIMENSION(ims:ime,1:urban_map_wd,jms:jme),                                                       &
+     INTENT(inout)                                       :: urban_map_wd_wgt
+   REAL,                                                                                              &
+     DIMENSION(ims:ime,1:urban_map_gbd,jms:jme),                                                      &
+     INTENT(inout)                                       :: urban_map_gbd_wgt
+   REAL,                                                                                              &
+     DIMENSION(ims:ime,1:urban_map_fbd,jms:jme),                                                      &
+     INTENT(inout)                                       :: urban_map_fbd_wgt
+   REAL,                                                                                              &
+     DIMENSION(ims:ime,1:urban_map_ndm,jms:jme),                                                      &
+     INTENT(inout)                                       :: num_urban_ndm_wgt
+
+   ! The same for all cases
+   REAL, DIMENSION(ims:ime,1:num_urban_ng,jms:jme),                                                   &
+     INTENT(inout)                                       :: TGB_URB4D_clpd
+#endif
+#if URBANCOLAPSE="urban_nz"
+   REAL, DIMENSION(ims:ime,1:num_urban_nz,jms:jme),                                                   &
+     INTENT(inout)                                       :: SFG_URB3D_clpd, DG_URB3D_clpd,            &
+       LFG_URB3D_clpd, TRB_URB4D_clpd, TW1_URB4D_clpd, TW2_URB4D_clpd,                                &
+       SFW1_URB3D_clpd, SFW2_URB3D_clpd, SFR_URB3D_clpd, T_PV_URB3D_clpd, DRAIN_URB4D_clpd,           &
+       SFRV_URB3D_clpd, LFRV_URB3D_clpd, DGR_URB3D_clpd, LFR_URB3D_clpd, TLEV_URB3D_clpd,             &
+       QLEV_URB3D_clpd, TW1LEV_URB3D_clpd, TW2LEV_URB3D_clpd, SFWIN1_URB3D_clpd,                      &
+       SFWIN2_URB3D_clpd, TFLEV_URB3D_clpd, TRV_URB4D_clpd, QR_URB4D_clpd
+#else if URBANCOLAPSE="urban_ndm"
+   REAL, DIMENSION(ims:ime,jms:jme),                                                                  &
+     INTENT(inout)                                       :: TLEV_URB3D_clpd, QLEV_URB3D_clpd
+   REAL, DIMENSION(ims:ime,1:num_urban_ndm,jms:jme),                                                  &
+     INTENT(inout)                                       :: SFG_URB3D_clpd, DG_URB3D_clpd,            &
+       LFG_URB3D_clpd, TRB_URB4D_clpd, TW1_URB4D_clpd, TW2_URB4D_clpd,                                &
+       SFW1_URB3D_clpd, SFW2_URB3D_clpd, SFR_URB3D_clpd, T_PV_URB3D_clpd, DRAIN_URB4D_clpd,           &
+       SFRV_URB3D_clpd, LFRV_URB3D_clpd, DGR_URB3D_clpd, LFR_URB3D_clpd,                              &
+       TW1LEV_URB3D_clpd, TW2LEV_URB3D_clpd, SFWIN1_URB3D_clpd,                                       &
+       SFWIN2_URB3D_clpd, TFLEV_URB3D_clpd, TRV_URB4D_clpd, QR_URB4D_clpd
+#endif
+
    INTEGER                                            :: UTYPE_URB
 !FS
    INTEGER :: SWITCH_URB
@@ -2630,6 +2765,42 @@ ENDIF
    INTEGER :: I,J,K,CHECK
 
    CHECK = 0
+
+#ifdef URBANCOLAPSE                      
+   urban_map_zrd_mask = 0
+   urban_map_zwd_mask = 0
+   urban_map_gd_mask = 0
+   urban_map_zd_mask = 0
+   urban_map_zdf_mask = 0
+   urban_map_bd_mask = 0
+   urban_map_wd_mask = 0 
+   urban_map_gbd_mask = 0
+   urban_map_fbd_mask = 0
+   num_urban_ndm_mask = 0
+
+   urban_map_zrd_Nvals = 0
+   urban_map_zwd_Nvals = 0
+   urban_map_gd_Nvals = 0
+   urban_map_zd_Nvals = 0
+   urban_map_zdf_Nvals = 0
+   urban_map_bd_Nvals = 0
+   urban_map_wd_Nvals = 0
+   urban_map_gbd_Nvals = 0
+   urban_map_fbd_Nvals = 0
+   urban_map_zgrd_Nvals = 0
+                      
+   urban_map_zrd_wgt = 0.
+   urban_map_zwd_wgt = 0.
+   urban_map_gd_wgt = 0.
+   urban_map_zd_wgt = 0.
+   urban_map_zdf_wgt = 0.
+   urban_map_bd_wgt = 0.
+   urban_map_wd_wgt = 0.
+   urban_map_gbd_wgt = 0.
+   urban_map_fbd_wgt = 0.
+   num_urban_ndm_wgt = 0.
+                    
+#endif
 
    DO I=ims,ime
     DO J=jms,jme
@@ -2808,17 +2979,33 @@ ENDIF
            TRB_URB4D(I,:,J)=TBLEND_TBL(UTYPE_URB2D(I,J))
            TW1_URB4D(I,:,J)=TBLEND_TBL(UTYPE_URB2D(I,J))
            TW2_URB4D(I,:,J)=TBLEND_TBL(UTYPE_URB2D(I,J))
+#ifdef URBANCOLAPSE
+           TRB_URB4D_clpd(I,:,J)=TBLEND_TBL(UTYPE_URB2D(I,J))
+           TW1_URB4D_clpd(I,:,J)=TBLEND_TBL(UTYPE_URB2D(I,J))
+           TW2_URB4D_clpd(I,:,J)=TBLEND_TBL(UTYPE_URB2D(I,J))
+#endif
         ELSE
            TRB_URB4D(I,:,J)=tlayer0_urb(I,1,J)
            TW1_URB4D(I,:,J)=tlayer0_urb(I,1,J)
            TW2_URB4D(I,:,J)=tlayer0_urb(I,1,J)
+#ifdef URBANCOLAPSE
+           TRB_URB4D_clpd(I,:,J)=tlayer0_urb(I,1,J)
+           TW1_URB4D_clpd(I,:,J)=tlayer0_urb(I,1,J)
+           TW2_URB4D_clpd(I,:,J)=tlayer0_urb(I,1,J)
+#endif
         ENDIF
         TGB_URB4D(I,:,J)=tlayer0_urb(I,1,J)
         SFW1_URB3D(I,:,J)=0.
         SFW2_URB3D(I,:,J)=0.
         SFR_URB3D(I,:,J)=0.
         SFG_URB3D(I,:,J)=0.
-       
+#ifdef URBANCOLAPSE
+        TGB_URB4D_clpd(I,:,J)=tlayer0_urb(I,1,J)
+        SFW1_URB3D_clpd(I,:,J)=0.
+        SFW2_URB3D_clpd(I,:,J)=0.
+        SFR_URB3D_clpd(I,:,J)=0.
+        SFG_URB3D_clpd(I,:,J)=0.       
+#endif
        ENDIF 
               
       if (SF_URBAN_PHYSICS.EQ.3) then
@@ -2831,6 +3018,10 @@ ENDIF
          T_PV_URB3D(I,:,J)=tlayer0_urb(I,1,J)
          TGR_URB3D(I,J)=tlayer0_urb(I,1,J)
          QR_URB4D(I,:,J)=SMOIS_URB(I,1,J)
+#ifdef URBANCOLAPSE
+         T_PV_URB3D_clpd(I,:,J)=tlayer0_urb(I,1,J)
+         QR_URB4D_clpd(I,:,J)=SMOIS_URB(I,1,J)
+#endif
          DRAIN_URB4D(I,:,J)=0. !GRZ
          SFRV_URB3D(I,:,J)=0.                !GRZ
          LFRV_URB3D(I,:,J)=0.                !GRZ
@@ -2838,14 +3029,29 @@ ENDIF
          DG_URB3D(I,:,J)=0.
          LFR_URB3D(I,:,J)=0.
          LFG_URB3D(I,:,J)=0.
+#ifdef URBANCOLAPSE
+         DRAIN_URB4D_clpd(I,:,J)=0.
+         SFRV_URB3D_clpd(I,:,J)=0.
+         LFRV_URB3D_clpd(I,:,J)=0.
+         DGR_URB3D_clpd(I,:,J)=0.
+         DG_URB3D_clpd(I,:,J)=0.
+         LFR_URB3D_clpd(I,:,J)=0.
+         LFG_URB3D_clpd(I,:,J)=0.         
+#endif
          QGR_URB3D(I,J)=SMOIS_URB(I,1,J)  !GRZ
          TGR_URB3D(I,J)=0.
          DRAINGR_URB3D(I,J)=0. !GRZ
 
        IF (UTYPE_URB2D(I,J) > 0) THEN
         TRV_URB4D(I,:,J)=TBLEND_TBL(UTYPE_URB2D(I,J))
+#ifdef URBANCOLAPSE
+        TRV_URB4D_clpd(I,:,J)=TBLEND_TBL(UTYPE_URB2D(I,J))
+#endif
        ELSE
        TRV_URB4D(I,:,J)=tlayer0_urb(I,1,J) !GRZ
+#ifdef URBANCOLAPSE
+         TRV_URB4D_clpd(I,:,J)=tlayer0_urb(I,1,J)
+#endif
       ENDIF
 
             TLEV_URB3D(I,:,J)=tlayer0_urb(I,1,J)
@@ -2856,6 +3062,21 @@ ENDIF
             QLEV_URB3D(I,:,J)=0.01
             SFWIN1_URB3D(I,:,J)=0.
             SFWIN2_URB3D(I,:,J)=0.
+#ifdef URBANCOLAPSE
+            TW1LEV_URB3D_clpd(I,:,J)=tlayer0_urb(I,1,J)
+            TW2LEV_URB3D_clpd(I,:,J)=tlayer0_urb(I,1,J)
+            TGLEV_URB3D_clpd(I,:,J)=tlayer0_urb(I,1,J)
+            TFLEV_URB3D_clpd(I,:,J)=tlayer0_urb(I,1,J)
+            SFWIN1_URB3D_clpd(I,:,J)=0.
+            SFWIN2_URB3D_clpd(I,:,J)=0.
+#endif
+#if URBANCOLAPSE="urban_nz"
+            TLEV_URB3D_clpd(I,:,J)=tlayer0_urb(I,1,J)
+            QLEV_URB3D_clpd(I,:,J)=0.01
+#else if URBANCOLAPSE="urban_ndm"
+            TLEV_URB3D_clpd(I,J)=tlayer0_urb(I,1,J)
+            QLEV_URB3D_clpd(I,J)=0.01
+#endif
 !rm         LF_AC_URB3D(I,J)=0.
 !rm         SF_AC_URB3D(I,J)=0.
 !rm         CM_AC_URB3D(I,J)=0.
