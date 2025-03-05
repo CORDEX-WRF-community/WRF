@@ -1,7 +1,7 @@
 # Dimensions
-dimspec    umap_1   2     namelist=num_urban_nz            z     num_urban_nz
-dimspec    umap_2   2     namelist=num_urban_types         z     num_urban_types
-dimspec    umap_3   2     namelist=num_urban_ng            z     num_urban_ng
+dimspec    umap_1  18     namelist=num_urban_nz            z     num_urban_nz
+dimspec    umap_2  11     namelist=num_urban_types         z     num_urban_types
+dimspec    umap_3  10     namelist=num_urban_ng            z     num_urban_ng
 
 
 # Diagnostics for urban studies
