@@ -255,72 +255,72 @@ use module_wrf_error
       ! Mask for each urban dimension (1: with value, 0:without)
       INTEGER,                                                                                        &
         DIMENSION(ims:ime,1:urban_map_zrd,jms:jme),                                                   &
-        INTENT(inout)                                    :: urban_map_zrd_mask
+        INTENT(in)                                       :: urban_map_zrd_mask
       INTEGER,                                                                                        &
         DIMENSION(ims:ime,1:urban_map_zwd,jms:jme),                                                   &
-        INTENT(inout)                                    :: urban_map_zwd_mask
+        INTENT(in)                                       :: urban_map_zwd_mask
       INTEGER,                                                                                        &
         DIMENSION(ims:ime,1:urban_map_gd,jms:jme),                                                    &
-        INTENT(inout)                                    :: urban_map_gd_mask
+        INTENT(in)                                       :: urban_map_gd_mask
       INTEGER,                                                                                        &
         DIMENSION(ims:ime,1:urban_map_zd,jms:jme),                                                    &
-        INTENT(inout)                                    :: urban_map_zd_mask
+        INTENT(in)                                       :: urban_map_zd_mask
       INTEGER,                                                                                        &
         DIMENSION(ims:ime,1:urban_map_zdf,jms:jme),                                                   &
-        INTENT(inout)                                    :: urban_map_zdf_mask
+        INTENT(in)                                       :: urban_map_zdf_mask
       INTEGER,                                                                                        &
         DIMENSION(ims:ime,1:urban_map_bd,jms:jme),                                                    &
-        INTENT(inout)                                    :: urban_map_bd_mask
+        INTENT(in)                                       :: urban_map_bd_mask
       INTEGER,                                                                                        &
         DIMENSION(ims:ime,1:urban_map_wd,jms:jme),                                                    &
-        INTENT(inout)                                    :: urban_map_wd_mask
+        INTENT(in)                                       :: urban_map_wd_mask
       INTEGER,                                                                                        &
         DIMENSION(ims:ime,1:urban_map_gbd,jms:jme),                                                   &
-        INTENT(inout)                                    :: urban_map_gbd_mask
+        INTENT(in)                                       :: urban_map_gbd_mask
       INTEGER,                                                                                        &
         DIMENSION(ims:ime,1:urban_map_fbd,jms:jme),                                                   &
-        INTENT(inout)                                    :: urban_map_fbd_mask
+        INTENT(in)                                       :: urban_map_fbd_mask
       INTEGER,                                                                                        &
         DIMENSION(ims:ime,1:urban_map_ndm,jms:jme),                                                   &
-        INTENT(inout)                                    :: num_urban_ndm_mask
+        INTENT(in)                                       :: num_urban_ndm_mask
 
       ! Amount of values for each urban dimension
       INTEGER, DIMENSION(ims:ime, jms:jme),                                                           &
-        INTENT(inout)                                    :: urban_map_zrd_Nvals, urban_map_zwd_Nvals, &
+        INTENT(in)                                       :: urban_map_zrd_Nvals, urban_map_zwd_Nvals, &
         urban_map_gd_Nvals, urban_map_zd_Nvals, urban_map_zdf_Nvals, urban_map_bd_Nvals,              &
         urban_map_wd_Nvals, urban_map_gbd_Nvals, urban_map_fbd_Nvals, urban_map_zgrd_Nvals
 
       ! Weights for each urban dimension
       REAL,                                                                                           &
         DIMENSION(ims:ime,1:urban_map_zrd,jms:jme),                                                   &
-        INTENT(inout)                                    :: urban_map_zrd_wgt
+        INTENT(in)                                       :: urban_map_zrd_wgt
       REAL,                                                                                           &
         DIMENSION(ims:ime,1:urban_map_zwd,jms:jme),                                                   &
-        INTENT(inout)                                    :: urban_map_zwd_wgt
+        INTENT(in)                                       :: urban_map_zwd_wgt
       REAL,                                                                                           &
         DIMENSION(ims:ime,1:urban_map_gd,jms:jme),                                                    &
-        INTENT(inout)                                    :: urban_map_gd_wgt
+        INTENT(in)                                       :: urban_map_gd_wgt
       REAL,                                                                                           &
         DIMENSION(ims:ime,1:urban_map_zd,jms:jme),                                                    &
-        INTENT(inout)                                    :: urban_map_zd_wgt
+        INTENT(in)                                       :: urban_map_zd_wgt
       REAL,                                                                                           &
         DIMENSION(ims:ime,1:urban_map_zdf,jms:jme),                                                   &
-        INTENT(inout)                                    :: urban_map_zdf_wgt
+        INTENT(in)                                       :: urban_map_zdf_wgt
       REAL,                                                                                           &
         DIMENSION(ims:ime,1:urban_map_bd,jms:jme),                                                    &
-        INTENT(inout)                                    :: urban_map_bd_wgt
+        INTENT(in)                                       :: urban_map_bd_wgt
       REAL,                                                                                           &
         DIMENSION(ims:ime,1:urban_map_wd,jms:jme),                                                    &
-        INTENT(inout)                                    :: urban_map_wd_wgt
+        INTENT(in)                                       :: urban_map_wd_wgt
       REAL,                                                                                           &
         DIMENSION(ims:ime,1:urban_map_gbd,jms:jme),                                                   &
-        INTENT(inout)                                    :: urban_map_gbd_wgt
+        INTENT(in)                                       :: urban_map_gbd_wgt
       REAL,                                                                                           &
         DIMENSION(ims:ime,1:urban_map_fbd,jms:jme),                                                   &
-        INTENT(inout)                                    :: urban_map_fbd_wgt
+        INTENT(in)                                       :: urban_map_fbd_wgt
       REAL,                                                                                           &
         DIMENSION(ims:ime,1:urban_map_ndm,jms:jme),                                                   &
-        INTENT(inout)                                    :: num_urban_ndm_wgt
+        INTENT(in)                                       :: num_urban_ndm_wgt
 
       ! The same for all cases
       REAL, DIMENSION(ims:ime,1:num_urban_ng,jms:jme),                                                &
@@ -675,10 +675,10 @@ use module_wrf_error
       ind_wd=0
       ind_gbd=0
       ind_fbd=0
+
 !
 !End initialization indexes
 !
-
       iii=0
       do ibui=1,nbui_max
       do iz_u=1,nz_um
