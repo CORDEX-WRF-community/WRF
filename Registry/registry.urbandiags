@@ -3,7 +3,6 @@ dimspec    umap_1   2     namelist=num_urban_nz            z     num_urban_nz
 dimspec    umap_2   2     namelist=num_urban_types         z     num_urban_types
 dimspec    umap_3   2     namelist=num_urban_ng            z     num_urban_ng
 
-
 # Diagnostics for urban studies
 
 state    real     tasupav        ij     misc        -         -       h{12}     "tasupav"          "Near-surface temperature urban pavements"     "K"
