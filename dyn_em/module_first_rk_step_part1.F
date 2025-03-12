@@ -828,6 +828,12 @@ BENCH_START(surf_driver_tim)
      &        ,SFWIN2_URB3D=grid%sfwin2_urb3d                           & !multi-layer urban
      &        ,SFW1_URB3D=grid%sfw1_urb3d,SFW2_URB3D=grid%sfw2_urb3d      & !multi-layer urban
      &        ,SFR_URB3D=grid%sfr_urb3d,SFG_URB3D=grid%sfg_urb3d          & !multi-layer urban
+#ifdef URBANSTATE
+     &        ,num_urban_nz=config_flags%num_urban_nz                   &
+     &        ,ua_u3D=grid%UAURB, va_u3D=grid%VAURB                     &
+     &        ,pt_u3D=grid%THAURB, da_u3D=grid%RHOURB                   &
+     &        ,pt0_u3D=grid%THA0URB, pr_u3D=grid%PRESURB                &
+#endif
      &        ,EP_PV_URB3D=grid%ep_pv_urb3d                               & !GRZ
      &        ,T_PV_URB3D=grid%t_pv_urb3d                                 & !GRZ
      &        ,TRV_URB4D=grid%trv_urb4d                                   & !GRZ

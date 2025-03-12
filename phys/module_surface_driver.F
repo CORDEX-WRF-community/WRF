@@ -279,6 +279,10 @@ CONTAINS
      &          ,sfvent_urb3d,lfvent_urb3d                            & !multi-layer urban 
      &          ,sfwin1_urb3d,sfwin2_urb3d                            & !multi-layer urban       
      &          ,sfw1_urb3d,sfw2_urb3d,sfr_urb3d,sfg_urb3d            & !multi-layer urban
+#ifdef URBANSTATE
+     &          ,num_urban_nz                                        &
+     &          ,ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D     &
+#endif
      &          ,ep_pv_urb3d,t_pv_urb3d                              & !multi-layer urban GRZ
      &          ,trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d              & !multi-layer urban GRZ
      &          ,drain_urb4d,draingr_urb3d                           & !multi-layer urban GRZ
@@ -1011,6 +1015,19 @@ CONTAINS
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::dlg_bep   !Height above ground
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::sf_bep  !Fraction air at the face of grid cell
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::dl_u_bep  !Length scale
+
+#ifdef URBANSTATE
+! Data interpolated from the "mesoscale grid" to the "urban grid" (num_urban_nz)
+! ua_u3D: Wind speed in the x direction [ms-1]
+! va_u3D: Wind speed in the y direction [ms-1]
+! pt_u3D: Potential temperature [K]
+! da_u3D: Air density [kgm-3]
+! pt0_u3D: Reference potential temperature [K]
+! pr_u3D: Air pressure [Pa]
+   INTEGER, OPTIONAL, INTENT(in)                                          :: num_urban_nz
+   REAL, OPTIONAL, DIMENSION(ims:ime,1:num_urban_nz,jms:jme), INTENT(out) :: ua_u3D, va_u3D, pt_u3D,  &
+     da_u3D, pt0_u3D, pr_u3D
+#endif
 
 !  arguments for Ocean Mixed Layer Model
    REAL, DIMENSION( ims:ime , jms:jme ), OPTIONAL, INTENT(INOUT )::   TML, T0ML, HML, H0ML, HUML, HVML
@@ -2742,6 +2759,9 @@ CONTAINS
                 sfvent_urb3d,lfvent_urb3d,                      & !H multi-layer urban
                 sfwin1_urb3d,sfwin2_urb3d,                      & !H multi-layer urban
                 sfw1_urb3d,sfw2_urb3d,sfr_urb3d,sfg_urb3d,      & !H multi-layer urban
+#ifdef URBANSTATE
+                ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,&
+#endif
                  ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
                 trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !GRZ
                 drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !GRZ
@@ -2874,6 +2894,9 @@ CONTAINS
                 sfvent_urb3d,lfvent_urb3d,                      & !H multi-layer urban
                 sfwin1_urb3d,sfwin2_urb3d,                      & !H multi-layer urban
                 sfw1_urb3d,sfw2_urb3d,sfr_urb3d,sfg_urb3d,      & !H multi-layer urban
+#ifdef URBANSTATE
+                ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D, &
+#endif
                 ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
                 trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !GRZ
                 drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !GRZ

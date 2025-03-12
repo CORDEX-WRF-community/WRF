@@ -113,6 +113,11 @@ use module_wrf_error
 		      sfrv_urb3d,lfrv_urb3d,                                       &
                       dgr_urb3d,dg_urb3d,                                          &
                       lfr_urb3d,lfg_urb3d,rainbl,swddir,swddif,                    &
+#ifdef URBANSTATE
+                      num_urban_nz,                                                &
+                      ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,             &
+#endif
+
 #ifdef URBANCOLAPSE                      
                       urban_map_zrd_mask, urban_map_zwd_mask,                      &
                       urban_map_gd_mask, urban_map_zd_mask,                        &
@@ -247,6 +252,15 @@ use module_wrf_error
 
    real z(ims:ime,kms:kme,jms:jme)            ! Vertical coordinates
    REAL, INTENT(IN )::   DT      ! Time step
+
+#ifdef URBANSTATE
+   INTEGER, INTENT(in)                                            :: num_urban_nz
+   REAL, DIMENSION(1:num_urban_nz)                                :: ua_u1D, va_u1D, pt_u1D, da_u1D,  &
+     pt0_u1D, pr_u1D
+
+   REAL, DIMENSION(ims:ime,1:num_urban_nz,jms:jme), INTENT(out)   :: ua_u3D, va_u3D, pt_u3D, da_u3D,  &
+     pt0_u3D, pr_u3D
+#endif
 
 #ifdef URBANCOLAPSE
 ! L. Fita, CIMA, UBA-CONICET-CRNS-IRD IFAECI
@@ -1074,6 +1088,9 @@ do iz= kts,kte
                    drain1D,rainbl(ix,iy),qr1D,                   &
                    a_u1D,a_v1D,a_t1D,a_e1D,                         & 
                    b_u1D,b_v1D,b_t1D,b_ac1D,b_e1D,b_q1D,            & 
+#ifdef URBANSTATE
+                   ua_u1D, va_u1D, pt_u1D, da_u1D, pt0_u1D, pr_u1D, &
+#endif                   
                    dlg1D,dl_u1D,sf1D,vl1D,rl_up(ix,iy),             &
                    rs_abs(ix,iy),emiss(ix,iy),grdflx_urb(ix,iy),    &
                    qv1D,tlev1D,qlev1D,sflev1D,lflev1D,consumlev1D,  &
@@ -1087,6 +1104,17 @@ do iz= kts,kte
 	       enddo
 	    enddo
          enddo
+         
+#ifdef URBANSTATE
+         DO iz=1,nz_um   !vertical levels
+           ua_u3d(ix,iz,iy)=ua_u1D(iz) 
+           va_u3d(ix,iz,iy)=va_u1D(iz) 
+           pt_u3d(ix,iz,iy)=pt_u1D(iz) 
+           da_u3d(ix,iz,iy)=da_u1D(iz) 
+           pt0_u3d(ix,iz,iy)=pt0_u1D(iz) 
+           pr_u3d(ix,iz,iy)=pr_u1D(iz) 
+         END DO
+#endif         
  
 	 do id=1,ndm
 	  sfg_urb3d(ix,id,iy)=sfg1D(id)
@@ -1312,6 +1340,9 @@ do iz= kts,kte
                       sfrv,lfrv,dgr,dg,lfr,lfg,drain,rainbl,qr,      & 
                       a_u,a_v,a_t,a_e,                                 &
                       b_u,b_v,b_t,b_ac,b_e,b_q,                        & 
+#ifdef URBANSTATE
+                      ua_u, va_u, pt_u, da_u, pt0_u, pr_u,            &
+#endif                      
                       dlg,dl_u,sf,vl,rl_up,rs_abs,emiss,grdflx_urb,    &
                       qv,tlev,qlev,sflev,lflev,consumlev,              &
                       eppvlev,tpvlev,sfvlev,lfvlev,twlev,tglev,tflev,sfwin,tmp_u,sfr_indoor,sfrpv,gfr)    
@@ -1456,8 +1487,11 @@ do iz= kts,kte
 ! ----------------------------------------------------------------------
 
       real dz(kms:kme)               ! vertical space steps of the "mesoscale grid"
-! Data interpolated from the "mesoscale grid" to the "urban grid"
+! Data interpolated from the "mesoscale grid" to the "urban grid" (nz_um)
 
+#ifdef URBANSTATE
+      REAL, DIMENSION(nz_um), INTENT(out)                :: ua_u, va_u, pt_u, da_u, pt0_u, pr_u
+#else
       real ua_u(nz_um)          ! Wind speed in the x direction
       real va_u(nz_um)          ! Wind speed in the y direction
       real pt_u(nz_um)          ! Potential temperature
@@ -1465,6 +1499,7 @@ do iz= kts,kte
       real pt0_u(nz_um)         ! Reference potential temperature
       real pr_u(nz_um)          ! Air pressure
       real qv_u(nz_um)          !Specific humidity
+#endif
 
 ! Data defining the building and street charateristics
 

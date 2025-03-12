@@ -52,6 +52,17 @@ state    integer urban_map_gbd_wgt    i{umap8}j   misc       1         Z     rh{
 state    integer urban_map_fbd_wgt    i{umap9}j   misc       1         Z     rh{12}      "urban_map_fbd_wgt"       "urban_map_fbd WEIGHTS"        "1."
 state    integer urban_map_zgrd_wgt   i{umap10}j  misc       1         Z     rh{12}      "urban_map_zgrd_wgt"      "urban_map_zgrd WEIGHTS"       "1."
 
+# State variales inside urban module
+#  remove ##urban_state## and introduce in configure.wrf -DURBANSTATE
+##urban_state##state    real   THAURB          i{umap_1}j   misc       1         Z     h{12}       "THAURB"               "POTENTIAL TEMPERATURE WITHIN URBAN CANOPY"                "K"
+##urban_state##state    real   THA0URB         i{umap_1}j   misc       1         Z     h{12}       "THA0URB"              "REFERENCE POTENTIAL TEMPERATURE WITHIN URBAN CANOPY"                "K"
+##urban_state##state    real   UAURB           i{umap_1}j   misc       1         Z     h{12}       "UAURB"                "WESTWARD WIND SPEED WITHIN URBAN CANOPY"                "ms-1"
+##urban_state##state    real   VAURB           i{umap_1}j   misc       1         Z     h{12}       "VAURB"                "NORTHWARD WIND SPEED WITHIN URBAN CANOPY"                "ms-1"
+##urban_state##state    real   RHOURB          i{umap_1}j   misc       1         Z     h{12}       "RHOURB"               "AIR DENSITY WITHIN URBAN CANOPY"                "kgk-1"
+##urban_state##state    real   PRESSURB        i{umap_1}j   misc       1         Z     h{12}       "PRESSURB"             "AIR PRESSURE WITHIN URBAN CANOPY"                "Pa"
+##urban_state##state    real   QVURB           i{umap_1}j   misc       1         Z     h{12}       "QVURB"                "MIXING RATIO WITHIN URBAN CANOPY"                "kgm-3"
+
+
 # Diagnostics from urban modules mean outputs with some colapsed dimensions
 #   Choose between:
 #       urban_nz: amount of urban vertical layers, remove ##urban_nz## and introduce in configure.wrf -DURBANCOLAPSE="urban_nz"

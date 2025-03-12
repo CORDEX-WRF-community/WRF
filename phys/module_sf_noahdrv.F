@@ -104,6 +104,9 @@ CONTAINS
                   sfvent_urb3d,lfvent_urb3d,                    & !H multi-layer urban
                   sfwin1_urb3d,sfwin2_urb3d,                    & !H multi-layer urban
                   sfw1_urb3d,sfw2_urb3d,sfr_urb3d,sfg_urb3d,    & !H multi-layer urban
+#ifdef URBANSTATE
+                  ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D, &
+#endif
                   ep_pv_urb3d,t_pv_urb3d,                         & !RMS
                   trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !RMS
                   drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !RMS
@@ -669,6 +672,18 @@ CONTAINS
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::dlg_bep   !Height above ground
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::sf_bep  !Fraction air at the face of grid cell
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::dl_u_bep  !Length scale
+
+#ifdef URBANSTATE
+! Data interpolated from the "mesoscale grid" to the "urban grid"
+! ua_u3D: Wind speed in the x direction [ms-1]
+! va_u3D: Wind speed in the y direction [ms-1]
+! pt_u3D: Potential temperature [K]
+! da_u3D: Air density [kgm-3]
+! pt0_u3D: Reference potential temperature [K]
+! pr_u3D: Air pressure [Pa]
+   REAL, OPTIONAL, DIMENSION(ims:ime,1:num_urban_nz,jms:jme), INTENT(out) :: ua_u3D, va_u3D, pt_u3D, da_u3D,  &
+     pt0_u3D, pr_u3D
+#endif
 
 ! Local variables for multi-layer UCM (Martilli et al. 2002)
    REAL,    DIMENSION( its:ite, jts:jte ) :: HFX_RURAL,LH_RURAL,GRDFLX_RURAL ! ,RN_RURAL
@@ -1608,6 +1623,10 @@ CONTAINS
            urban_map_gbd, urban_map_fbd,  num_urban_hi,                &
                 trb_urb4d,tw1_urb4d,tw2_urb4d,tgb_urb4d,               &
                 sfw1_urb3d,sfw2_urb3d,sfr_urb3d,sfg_urb3d,             &
+#ifdef URBANSTATE
+                num_urban_nz,                                          &
+                ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,       &
+#endif
                 lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,                  &
                 a_u_bep,a_v_bep,a_t_bep,                               &
                 a_e_bep,b_u_bep,b_v_bep,                               &
@@ -1652,6 +1671,10 @@ CONTAINS
                 drain_urb4d,draingr_urb3d,sfrv_urb3d,                  & !RMS
                 lfrv_urb3d,dgr_urb3d,dg_urb3d,lfr_urb3d,lfg_urb3d,     & !RMS
                 rainbl,swddir,swddif,                                  & !RMS
+#ifdef URBANSTATE
+                num_urban_nz,                                          &
+                ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,       &
+#endif
                 lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,                  &
                 a_u_bep,a_v_bep,a_t_bep,                               &
                 a_e_bep,b_u_bep,b_v_bep,                               &
@@ -2424,6 +2447,10 @@ SUBROUTINE lsm_mosaic(DZ8W,QV3D,P8W3D,T3D,TSK,                      &
                   sfvent_urb3d,lfvent_urb3d,                    & !H multi-layer urban
                   sfwin1_urb3d,sfwin2_urb3d,                    & !H multi-layer urban
                   sfw1_urb3d,sfw2_urb3d,sfr_urb3d,sfg_urb3d,    & !H multi-layer urban
+#ifdef URBANSTATE
+                  num_urban_nz,                                   &
+                  ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,&
+#endif
                   ep_pv_urb3d,t_pv_urb3d,                         & !RMS
                   trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !RMS
                   drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !RMS
@@ -2985,6 +3012,19 @@ SUBROUTINE lsm_mosaic(DZ8W,QV3D,P8W3D,T3D,TSK,                      &
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::dlg_bep   !Height above ground
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::sf_bep  !Fraction air at the face of grid cell
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::dl_u_bep  !Length scale
+
+#ifdef URBANSTATE
+! Data interpolated from the "mesoscale grid" to the "urban grid" (num_urban_nz)
+! ua_u3D: Wind speed in the x direction [ms-1]
+! va_u3D: Wind speed in the y direction [ms-1]
+! pt_u3D: Potential temperature [K]
+! da_u3D: Air density [kgm-3]
+! pt0_u3D: Reference potential temperature [K]
+! pr_u3D: Air pressure [Pa]
+   INTEGER, OPTIONAL, INTENT(in)                                          :: num_urban_nz
+   REAL, OPTIONAL, DIMENSION(ims:ime,1:num_urban_nz,jms:jme), INTENT(out) :: ua_u3D, va_u3D, pt_u3D,  &
+     da_u3D, pt0_u3D, pr_u3D
+#endif
 
 ! Local variables for multi-layer UCM (Martilli et al. 2002)
    REAL,    DIMENSION( its:ite, jts:jte ) :: HFX_RURAL,LH_RURAL,GRDFLX_RURAL ! ,RN_RURAL

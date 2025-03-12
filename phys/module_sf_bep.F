@@ -69,6 +69,10 @@ use module_wrf_error
                        num_urban_hi,                                               &
                       trb_urb4d,tw1_urb4d,tw2_urb4d,tgb_urb4d,        &
                       sfw1_urb3d,sfw2_urb3d,sfr_urb3d,sfg_urb3d,      &
+#ifdef URBANSTATE
+                      num_urban_nz,                                                &
+                      ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,             &
+#endif
                       lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,           &
                       a_u,a_v,a_t,a_e,b_u,b_v,                        &
                       b_t,b_e,b_q,dlg,dl_u,sf,vl,                     &
@@ -136,6 +140,16 @@ use module_wrf_error
 !      integer nx,ny,nz              ! Number of points in the mesocsale grid
       real z(ims:ime,kms:kme,jms:jme)            ! Vertical coordinates
       REAL, INTENT(IN )::   DT      ! Time step
+      
+#ifdef URBANSTATE
+   INTEGER, INTENT(in)                                            :: num_urban_nz
+   REAL, DIMENSION(1:num_urban_nz)                                :: ua_u1D, va_u1D, pt_u1D, da_u1D,  &
+     pt0_u1D, pr_u1D
+
+   REAL, DIMENSION(ims:ime,1:num_urban_nz,jms:jme), INTENT(out)   :: ua_u3D, va_u3D, pt_u3D, da_u3D,  &
+     pt0_u3D, pr_u3D
+#endif
+      
 !      real zr(ims:ime,jms:jme)                ! Solar zenith angle
 !      real deltar(ims:ime,jms:jme)            ! Declination of the sun
 !      real ah(ims:ime,jms:jme)                ! Hour angle
@@ -502,6 +516,9 @@ use module_wrf_error
                    tw1D,tg1D,tr1D,sfw1D,sfg1D,sfr1D,                & 
                    a_u1D,a_v1D,a_t1D,a_e1D,                         & 
                    b_u1D,b_v1D,b_t1D,b_e1D,                         & 
+#ifdef URBANSTATE
+                   ua_u1D, va_u1D, pt_u1D, da_u1D, pt0_u1D, pr_u1D, &
+#endif
                    dlg1D,dl_u1D,sf1D,vl1D,rl_up(ix,iy),             &
                    rs_abs(ix,iy),emiss(ix,iy),grdflx_urb(ix,iy))                            
 !        write(*,*) 'salgo de BEP1D'
@@ -511,6 +528,17 @@ use module_wrf_error
 	  sfw2_urb3d(ix,ind_zd(iz,id),iy)=sfw1D(2*id,iz) 
 	 enddo
 	 enddo
+
+#ifdef URBANSTATE
+         DO iz=1,nz_um   !vertical levels
+           ua_u3d(ix,iz,iy)=ua_u1D(iz) 
+           va_u3d(ix,iz,iy)=va_u1D(iz) 
+           pt_u3d(ix,iz,iy)=pt_u1D(iz) 
+           da_u3d(ix,iz,iy)=da_u1D(iz) 
+           pt0_u3d(ix,iz,iy)=pt0_u1D(iz) 
+           pr_u3d(ix,iz,iy)=pr_u1D(iz) 
+         END DO
+#endif         
  
 	 do id=1,ndm
 	  sfg_urb3d(ix,id,iy)=sfg1D(id) 
@@ -596,6 +624,9 @@ use module_wrf_error
                       tw,tg,tr,sfw,sfg,sfr,                           & 
                       a_u,a_v,a_t,a_e,                                &
                       b_u,b_v,b_t,b_e,                                & 
+#ifdef URBANSTATE
+                      ua_u, va_u, pt_u, da_u, pt0_u, pr_u,            &
+#endif
                       dlg,dl_u,sf,vl,rl_up,rs_abs,emiss,grdflx_urb)                             
 
 ! ----------------------------------------------------------------------
@@ -754,14 +785,17 @@ use module_wrf_error
 
       real dz(kms:kme)               ! vertical space steps of the "mesoscale grid"
 
-! Data interpolated from the "mesoscale grid" to the "urban grid"
-
+! Data interpolated from the "mesoscale grid" to the "urban grid" (num_urban_nz)
+#ifdef URBANSTATE
+      REAL, DIMENSION(nz_um), INTENT(out)                :: ua_u, va_u, pt_u, da_u, pt0_u, pr_u
+#else
       real ua_u(nz_um)          ! Wind speed in the x direction
       real va_u(nz_um)          ! Wind speed in the y direction
       real pt_u(nz_um)          ! Potential temperature
       real da_u(nz_um)          ! Air density
       real pt0_u(nz_um)         ! Reference potential temperature
       real pr_u(nz_um)          ! Air pressure
+#endif
 
 ! Solar radiation at each level of the "urban grid"
 
