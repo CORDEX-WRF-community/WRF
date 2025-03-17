@@ -341,7 +341,7 @@ use module_wrf_error
         INTENT(inout)                                    :: TGB_URB4D_clpd
 
 #endif
-#if URBANCOLAPSE="urban_nz"
+#if URBANCOLAPSE==1
       REAL, DIMENSION(ims:ime,1:num_urban_nz,jms:jme),                                                &
         INTENT(inout)                                    :: SFG_URB3D_clpd, DG_URB3D_clpd,            &
           LFG_URB3D_clpd, TRB_URB4D_clpd, TW1_URB4D_clpd, TW2_URB4D_clpd,                             &
@@ -349,7 +349,7 @@ use module_wrf_error
           SFRV_URB3D_clpd, LFRV_URB3D_clpd, DGR_URB3D_clpd, LFR_URB3D_clpd, TLEV_URB3D_clpd,          &
           QLEV_URB3D_clpd, TW1LEV_URB3D_clpd, TW2LEV_URB3D_clpd, SFWIN1_URB3D_clpd,                   &
           SFWIN2_URB3D_clpd, TFLEV_URB3D_clpd, TRV_URB4D_clpd, QR_URB4D_clpd
-#else if URBANCOLAPSE="urban_ndm"
+#elif URBANCOLAPSE==2
       REAL, DIMENSION(ims:ime,jms:jme),                                                               &
         INTENT(inout)                                    :: TLEV_URB3D_clpd, QLEV_URB3D_clpd
       REAL, DIMENSION(ims:ime,1:num_urban_ndm,jms:jme),                                               &
