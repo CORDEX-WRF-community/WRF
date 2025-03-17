@@ -30,3 +30,4 @@ include registry.solar_fields
 include registry.diags
 include registry.CMAQ
 include registry.cordex_comp
+include registry.urbandiags_comp
