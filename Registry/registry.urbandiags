@@ -75,8 +75,8 @@ state    integer urban_map_zgrd_wgt   i{umap10}j  misc       1         Z     rh{
 
 # Diagnostics from urban modules mean outputs with some colapsed dimensions
 #   Choose between:
-#       urban_nz: amount of urban vertical layers, remove ##urban_nz## and introduce in configure.wrf -DURBANCOLAPSE="urban_nz"
-#       urban_ndm: amount of street directions, remove ##urban_ndm## and introduce in configure.wrf -DURBANCOLAPSE="urban_ndm"
+#       urban_nz: amount of urban vertical layers, remove ##urban_nz## and introduce in configure.wrf -DURBANCOLAPSE=1
+#       urban_ndm: amount of street directions, remove ##urban_ndm## and introduce in configure.wrf -DURBANCOLAPSE=2
 ##urban_nz##state    real   SFG_URB3D_clpd     i{umap_1}j   misc       1         Z     rh{12}      "SFG_URB3D_clpd"       "URBAN LEVELS MEAN COLLAPSED SENSIBLE HEAT FLUX FROM URBAN SFC"        "W m{-2}"
 ##urban_nz##state    real   DG_URB3D_clpd      i{umap_1}j   misc       1         Z     rh{12}      "DG_URB4D_clpd"        "URBAN LEVELS MEAN COLLAPSED ROOF LAYER DEPTH WATER RETENTION"         "mm"
 ##urban_nz##state    real   LFG_URB3D_clpd     i{umap_1}j   misc       1         Z     rh{12}      "LFG_URB3D_clpd"       "URBAN LEVELS MEAN COLLAPSED LATENT HEAT FLUX FROM URBAN SFC"          "W m{-2}"
