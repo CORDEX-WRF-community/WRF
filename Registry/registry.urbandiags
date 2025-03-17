@@ -1,10 +1,21 @@
 # Dimensions
-dimspec    umap_1   2     namelist=num_urban_nz            z     num_urban_nz
-dimspec    umap_2   2     namelist=num_urban_types         z     num_urban_types
-dimspec    umap_3   2     namelist=num_urban_ng            z     num_urban_ng
+rconfig   real       dz_u                 namelist,physics      1              5.     rh{12}  "dz_u"                        "amount of vertical layers used by the urban module BEP"   ""
+rconfig   integer    num_urban_nz         namelist,physics      1              18     rh{12}  "num_urban_nz"                 "amount of vertical layers used by the urban module BEP"   ""
+rconfig   integer    num_urban_nbui       namelist,physics      1              15     rh{12}  "num_urban_nbui"               "amount of types of buildings per LCZ used by the urban module BEP"   ""
+rconfig   integer    num_urban_ng         namelist,physics      1              10     rh{12}  "num_urban_ng"                 "amount of ground layers used by module BEP"   ""
+rconfig   integer    num_urban_ndm        namelist,physics      1              2      rh{12}  "num_urban_ndm"                "amount of directions of streets used by module BEP as "   ""
+rconfig   integer    urban_map_zrd        namelist,physics      1              360    rh{12}  "urban_map_zrd"                "dimension used by module BEP as num_urban_ndm*num_urban_nwr*num_urban_nz"   ""
+rconfig   integer    urban_map_zwd        namelist,physics      1              5400   rh{12}  "urban_map_zwd"                "dimension used by module BEP as num_urban_ndm*num_urban_nwr*num_urban_nz*num_urban_nbui"  ""
+rconfig   integer    urban_map_gd         namelist,physics      1              20     rh{12}  "urban_map_gd"                 "dimension used by module BEP as num_urban_ndm*num_urban_ng"   ""
+rconfig   integer    urban_map_zd         namelist,physics      1              540    rh{12}  "urban_map_zd"                 "dimension used by module BEP as num_urban_ndm*num_urban_nz*num_urban_nbui"   ""
+rconfig   integer    urban_map_zdf        namelist,physics      1              36     rh{12}  "urban_map_zdf"                "dimension used by module BEP as num_urban_ndm*num_urban_nz"   ""
+rconfig   integer    urban_map_bd         namelist,physics      1              270    rh{12}  "urban_map_bd"                 "dimension used by module BEP as num_urban_nz*num_urban_nbui"   ""
+rconfig   integer    urban_map_wd         namelist,physics      1              540    rh{12}  "urban_map_wd"                 "dimension used by module BEP as num_urban_ndm*num_urban_nz*num_urban_nbui"   ""
+rconfig   integer    urban_map_gbd        namelist,physics      1              300    rh{12}  "urban_map_gbd"                "dimension used by module BEP as num_urban_ndm*num_urban_ngb*num_urban_nbui"   ""
+rconfig   integer    urban_map_fbd        namelist,physics      1              5100   rh{12}  "urban_map_fbd"                "dimension used by module BEP as num_urban_ndm*(num_urban_nz - 1)*num_urban_nf*num_urban_nbui"   ""
+rconfig   integer    urban_map_zgrd       namelist,physics      1              360    rh{12}  "urban_map_zgrd"               "dimension used by module BEP as num_urban_ndm*num_urban_ngr*num_urban_nz"   ""
 
 # Diagnostics for urban studies
-
 state    real     tasupav        ij     misc        -         -       h{12}     "tasupav"          "Near-surface temperature urban pavements"     "K"
 state    real     tasuroof       ij     misc        -         -       h{12}     "tasuroof"         "Near-surface temperature urban roof"          "K"
 state    real     tasugreen      ij     misc        -         -       h{12}     "tasugreen"        "Near-surface temperature urban green spaces"  "K"
