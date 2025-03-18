@@ -832,7 +832,8 @@ BENCH_START(surf_driver_tim)
      &        ,num_urban_nz=config_flags%num_urban_nz                   &
      &        ,ua_u3D=grid%UAURB, va_u3D=grid%VAURB                     &
      &        ,pt_u3D=grid%THAURB, da_u3D=grid%RHOURB                   &
-     &        ,pt0_u3D=grid%THA0URB, pr_u3D=grid%PRESURB                &
+     &        ,pt0_u3D=grid%THA0URB, pr_u3D=grid%PRESSURB               &
+     &        ,qv_u3D=grid%QVURB                                        &
 #endif
      &        ,EP_PV_URB3D=grid%ep_pv_urb3d                               & !GRZ
      &        ,T_PV_URB3D=grid%t_pv_urb3d                                 & !GRZ

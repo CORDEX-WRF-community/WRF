@@ -116,6 +116,7 @@ use module_wrf_error
 #ifdef URBANSTATE
                       num_urban_nz,                                                &
                       ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,             &
+                      qv_u3D,                                                      &
 #endif
 
 #ifdef URBANCOLAPSE                      
@@ -256,10 +257,10 @@ use module_wrf_error
 #ifdef URBANSTATE
    INTEGER, INTENT(in)                                            :: num_urban_nz
    REAL, DIMENSION(1:num_urban_nz)                                :: ua_u1D, va_u1D, pt_u1D, da_u1D,  &
-     pt0_u1D, pr_u1D
+     pt0_u1D, pr_u1D, qv_u1D
 
    REAL, DIMENSION(ims:ime,1:num_urban_nz,jms:jme), INTENT(out)   :: ua_u3D, va_u3D, pt_u3D, da_u3D,  &
-     pt0_u3D, pr_u3D
+     pt0_u3D, pr_u3D, qv_u3D
 #endif
 
 #ifdef URBANCOLAPSE
@@ -1090,6 +1091,7 @@ do iz= kts,kte
                    b_u1D,b_v1D,b_t1D,b_ac1D,b_e1D,b_q1D,            & 
 #ifdef URBANSTATE
                    ua_u1D, va_u1D, pt_u1D, da_u1D, pt0_u1D, pr_u1D, &
+                   qv_u1D,                                          &
 #endif                   
                    dlg1D,dl_u1D,sf1D,vl1D,rl_up(ix,iy),             &
                    rs_abs(ix,iy),emiss(ix,iy),grdflx_urb(ix,iy),    &
@@ -1113,6 +1115,7 @@ do iz= kts,kte
            da_u3d(ix,iz,iy)=da_u1D(iz) 
            pt0_u3d(ix,iz,iy)=pt0_u1D(iz) 
            pr_u3d(ix,iz,iy)=pr_u1D(iz) 
+           qv_u3d(ix,iz,iy)=qv_u1D(iz) 
          END DO
 #endif         
  
@@ -1341,7 +1344,7 @@ do iz= kts,kte
                       a_u,a_v,a_t,a_e,                                 &
                       b_u,b_v,b_t,b_ac,b_e,b_q,                        & 
 #ifdef URBANSTATE
-                      ua_u, va_u, pt_u, da_u, pt0_u, pr_u,            &
+                      ua_u, va_u, pt_u, da_u, pt0_u, pr_u, qv_u,       &
 #endif                      
                       dlg,dl_u,sf,vl,rl_up,rs_abs,emiss,grdflx_urb,    &
                       qv,tlev,qlev,sflev,lflev,consumlev,              &
@@ -1490,7 +1493,7 @@ do iz= kts,kte
 ! Data interpolated from the "mesoscale grid" to the "urban grid" (nz_um)
 
 #ifdef URBANSTATE
-      REAL, DIMENSION(nz_um), INTENT(out)                :: ua_u, va_u, pt_u, da_u, pt0_u, pr_u
+      REAL, DIMENSION(nz_um), INTENT(out)                :: ua_u, va_u, pt_u, da_u, pt0_u, pr_u, qv_u
 #else
       real ua_u(nz_um)          ! Wind speed in the x direction
       real va_u(nz_um)          ! Wind speed in the y direction

@@ -282,6 +282,7 @@ CONTAINS
 #ifdef URBANSTATE
      &          ,num_urban_nz                                        &
      &          ,ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D     &
+     &          ,qv_u3D                                              &
 #endif
      &          ,ep_pv_urb3d,t_pv_urb3d                              & !multi-layer urban GRZ
      &          ,trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d              & !multi-layer urban GRZ
@@ -1024,9 +1025,11 @@ CONTAINS
 ! da_u3D: Air density [kgm-3]
 ! pt0_u3D: Reference potential temperature [K]
 ! pr_u3D: Air pressure [Pa]
-   INTEGER, OPTIONAL, INTENT(in)                                          :: num_urban_nz
-   REAL, OPTIONAL, DIMENSION(ims:ime,1:num_urban_nz,jms:jme), INTENT(out) :: ua_u3D, va_u3D, pt_u3D,  &
-     da_u3D, pt0_u3D, pr_u3D
+   INTEGER, INTENT(in)                                   :: num_urban_nz
+   REAL, OPTIONAL,                                                                                    &
+     DIMENSION(ims:ime,1:num_urban_nz,jms:jme),                                                       &
+     INTENT(inout)                                       :: ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D,  &
+     pr_u3D, qv_u3D
 #endif
 
 !  arguments for Ocean Mixed Layer Model
@@ -2760,9 +2763,11 @@ CONTAINS
                 sfwin1_urb3d,sfwin2_urb3d,                      & !H multi-layer urban
                 sfw1_urb3d,sfw2_urb3d,sfr_urb3d,sfg_urb3d,      & !H multi-layer urban
 #ifdef URBANSTATE
+                num_urban_nz,                                   &
                 ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,&
+                qv_u3D,                                         &
 #endif
-                 ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
+                ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
                 trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !GRZ
                 drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !GRZ
                 lfrv_urb3d,dgr_urb3d,dg_urb3d,lfr_urb3d,lfg_urb3d,& !GRZ
@@ -2895,7 +2900,9 @@ CONTAINS
                 sfwin1_urb3d,sfwin2_urb3d,                      & !H multi-layer urban
                 sfw1_urb3d,sfw2_urb3d,sfr_urb3d,sfg_urb3d,      & !H multi-layer urban
 #ifdef URBANSTATE
-                ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D, &
+                num_urban_nz,                                   &
+                ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,&
+                qv_u3D,                                         &
 #endif
                 ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
                 trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !GRZ
@@ -3235,6 +3242,11 @@ CONTAINS
                        sfwin1_urb3d,   sfwin2_urb3d,                                        & !H multi-layer urban
                          sfw1_urb3d,     sfw2_urb3d,      sfr_urb3d,  sfg_urb3d,            & !H multi-layer urban
                         ep_pv_urb3d,     t_pv_urb3d,                                        & !GRZ
+#ifdef URBANSTATE
+                       num_urban_nz,                                                        &
+                             ua_u3D,         va_u3D,         pt_u3D,     da_u3D,   pt0_u3D, &
+                             pr_u3D,         qv_u3D,                                        &
+#endif
                           trv_urb4d,       qr_urb4d,      qgr_urb3d,  tgr_urb3d,            & !GRZ
                         drain_urb4d,  draingr_urb3d,     sfrv_urb3d, lfrv_urb3d,            & !GRZ
                           dgr_urb3d,       dg_urb3d,      lfr_urb3d,  lfg_urb3d,            & !GRZ

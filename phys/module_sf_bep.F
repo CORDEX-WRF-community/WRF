@@ -72,6 +72,7 @@ use module_wrf_error
 #ifdef URBANSTATE
                       num_urban_nz,                                                &
                       ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,             &
+                      qv_u3D,                                                      &
 #endif
                       lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,           &
                       a_u,a_v,a_t,a_e,b_u,b_v,                        &
@@ -144,10 +145,10 @@ use module_wrf_error
 #ifdef URBANSTATE
    INTEGER, INTENT(in)                                            :: num_urban_nz
    REAL, DIMENSION(1:num_urban_nz)                                :: ua_u1D, va_u1D, pt_u1D, da_u1D,  &
-     pt0_u1D, pr_u1D
+     pt0_u1D, pr_u1D, qv_u1D
 
    REAL, DIMENSION(ims:ime,1:num_urban_nz,jms:jme), INTENT(out)   :: ua_u3D, va_u3D, pt_u3D, da_u3D,  &
-     pt0_u3D, pr_u3D
+     pt0_u3D, pr_u3D, qv_u3D
 #endif
       
 !      real zr(ims:ime,jms:jme)                ! Solar zenith angle
