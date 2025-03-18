@@ -157,6 +157,15 @@ MODULE module_driver_constants
 #endif
 #endif
 
+#ifdef URBANSTATE
+    !  Maximum number of urban classes
+    INTEGER, PARAMETER                                   :: nurbmax = 11
+    ! Maximum number of street directions
+    INTEGER, PARAMETER                                   :: ndm = 2
+    ! Maximum number of vertical levels in the urban grid
+    INTEGER, PARAMETER                                   :: nz_um = 100
+#endif
+
  CONTAINS
    SUBROUTINE init_module_driver_constants
    END SUBROUTINE init_module_driver_constants
