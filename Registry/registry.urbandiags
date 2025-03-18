@@ -1,9 +1,24 @@
 # Dimensions
-rconfig   real       dz_u                 namelist,physics      1              5.     rh{12}  "dz_u"                        "amount of vertical layers used by the urban module BEP"   ""
+rconfig   real       dz_u                 namelist,physics      1              5.     rh{12}  "dz_u"                         "amount of vertical layers used by the urban module BEP"   ""
 rconfig   integer    num_urban_nz         namelist,physics      1              18     rh{12}  "num_urban_nz"                 "amount of vertical layers used by the urban module BEP"   ""
 rconfig   integer    num_urban_nbui       namelist,physics      1              15     rh{12}  "num_urban_nbui"               "amount of types of buildings per LCZ used by the urban module BEP"   ""
+rconfig   integer    num_urban_nd         namelist,physics      1              2      rh{12}  "num_urban_nd"                 "amount of directions of streets used by module BEP"   ""
 rconfig   integer    num_urban_ng         namelist,physics      1              10     rh{12}  "num_urban_ng"                 "amount of ground layers used by module BEP"   ""
-rconfig   integer    num_urban_ndm        namelist,physics      1              2      rh{12}  "num_urban_ndm"                "amount of directions of streets used by module BEP as "   ""
+rconfig   integer    num_urban_ngr        namelist,physics      1              10     rh{12}  "num_urban_ngr"                "amount of grid levels in green roofs used by module BEM"   ""
+rconfig   integer    num_urban_nwr        namelist,physics      1              10     rh{12}  "num_urban_nwr"                "amount of grid levels in the walls or roofs used by module BEM"   ""
+rconfig   integer    num_urban_nf         namelist,physics      1              10     rh{12}  "num_urban_nf"                 "amount of grid levels in floors used by module BEM"   ""
+rconfig   integer    num_urban_ngb        namelist,physics      1              10     rh{12}  "num_urban_ngb"                "amount of grid levels in the ground below building used by module BEM"   ""
+rconfig   real       h_water              namelist,physics      1       0.0009722     rh{12}  "h_water"                      "mm of irrigation per hour"
+# FROM: phys/module_sf_bep_bem.F
+#----------------------------------------------------------------------------------
+#-Parameters of the windows. The glasses of windows are considered without films  -
+#-Read the paper of J.Karlsson and A.Roos(2000):"modelling the angular behaviour  -
+#-of the total solar energy transmittance of windows".Solar Energy Vol.69,No.4,   -
+#-pp. 321-329, for more details.                                                  -
+#----------------------------------------------------------------------------------
+rconfig   integer    p_num                namelist,physics      1               2     rh{12}  "p_num"                        "number of panes in the windows (1,2 or 3)"
+rconfig   integer    q_num                namelist,physics      1               4     rh{12}  "q_num"                        "category number for the windows (q_num= 4, standard glasses) [max=10]"
+
 rconfig   integer    urban_map_zrd        namelist,physics      1              360    rh{12}  "urban_map_zrd"                "dimension used by module BEP as num_urban_ndm*num_urban_nwr*num_urban_nz"   ""
 rconfig   integer    urban_map_zwd        namelist,physics      1              5400   rh{12}  "urban_map_zwd"                "dimension used by module BEP as num_urban_ndm*num_urban_nwr*num_urban_nz*num_urban_nbui"  ""
 rconfig   integer    urban_map_gd         namelist,physics      1              20     rh{12}  "urban_map_gd"                 "dimension used by module BEP as num_urban_ndm*num_urban_ng"   ""
@@ -63,7 +78,7 @@ state    integer urban_map_fbd_wgt    i{umap9}j   misc       1         Z     rh{
 state    integer urban_map_zgrd_wgt   i{umap10}j  misc       1         Z     rh{12}      "urban_map_zgrd_wgt"      "urban_map_zgrd WEIGHTS"       "1."
 
 # State variales inside urban module
-#  remove ##urban_state## and introduce in configure.wrf -DURBANSTATE
+#  remove ##urban_state## and introduce in configure.wrf -DURBANSTATE=1
 ##urban_state##state    real   THAURB          i{umap_1}j   misc       1         Z     h{12}       "THAURB"               "POTENTIAL TEMPERATURE WITHIN URBAN CANOPY"                "K"
 ##urban_state##state    real   THA0URB         i{umap_1}j   misc       1         Z     h{12}       "THA0URB"              "REFERENCE POTENTIAL TEMPERATURE WITHIN URBAN CANOPY"                "K"
 ##urban_state##state    real   UAURB           i{umap_1}j   misc       1         Z     h{12}       "UAURB"                "WESTWARD WIND SPEED WITHIN URBAN CANOPY"                "ms-1"

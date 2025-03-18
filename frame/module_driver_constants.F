@@ -158,12 +158,14 @@ MODULE module_driver_constants
 #endif
 
 #ifdef URBANSTATE
-    !  Maximum number of urban classes
-    INTEGER, PARAMETER                                   :: nurbmax = 11
-    ! Maximum number of street directions
-    INTEGER, PARAMETER                                   :: ndm = 2
-    ! Maximum number of vertical levels in the urban grid
-    INTEGER, PARAMETER                                   :: nz_um = 100
+   !  Maximum number of urban classes
+   INTEGER, PARAMETER                                    :: nurbmax = 11
+   ! Maximum number of street directions
+   INTEGER, PARAMETER                                    :: ndm = 2
+   ! Maximum number of vertical levels in the urban grid
+   INTEGER, PARAMETER                                    :: nz_um = 100
+   !maximum number of types of buildings in an urban class (must be less or equal than nz_um)
+   INTEGER, PARAMETER                                    :: nbui_max = 15
 #endif
 
  CONTAINS

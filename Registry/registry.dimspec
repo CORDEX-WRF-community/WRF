@@ -54,7 +54,7 @@ dimspec    snly    2     namelist=num_snow_layers          z     snow_layers
 dimspec    l       2     namelist=num_soil_layers          z     soil_layers
 dimspec    snsl    2     namelist=num_snso_layers          z     snso_layers
 
-dimspec    umap0   2     namelist=num_urban_ndm            z     num_urban_ndm
+dimspec    umap0   2     namelist=num_urban_nd             z     num_urban_nd
 dimspec    umap1   2     namelist=urban_map_zrd            z     urban_map_zrd
 dimspec    umap2   2     namelist=urban_map_zwd            z     urban_map_zwd
 dimspec    umap3   2     namelist=urban_map_gd             z     urban_map_gd
@@ -144,4 +144,8 @@ dimspec    nsh     2     constant=100                      z     nsh
 dimspec    umap_1   2     namelist=num_urban_nz            z     num_urban_nz
 dimspec    umap_2   2     namelist=num_urban_nbui          z     num_urban_nbui
 dimspec    umap_3   2     namelist=num_urban_ng            z     num_urban_ng
+dimspec    uamp_4   2     nmmelist=num_urban_ngr           z     num_urban_ngr
+dimspec    umap_5   2     nmmelist=num_urban_nwr           z     num_urban_nwr
+dimspec    umap_6   2     nmmelist=num_urban_nf            z     num_urban_nf
+dimspec    umap_7   2     nmmelist=num_urban_ngb           z     num_urban_ngb
 
