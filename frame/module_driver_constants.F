@@ -158,7 +158,7 @@ MODULE module_driver_constants
 #endif
 
 #ifdef URBANSTATE
-   !  Maximum number of urban classes
+   ! Maximum number of urban classes
    INTEGER, PARAMETER                                    :: nurbmax = 11
    ! Maximum number of street directions
    INTEGER, PARAMETER                                    :: ndm = 2

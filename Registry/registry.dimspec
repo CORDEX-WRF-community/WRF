@@ -141,6 +141,7 @@ endif
 dimspec    nsh     2     constant=100                      z     nsh
 
 # Additioal dimensions from urban modeule
+dimspec    umap_0   2     namelist=num_urban               z     num_urban
 dimspec    umap_1   2     namelist=num_urban_nz            z     num_urban_nz
 dimspec    umap_2   2     namelist=num_urban_nbui          z     num_urban_nbui
 dimspec    umap_3   2     namelist=num_urban_ng            z     num_urban_ng
