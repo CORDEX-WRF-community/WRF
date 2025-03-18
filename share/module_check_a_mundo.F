@@ -462,31 +462,6 @@
       END IF
 
 !-----------------------------------------------------------------------
-! Assign the dimensions for the urban options to the values defined in 
-! each of those respective modules.
-!-----------------------------------------------------------------------
-      DO i = 1, model_config_rec % max_dom
-         IF ( .NOT. model_config_rec % grid_allowed(i) ) CYCLE
-         IF ( model_config_rec % sf_urban_physics(i) == bepscheme     ) THEN
-           model_config_rec % num_urban_ndm  = bep_ndm()
-           model_config_rec % num_urban_nz   = bep_nz_um()
-           model_config_rec % num_urban_ng   = bep_ng_u()
-           model_config_rec % num_urban_nwr  = bep_nwr_u()
-         END IF
-         IF ( model_config_rec % sf_urban_physics(i) == bep_bemscheme ) THEN 
-           model_config_rec % num_urban_ndm  = bep_bem_ndm()
-           model_config_rec % num_urban_nz   = bep_bem_nz_um()
-           model_config_rec % num_urban_ng   = bep_bem_ng_u()
-           model_config_rec % num_urban_nwr  = bep_bem_nwr_u()
-           model_config_rec % num_urban_nf   = bep_bem_nf_u()
-           model_config_rec % num_urban_ngb  = bep_bem_ngb_u()
-           model_config_rec % num_urban_nbui = bep_bem_nbui_max()
-           model_config_rec % num_urban_ngr  = bep_bem_ngr_u()
-
-         END IF
-      ENDDO
-
-!-----------------------------------------------------------------------
 ! Check that mosiac option cannot turn on when sf_urban_physics = 2 and 3
 !-----------------------------------------------------------------------
       DO i = 1, model_config_rec % max_dom
