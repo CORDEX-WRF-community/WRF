@@ -14,30 +14,7 @@ use module_wrf_error
 ! Access urban_param.tbl values through calling urban_param_init in module_physics_init
 ! for CASE (BEPSCHEME) select sf_urban_physics
 !
-#ifdef URBANSTATE
-!  Nothing to define here, passed from namelist
  USE module_driver_constants, ONLY: nurbmax, ndm, nz_um
-#else
-! -----------------------------------------------------------------------
-!  Dimension for the array used in the BEP module
-! -----------------------------------------------------------------------
-      integer nurbmax         ! Maximum number of urban classes    
-      parameter (nurbmax=11)
-
-      integer ndm             ! Maximum number of street directions 
-      parameter (ndm=2)
-
-      integer nz_um           ! Maximum number of vertical levels in the urban grid
-      parameter(nz_um=18)
-
-      integer ng_u            ! Number of grid levels in the ground
-      parameter (ng_u=10)
-      integer nwr_u            ! Number of grid levels in the walls or roofs
-      parameter (nwr_u=10)
-
-      real dz_u                 ! Urban grid resolution
-      parameter (dz_u=5.)
-#endif
 
 ! The change of ng_u, nwr_u should be done in agreement with the block data
 !  in the routine "surf_temp" 
@@ -74,10 +51,11 @@ use module_wrf_error
                        num_urban_hi,                                               &
                       trb_urb4d,tw1_urb4d,tw2_urb4d,tgb_urb4d,        &
                       sfw1_urb3d,sfw2_urb3d,sfr_urb3d,sfg_urb3d,      &
-#ifdef URBANSTATE
                       num_urban_nz,                                   &
+#ifdef URBANSTATE
                       ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D,        &
                       pr_u3D, qv_u3D,                                 &
+#endif
 ! These dimensions are no longer depending no activation of DURBANSTATE, it would complicate
 !   too much the lecture of the code. By now own, all the uses of the following dimensions
 !   have been changed from the use of their maximum value (defined in frame/module_driver_constants.F)
@@ -88,7 +66,6 @@ use module_wrf_error
 ! However, they are kept insiude the definition in order to faciliate the comprehension of the 
 !   compilation error
                       nbui, nd, nz_ui, ng_u, nwr_u, dz_u,             &
-#endif
                       lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,           &
                       a_u,a_v,a_t,a_e,b_u,b_v,                        &
                       b_t,b_e,b_q,dlg,dl_u,sf,vl,                     &
@@ -157,10 +134,10 @@ use module_wrf_error
       real z(ims:ime,kms:kme,jms:jme)            ! Vertical coordinates
       REAL, INTENT(IN )::   DT      ! Time step
       
-#ifdef URBANSTATE
    INTEGER, INTENT(in)                                            :: num_urban_nz
    INTEGER, INTENT(in)                                            :: nbui, nd, nz_ui, ng_u, nwr_u
    REAL, INTENT(in)                                               :: dz_u
+#ifdef URBANSTATE
    REAL, DIMENSION(1:num_urban_nz)                                :: ua_u1D, va_u1D, pt_u1D, da_u1D,  &
      pt0_u1D, pr_u1D, qv_u1D
    REAL, DIMENSION(ims:ime,1:num_urban_nz,jms:jme), INTENT(out)   :: ua_u3D, va_u3D, pt_u3D, da_u3D,  &
@@ -331,15 +308,15 @@ use module_wrf_error
       data first/.true./
       save first,time_bep 
 
-#ifdef URBANSTATE
+!#ifdef URBANSTATE
 ! L. Fita, CIMA/IFAECI, March 2025
 ! Avoiding SAVE, I do not know how will it work.... 
-#else
-      save alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,                      &
-           albg_u,albw_u,albr_u,emg_u,emw_u,emr_u,                      &
-           z0g_u,z0r_u, nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b,ss_u,pb_u, &
-           nz_u,z_u 
-#endif
+!#else
+!      save alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,                      &
+!           albg_u,albw_u,albr_u,emg_u,emw_u,emr_u,                      &
+!           z0g_u,z0r_u, nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b,ss_u,pb_u, &
+!           nz_u,z_u 
+!#endif
 !------------------------------------------------------------------------
 !    Calculation of the momentum, heat and turbulent kinetic fluxes
 !     produced by builgings
@@ -410,21 +387,15 @@ use module_wrf_error
       if (first) then                           ! True only on first call
          
          call init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,          &
-#ifdef URBANSTATE
                 nbui, nz_ui, nd,                                         &
-#endif
                 twini_u,trini_u,tgini_u,albg_u,albw_u,albr_u,emg_u,emw_u,&
                 emr_u,z0g_u,z0r_u,nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b)
 
 !      Initialisation of the urban parameters and calculation of the view factors
              
-#ifdef URBANSTATE
          call icBEP (nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u,                    &
                       nbui, nz_ui, dz_u)
-#else
-         call icBEP (nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u)                               
-#endif
-          
+
          first=.false.
 
       endif ! first
@@ -439,17 +410,10 @@ use module_wrf_error
               hi_urb1D(iz_u)=hi_urb(ix,iz_u,iy)
            enddo
 
-#ifdef URBANSTATE
            call icBEPHI_XY(hb_u,hi_urb1D,ss_urb,pb_urb,nz_urb(iurb),z_u,     &
                       nd, nz_ui, dz_u)
-#else
-           call icBEPHI_XY(hb_u,hi_urb1D,ss_urb,pb_urb,nz_urb(iurb),z_u)
-#endif
-           
            call param(iurb,nz_u(iurb),nz_urb(iurb),nzurban(iurb),nd_u(iurb), &
-#ifdef URBANSTATE
                       nbui, nd, nz_ui, ng_u, nwr_u,                  &
-#endif                                      
                       csg_u,csg,alag_u,alag,csr_u,csr,               &
                       alar_u,alar,csw_u,csw,alaw_u,alaw,             &
                       ws_u,ws,bs_u,bs,z0g_u,z0r_u,z0,                &
@@ -461,9 +425,7 @@ use module_wrf_error
 !           
          
            call icBEP_XY(iurb,fww_u,fwg_u,fgw_u,fsw_u,               &
-#ifdef URBANSTATE
                       nbui, nd, nz_ui,                               &
-#endif
                       fws_u,fsg_u,nd_u(iurb),strd,ws,nzurban(iurb),z_u)   
 
        do iz= kts,kte
@@ -557,8 +519,8 @@ use module_wrf_error
                    b_u1D,b_v1D,b_t1D,b_e1D,                         & 
 #ifdef URBANSTATE
                    ua_u1D, va_u1D, pt_u1D, da_u1D, pt0_u1D, pr_u1D, &
-                   nbui, nd, nz_ui, ng_u, nwr_u, dz_u,          &
 #endif
+                   nbui, nd, nz_ui, ng_u, nwr_u, dz_u,              &
                    dlg1D,dl_u1D,sf1D,vl1D,rl_up(ix,iy),             &
                    rs_abs(ix,iy),emiss(ix,iy),grdflx_urb(ix,iy))                            
 !        write(*,*) 'salgo de BEP1D'
@@ -666,8 +628,8 @@ use module_wrf_error
                       b_u,b_v,b_t,b_e,                                & 
 #ifdef URBANSTATE
                       ua_u, va_u, pt_u, da_u, pt0_u, pr_u,            &
-                      nbui, nd, nz_ui, ng_u, nwr_u, dz_u,             &
 #endif
+                      nbui, nd, nz_ui, ng_u, nwr_u, dz_u,             &
                       dlg,dl_u,sf,vl,rl_up,rs_abs,emiss,grdflx_urb)                             
 
 ! ----------------------------------------------------------------------
@@ -740,10 +702,8 @@ use module_wrf_error
 
       integer iurb               ! Current urban class
 
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                :: nbui, nd, nz_ui, ng_u, nwr_u
       REAL, INTENT(in)                                   :: dz_u
-#endif
 
 !    Building parameters      
       real alag(ng_u)            ! Ground thermal diffusivity [m^2 s^-1]
@@ -893,29 +853,18 @@ use module_wrf_error
       end do
 
 ! Interpolation on the "urban grid"
-#ifdef URBANSTATE
       call interpol(kms,kme,kts,kte,nz_ui,z,z_u,ua,ua_u)
       call interpol(kms,kme,kts,kte,nz_ui,z,z_u,va,va_u)
       call interpol(kms,kme,kts,kte,nz_ui,z,z_u,pt,pt_u)
       call interpol(kms,kme,kts,kte,nz_ui,z,z_u,pt0,pt0_u)
       call interpol(kms,kme,kts,kte,nz_ui,z,z_u,pr,pr_u)
       call interpol(kms,kme,kts,kte,nz_ui,z,z_u,da,da_u)
-#else
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,ua,ua_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,va,va_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,pt,pt_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,pt0,pt0_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,pr,pr_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,da,da_u)
-#endif
                    
 ! Compute the modification of the radiation due to the buildings
 
       call modif_rad(iurb,ndu,nzu,z_u,ws,               &
                     drst,strd,ss,pb,                    &
-#ifdef URBANSTATE
                     nbui, nz_ui, ng_u, nwr_u,           &
-#endif
                     tw,tg,albg,albw,emw,emg,            &
                     fww,fwg,fgw,fsw,fsg,                &
                     zr,deltar,ah,                       &
@@ -925,9 +874,7 @@ use module_wrf_error
        
        call upward_rad(ndu,nzu,ws,bs,                   &
                        sigma,pb,ss,                     &
-#ifdef URBANSTATE
                        nd, nz_ui, ng_u, nwr_u, dz_u,    &
-#endif
                        tg,emg,albg,rlg,rsg,sfg,         & 
                        tw,emw,albw,rlw,rsw,sfw,         & 
                        tr,emr,albr,rld,rs,sfr,          & 
@@ -938,9 +885,7 @@ use module_wrf_error
 
       call surf_temp(nzu,ndu,pr_u,dt,ss,                & 
                     rs,rld,rsg,rlg,rsw,rlw,             &
-#ifdef URBANSTATE
                     nz_ui, ng_u, nwr_u,                 &
-#endif
                     tg,alag,csg,emg,albg,ptg,sfg,gfg,   &
                     tr,alar,csr,emr,albr,ptr,sfr,gfr,   &
                     tw,alaw,csw,emw,albw,ptw,sfw,gfw)  
@@ -950,10 +895,7 @@ use module_wrf_error
        
       call buildings(ndu,nzu,z0,ua_u,va_u,                       & 
                      pt_u,pt0_u,                                 &
-#ifdef URBANSTATE
                      nz_ui, dz_u,                                &
-#endif                     
-                     
                      ptg,ptr,da_u,ptw,drst,                      &                      
                      uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,  & 
                      uhb_u,vhb_u,thb_u,ehb_u,ss,dt)                        
@@ -992,9 +934,7 @@ use module_wrf_error
 
       call urban_meso(ndu,kms,kme,kts,kte,nzu,z,dz,z_u,pb,ss,bs,ws,sf, & 
                      vl,                                               &
-#ifdef URBANSTATE
                      nz_ui,                                            &
-#endif
                      uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,        &
                      uhb_u,vhb_u,thb_u,ehb_u,                          &
                      a_u,a_v,a_t,a_e,b_u,b_v,b_t,b_e)                    
@@ -1006,9 +946,7 @@ use module_wrf_error
 ! Calculation of the length scale taking into account the buildings effects
 
       call interp_length(ndu,kms,kme,kts,kte,nzu,z_u,z,ss,ws,bs,      &
-#ifdef URBANSTATE
         nz_ui,                                                        &
-#endif      
         dlg,dl_u)
 
       return
@@ -1018,9 +956,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 
        subroutine param(iurb,nzu,nzurb,nzurban,ndu,                   &
-#ifdef URBANSTATE
                        nbui, nd, nz_ui, ng_u, nwr_u,                  &
-#endif
                        csg_u,csg,alag_u,alag,csr_u,csr,               &
                        alar_u,alar,csw_u,csw,alaw_u,alaw,             &
                        ws_u,ws,bs_u,bs,z0g_u,z0r_u,z0,                &  
@@ -1041,10 +977,7 @@ use module_wrf_error
       integer nzu                  ! Number of vertical urban levels in the current class
       integer nzurb                ! Number of vertical urban levels in the current class
       integer ndu                  ! Number of street direction for the current urban class
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                :: nbui, nd, nz_ui, ng_u, nwr_u
-#endif
-
       real alag_u(nbui)           ! Ground thermal diffusivity [m^2 s^-1]
       real alar_u(nbui)           ! Roof thermal diffusivity [m^2 s^-1]
       real alaw_u(nbui)           ! Wall thermal diffusivity [m^2 s^-1]
@@ -1194,11 +1127,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 ! ===6=8===============================================================72
 
-#ifdef URBANSTATE
       subroutine interpol(kms,kme,kts,kte,nz_ui,z,z_u,c,c_u)
-#else
-      subroutine interpol(kms,kme,kts,kte,nz_u,z,z_u,c,c_u)
-#endif
 ! ----------------------------------------------------------------------
 !  This routine interpolate para
 !  meters from the "mesoscale grid" to
@@ -1216,11 +1145,7 @@ use module_wrf_error
       real z(kms:kme)          ! Altitude of the cell interface
       real c(kms:kme)            ! Parameter which has to be interpolated
 ! Data relative to the "urban grid"
-#ifdef URBANSTATE
       integer nz_ui          ! Number of levels
-#else
-      integer nz_u          ! Number of levels
-#endif
 !!    real z_u(nz_u+1)      ! Altitude of the cell interface
       real z_u(nz_ui)       ! Altitude of the cell interface
 ! ----------------------------------------------------------------------
@@ -1239,11 +1164,7 @@ use module_wrf_error
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------
 
-#ifdef URBANSTATE
        do iz_u=1,nz_ui
-#else
-       do iz_u=1,nz_u
-#endif
         ctot=0.
         do iz=kts,kte
          dz=max(min(z(iz+1),z_u(iz_u+1))-max(z(iz),z_u(iz_u)),0.)
@@ -1259,9 +1180,7 @@ use module_wrf_error
 ! ===6=8===============================================================72     
 
       subroutine modif_rad(iurb,nd,nz_u,z,ws,drst,strd,ss,pb,    &
-#ifdef URBANSTATE
                           nbui, nz_ui, ng_u, nwr_u,              &
-#endif
                           tw,tg,albg,albw,emw,emg,               &
                           fww,fwg,fgw,fsw,fsg,                   &
                           zr,deltar,ah,                          &    
@@ -1281,10 +1200,7 @@ use module_wrf_error
       integer iurb              ! current urban class
       integer nd                ! Number of street direction for the current urban class
       integer nz_u              ! Number of layer in the urban grid
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                            :: nbui, nz_ui, ng_u, nwr_u
-#endif
-
       real z(nz_ui)           ! Height of the urban grid levels
       real ws(nd)              ! Street widths of the current urban class
       real drst(nd)            ! street directions for the current urban class
@@ -1325,26 +1241,17 @@ use module_wrf_error
 !  Calculation of the shadow effects
 
       call shadow_mas(nd,nz_u,zr,deltar,ah,drst,ws,ss,pb,z,           &
-#ifdef URBANSTATE
                      nz_ui,                                           &
-#endif
                      rs,rsw,rsg)
-
-
 
 ! Calculation of the reflection effects          
       do id=1,nd
          call long_rad(iurb,nz_u,id,emw,emg,                 &
-#ifdef URBANSTATE
                       nbui, nz_ui, nd, ng_u, nwr_u,          &
-#endif
-
                       fwg,fww,fgw,fsw,fsg,tg,tw,rlg,rlw,rl,pb)
          
          call short_rad(iurb,nz_u,id,albw,                   & 
-#ifdef URBANSTATE
                            nbui, nz_ui, nd, ng_u,            &
-#endif
                            albg,fwg,fww,fgw,rsg,rsw,pb)
   
       enddo
@@ -1357,11 +1264,9 @@ use module_wrf_error
 ! ===6=8===============================================================72     
 
       subroutine surf_temp(nz_u,nd,pr,dt,ss,rs,rl,rsg,rlg,rsw,rlw,     &
-#ifdef URBANSTATE
                           nz_ui, ng_u, nwr_u,                          &
-#endif
-                          tg,alag,csg,emg,albg,ptg,sfg,gfg,             &
-                          tr,alar,csr,emr,albr,ptr,sfr,gfr,             &
+                          tg,alag,csg,emg,albg,ptg,sfg,gfg,            &
+                          tr,alar,csr,emr,albr,ptr,sfr,gfr,            &
                           tw,alaw,csw,emw,albw,ptw,sfw,gfw)             
                  
 
@@ -1378,9 +1283,7 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
       integer nz_u              ! Number of vertical layers defined in the urban grid
       integer nd                ! Number of street direction for the current urban class
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                :: nz_ui, ng_u, nwr_u
-#endif
 
       real alag(ng_u)           ! Ground thermal diffusivity for the current urban class [m^2 s^-1] 
       real alar(nwr_u)           ! Roof thermal diffusivity for the current urban class [m^2 s^-1]  
@@ -1440,7 +1343,6 @@ use module_wrf_error
       real dzw_u(nwr_u)          ! Layer sizes in the wall
       
 ! This does not work for flexible amount of layers
-#ifdef URBANSTATE
       IF (ng_u == 10) THEN
         dzg_u = (/ 0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025 /)
       ELSE
@@ -1459,11 +1361,6 @@ use module_wrf_error
         FATAL_ERROR('modify code or namelist parameter num_urban_nwr')
       END IF
 
-#else
-      data dzg_u /0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025/
-      data dzr_u /0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025/   
-      data dzw_u /0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025/
-#endif
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------
@@ -1546,9 +1443,7 @@ use module_wrf_error
 ! ===6=8===============================================================72  
 
       subroutine buildings(nd,nz,z0,ua_u,va_u,pt_u,pt0_u,         &
-#ifdef URBANSTATE
                         nz_ui, dz_u,                                 &
-#endif
                         ptg,ptr,da_u,ptw,                            &
                         drst,uva_u,vva_u,uvb_u,vvb_u,                &
                         tva_u,tvb_u,evb_u,                           &
@@ -1568,10 +1463,8 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
       integer nd                ! Number of street direction for the current urban class
       integer nz                ! number of vertical space steps
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                :: nz_ui
       REAL, INTENT(in)                                   :: dz_u
-#endif
       real ua_u(nz_ui)          ! Wind speed in the x direction on the urban grid
       real va_u(nz_ui)          ! Wind speed in the y direction on the urban grid
       real da_u(nz_ui)          ! air density on the urban grid
@@ -1668,9 +1561,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 
         subroutine urban_meso(nd,kms,kme,kts,kte,nz_u,z,dz,z_u,pb,ss,bs,ws,sf,vl,    &
-#ifdef URBANSTATE
                              nz_ui,                                     &
-#endif
                              uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u, &       
                              uhb_u,vhb_u,thb_u,ehb_u,                   &      
                              a_u,a_v,a_t,a_e,b_u,b_v,b_t,b_e)           
@@ -1694,9 +1585,8 @@ use module_wrf_error
 ! Data relative to the "uban grid"
       integer nz_u              ! Number of layer in the urban grid
       integer nd                ! Number of street direction for the current urban class
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                :: nz_ui
-#endif
+
       real bs(nd)              ! Building widths of the current urban class
       real ws(nd)              ! Street widths of the current urban class
       real z_u(nz_ui)         ! Height of the urban grid levels
@@ -1876,9 +1766,7 @@ use module_wrf_error
 ! ===6=8===============================================================72 
 
       subroutine interp_length(nd,kms,kme,kts,kte,nz_u,z_u,z,ss,ws,bs,              &
-#ifdef URBANSTATE
                              nz_ui,                                                 &
-#endif
                              dlg,dl_u)
 
 ! ----------------------------------------------------------------------     
@@ -1896,9 +1784,7 @@ use module_wrf_error
       real z(kms:kme)              ! Altitude above the ground of the cell interface
       integer nd                ! Number of street direction for the current urban class
       integer nz_u              ! Number of levels in the "urban grid"
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                :: nz_ui
-#endif
 
       real z_u(nz_ui)         ! Height of the urban grid levels
       real bs(nd)              ! Building widths of the current urban class
@@ -1968,9 +1854,7 @@ use module_wrf_error
 ! ===6=8===============================================================72   
 
       subroutine shadow_mas(nd,nz_u,zr,deltar,ah,drst,ws,ss,pb,z,         &
-#ifdef URBANSTATE
                            nz_ui,                                         &
-#endif
                            rs,rsw,rsg)
         
 ! ----------------------------------------------------------------------
@@ -1985,9 +1869,7 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
       integer nd                ! Number of street direction for the current urban class
       integer nz_u              ! number of vertical layers defined in the urban grid
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                :: nz_ui
-#endif
       real ah                   ! Hour angle (it should come from the radiation routine)
       real deltar               ! Declination of the sun
       real drst(nd)            ! street directions for the current urban class
@@ -2151,10 +2033,7 @@ use module_wrf_error
 ! ===6=8===============================================================72     
 
       subroutine long_rad(iurb,nz_u,id,emw,emg,                  &
-#ifdef URBANSTATE
                          nbui, nz_ui, nd, ng_u, nwr_u,           &
-#endif
-
                          fwg,fww,fgw,fsw,fsg,tg,tw,rlg,rlw,rl,pb)
 
 ! ----------------------------------------------------------------------
@@ -2175,9 +2054,7 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
       real emg                        ! Emissivity of ground for the current urban class
       real emw                        ! Emissivity of wall for the current urban class
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                :: nbui, nz_ui, nd, ng_u, nwr_u
-#endif
       real fgw(nz_ui,nd,nbui)       ! View factors from ground to wall
       real fsg(nd,nbui)             ! View factors from sky to ground
       real fsw(nz_ui,nd,nbui)       ! View factors from sky to wall
@@ -2304,9 +2181,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 
        subroutine short_rad(iurb,nz_u,id,albw,                        & 
-#ifdef URBANSTATE
                            nbui, nz_ui, nd, ng_u,                     &
-#endif
                            albg,fwg,fww,fgw,rsg,rsw,pb)
 
 ! ----------------------------------------------------------------------
@@ -2327,9 +2202,7 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
       real albg                 ! Albedo of the ground for the current urban class
       real albw                 ! Albedo of the wall for the current urban class
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                :: nbui, nz_ui, nd, ng_u
-#endif
       real fgw(nz_ui,nd,nbui)       ! View factors from ground to wall
       real fwg(nz_ui,nd,nbui)       ! View factors from wall to ground
       real fww(nz_ui,nz_ui,nd,nbui) ! View factors from wall to wall
@@ -2880,20 +2753,14 @@ use module_wrf_error
 ! ===6=8===============================================================72
 ! ===6=8===============================================================72
 
-#ifdef URBANSTATE
       subroutine icBEP (nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u,            &                               
                       nbui, nz_ui, dz_u)
-#else
-      subroutine icBEP (nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u)                               
-#endif
 
       implicit none       
         
 
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                :: nbui, nz_ui
       REAL, INTENT(in)                                   :: dz_u
-#endif
 
 !    Street parameters
       integer nd_u(nbui)     ! Number of street direction for each urban class
@@ -2997,16 +2864,10 @@ use module_wrf_error
 ! ===6=8===============================================================72
 ! ===6=8===============================================================72
 
-#ifdef URBANSTATE
       subroutine view_factors(iurb,nz_u,id,dxy,z,ws,fww,fwg,fgw,fsg,fsw,fws,   &
                       nbui, nz_ui, nd)
-#else
-      subroutine view_factors(iurb,nz_u,id,dxy,z,ws,fww,fwg,fgw,fsg,fsw,fws) 
-#endif
      
-      implicit none
-
- 
+      implicit none 
 
 ! -----------------------------------------------------------------------
 !     Input
@@ -3015,9 +2876,7 @@ use module_wrf_error
       integer iurb            ! Number of the urban class
       integer nz_u            ! Number of levels in the urban grid
       integer id              ! Street direction number
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                :: nbui, nz_ui, nd
-#endif
       real ws                 ! Street width
       real z(nz_ui)         ! Height of the urban grid levels
       real dxy                ! Street lenght
@@ -3230,9 +3089,7 @@ use module_wrf_error
   ! ===6=8===============================================================72  
      
       SUBROUTINE init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,       &
-#ifdef URBANSTATE
                 nbui, nz_ui, nd,                                         &
-#endif
                 twini_u,trini_u,tgini_u,albg_u,albw_u,albr_u,emg_u,emw_u,&
                 emr_u,z0g_u,z0r_u,nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b)
 
@@ -3241,9 +3098,7 @@ use module_wrf_error
       implicit none
       
       integer iurb            ! urban class number
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                :: nbui, nz_ui, nd
-#endif
 
 !    Building parameters      
       real alag_u(nbui)      ! Ground thermal diffusivity [m^2 s^-1]
@@ -3431,9 +3286,7 @@ use module_wrf_error
 !====6=8===============================================================72 
 
       subroutine upward_rad(ndu,nzu,ws,bs,sigma,pb,ss,                     &
-#ifdef URBANSTATE
                        nd, nz_ui, ng_u, nwr_u, dz_u,                       &
-#endif
                        tg,emg_u,albg_u,rlg,rsg,sfg,                        & 
                        tw,emw_u,albw_u,rlw,rsw,sfw,                        & 
                        tr,emr_u,albr_u,rld,rs, sfr,                        & 
@@ -3447,10 +3300,9 @@ use module_wrf_error
 !
 !INPUT VARIABLES
 !
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                            :: nd, nz_ui, ng_u, nwr_u
       REAL, INTENT(in)                                               :: dz_u
-#endif
+
       real rsw(2*nd,nz_ui)        ! Short wave radiation at the wall for a given canyon direction [W/m2]
       real rlw(2*nd,nz_ui)         ! Long wave radiation at the walls for a given canyon direction [W/m2]
       real rsg(nd)                   ! Short wave radiation at the canyon for a given canyon direction [W/m2]
@@ -3565,9 +3417,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 
       subroutine icBEP_XY(iurb,fww_u,fwg_u,fgw_u,fsw_u,             &
-#ifdef URBANSTATE
-                          nbui, nd, nz_ui,                           &
-#endif
+                          nbui, nd, nz_ui,                          &
                           fws_u,fsg_u,ndu,strd,ws,nzu,z_u)                               
 
       implicit none       
@@ -3576,9 +3426,7 @@ use module_wrf_error
       integer ndu     ! Number of street direction for each urban class
       integer iurb
 
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                            :: nbui, nd, nz_ui
-#endif
 
       real strd(nd)        ! Street length (fix to greater value to the horizontal length of the cells)
       real ws(nd)          ! Street width [m]
@@ -3622,14 +3470,9 @@ use module_wrf_error
       
       do id=1,ndu
 
-#ifdef URBANSTATE
             call view_factors(iurb,nzu,id,strd(id),z_u,ws(id),    &
                               fww_u,fwg_u,fgw_u,fsg_u,fsw_u,fws_u,&
                               nbui, nz_ui, nd)
-#else
-            call view_factors(iurb,nzu,id,strd(id),z_u,ws(id),    &    
-                              fww_u,fwg_u,fgw_u,fsg_u,fsw_u,fws_u) 
-#endif
       
       enddo               
       return       
@@ -3637,12 +3480,8 @@ use module_wrf_error
 ! ===6=8===============================================================72
 ! ===6=8===============================================================72
 
-#ifdef URBANSTATE
       subroutine icBEPHI_XY(hb_u,hi_urb1D,ss_u,pb_u,nzu,z_u,                                          &
                       nd, nz_ui, dz_u)
-#else
-      subroutine icBEPHI_XY(hb_u,hi_urb1D,ss_u,pb_u,nzu,z_u)
-#endif
 
       implicit none   
 !-----------------------------------------------------------------------
@@ -3650,10 +3489,9 @@ use module_wrf_error
 !-----------------------------------------------------------------------
 !    Street parameters
 !
-#ifdef URBANSTATE
       INTEGER, INTENT(in)                                :: nd, nz_ui
       REAL, INTENT(in)                                   :: dz_u
-#endif
+
       real hi_urb1D(nz_ui)    ! The probability that a building has an height h_b
 !
 !     Grid parameters
