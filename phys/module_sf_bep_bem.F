@@ -1986,7 +1986,7 @@ use module_wrf_error
 
       call buildings(iurb,ndu,nzu,z0,cdrag,ua_u,va_u,                                                 &
                      pt_u,pt0_u,                                                                      &
-                     nz_ui, dz_u,                                                                     &
+                     nz_ui,                                                                           &
                      ptg,ptr,ptrv,da_u,qv_u,pr_u,tmp_u,ptw,ptwin,pwin_u(iurb),drst,                   &
                      uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,qvb_u,qhb_u,                           &
                      uhb_u,vhb_u,thb_u,ehb_u,ss,dt,sfw,sfg,sfr,sfrpv,sfrv,lfrv,                       &
@@ -2764,7 +2764,7 @@ use module_wrf_error
 ! ===6=8===============================================================72  
 
       subroutine buildings(iurb,nd,nz,z0,cdrag,ua_u,va_u,pt_u,pt0_u,                                       &
-                        nz_ui, dz_u,                                                                       &
+                        nz_ui,                                                                             &
                         ptg,ptr,ptrv,da_u,qv_u,pr_u,tmp_u,ptw,ptwin,pwin,                                  &
                         drst,uva_u,vva_u,uvb_u,vvb_u,                                                      &
                         tva_u,tvb_u,evb_u,qvb_u,qhb_u,                                                     &
@@ -2789,7 +2789,6 @@ use module_wrf_error
       integer ix,iy
       integer nz                ! number of vertical space steps
       INTEGER, INTENT(in)                                :: nz_ui
-      REAL, INTENT(in)                                   :: dz_u
       real ua_u(nz_ui)          ! Wind speed in the x direction on the urban grid
       real va_u(nz_ui)          ! Wind speed in the y direction on the urban grid
       real da_u(nz_ui)          ! air density on the urban grid
