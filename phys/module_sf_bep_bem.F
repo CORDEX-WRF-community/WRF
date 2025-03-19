@@ -79,10 +79,8 @@ use module_wrf_error
 !     ndm --> nd
 !     nz_um --> nz_ui
 !     nbui_max --> nbi
-! However, they are kept insiude the definition in order to faciliate the comprehension of the 
-!   compilation error
                       nurbi, nd, nz_ui, ng_u, ngr_u,                               &
-                      nwr_u, nf_u, ngb_u, nbui, p_num, q_num, dz_u, h_water,       &
+                      nwr_u, nf_u, ngb_u, nbi, p_num, q_num, dz_u, h_water,       &
 #ifdef URBANCOLAPSE                      
                       urban_map_zrd_mask, urban_map_zwd_mask,                      &
                       urban_map_gd_mask, urban_map_zd_mask,                        &
@@ -523,7 +521,7 @@ use module_wrf_error
       real roof_frac                       ! Surface fraction occupied by roof 
       real d_urb(nz_ui)    
       real sf_ac
-      integer ibui,nurbi
+      integer ibui,nbui
       integer nlev(nz_ui)
  
 !
@@ -1064,7 +1062,7 @@ do iz= kts,kte
                    qv1D,tlev1D,qlev1D,sflev1D,lflev1D,consumlev1D,  &
                    eppvlev1D,tpvlev1D,sfvlev1D,lfvlev1D,twlev1D,tglev1D,tflev1D,sfwin1D,tair1D,sfr_indoor1D,sfrpv1D,gfr1D) 
            
-          do ibui=1,nbui !type of building
+          do ibui=1,nbi !type of building
 	    do iz=1,nz_ui   !vertical levels
                do id=1,nd ! direction
 	          sfw1_urb3d(ix,ind_zd(ibui,iz,id),iy)=sfw1D(2*id-1,iz,ibui) 
@@ -1105,7 +1103,7 @@ do iz= kts,kte
 	 enddo
 	 enddo
          
-        do ibui=1,nbui
+        do ibui=1,nbi
          do iz_u=1,nz_ui
          do iw=1,nwr_u
          do id=1,nd
@@ -1140,14 +1138,14 @@ do iz= kts,kte
 !Outputs of BEM
 !
         
-         do ibui=1,nbui !type of building
+         do ibui=1,nbi !type of building
          do iz_u=1,nz_ui !vertical levels
             tlev_urb3d(ix,ind_bd(ibui,iz_u),iy)=tlev1D(iz_u,ibui)  
             qlev_urb3d(ix,ind_bd(ibui,iz_u),iy)=qlev1D(iz_u,ibui)  
          enddo !iz_u
          enddo !ibui
  
-         do ibui=1,nbui !type of building
+         do ibui=1,nbi !type of building
          do iz_u=1,nz_ui !vertical levels
             do id=1,nd !direction
                tw1lev_urb3d(ix,ind_wd(ibui,iz_u,id),iy)=twlev1D(2*id-1,iz_u,ibui)
@@ -1158,7 +1156,7 @@ do iz= kts,kte
          enddo !iz_u
          enddo !ibui
         
-         do ibui=1,nbui  !type of building
+         do ibui=1,nbi  !type of building
             do iw=1,ngb_u !layers in the walls
                do id=1,nd !direction
                   tglev_urb3d(ix,ind_gbd(ibui,iw,id),iy)=tglev1D(id,iw,ibui)
@@ -1166,7 +1164,7 @@ do iz= kts,kte
             enddo !iw
          enddo !ibui
 
-        do ibui=1,nbui !type of building 
+        do ibui=1,nbi !type of building 
         do iw=1,nf_u !layer in the walls
                do iz_u=1,nz_ui-1 !verticals levels
                  do  id=1,nd
@@ -1193,21 +1191,21 @@ do iz= kts,kte
           roof_frac=FRC_URB2D(ix,iy)*bs_urb(1,iurb)/(bs_urb(1,iurb)+ws_urb(1,iurb))
          ibui=0
          nlev=0
-         nurbi=0
+         nbui=0
          d_urb=0.
          do iz=1,nz_ui		   
          if(ss_urb(iz,iurb).gt.0) then		
            ibui=ibui+1		                
            nlev(ibui)=iz-1
            d_urb(ibui)=ss_urb(iz,iurb)
-           nurbi=ibui
+           nbui=ibui
 	 endif	  
          end do  !iz
 
        
 
 
-        do ibui=1,nurbi       !type of building
+        do ibui=1,nbui       !type of building
             ep_pv_urb3d(ix,iy)=ep_pv_urb3d(ix,iy)+meso_urb_ac*d_urb(ibui)*eppvlev1D(ibui)
          do iz_u=1,nlev(ibui) !vertical levels
                sf_ac_urb3d(ix,iy)=sf_ac_urb3d(ix,iy)+meso_urb_ac*d_urb(ibui)*sflev1D(iz_u,ibui)
@@ -1398,20 +1396,20 @@ do iz= kts,kte
       real pv_frac_roof
       integer gr_flag
       integer gr_type
-      real tpv(nbui)
-     real  sfpv(nbui)
-     real sfr_indoor(nbui)
+      real tpv(nbi)
+     real  sfpv(nbi)
+     real sfr_indoor(nbi)
 ! ----------------------------------------------------------------------
 ! INPUT-OUTPUT
 ! ----------------------------------------------------------------------
 
 ! Data relative to the "urban grid" which should be stored from the current time step to the next one
 
-      real tw(2*nd,nz_ui,nwr_u,nbui)  ! Temperature in each layer of the wall [K]
+      real tw(2*nd,nz_ui,nwr_u,nbi)  ! Temperature in each layer of the wall [K]
       real tr(nd,nz_ui,nwr_u)  ! Temperature in each layer of the roof [K]
       real tg(nd,ng_u)          ! Temperature in each layer of the ground [K]
       real trv(nd,nz_ui,ngr_u)  ! Temperature in each layer of the green roof [K]
-      real sfw(2*nd,nz_ui,nbui)      ! Sensible heat flux from walls
+      real sfw(2*nd,nz_ui,nbi)      ! Sensible heat flux from walls
       real sfg(nd)              ! Sensible heat flux from ground (road)
       real sfr(nd,nz_ui)      ! Sensible heat flux from roofs
       real sfrv(nd,nz_ui)      ! Sensible heat flux from green roofs
@@ -1424,7 +1422,7 @@ do iz= kts,kte
       real rainbl              ! Rainfall 
       real gfg(nd)             ! Heat flux transferred from the surface of the ground (road) towards the interior
       real gfr(nd,nz_ui)     ! Heat flux transferred from the surface of the roof towards the interior
-      real gfw(2*nd,nz_ui,nbui)     ! Heat flux transfered from the surface of the walls towards the interior
+      real gfw(2*nd,nz_ui,nbi)     ! Heat flux transfered from the surface of the walls towards the interior
       real qr(nd,nz_ui,ngr_u)  ! Green Roof soil moisture
 
 ! ----------------------------------------------------------------------
@@ -1501,7 +1499,7 @@ do iz= kts,kte
       real ptg(nd)             ! Ground potential temperatures 
       real ptr(nd,nz_ui)     ! Roof potential temperatures 
       real ptrv(nd,nz_ui)     ! Roof potential temperatures 
-      real ptw(2*nd,nz_ui,nbui)     ! Walls potential temperatures 
+      real ptw(2*nd,nz_ui,nbi)     ! Walls potential temperatures 
 
       real tg_av(nd) 
 ! Explicit and implicit component of the momentum, temperature and TKE sources or sinks on
@@ -1555,32 +1553,32 @@ do iz= kts,kte
       real alaf(nf_u+1)     ! Floor thermal diffusivity at each wall layers [W/m K]     
       real alagb(ngb_u+1)   ! Ground thermal diffusivity below the building at each wall layer [W/m K] 
 
-      real sfrb(nd,nbui)        ! Sensible heat flux from roofs [W/m2]
-      real sfrbpv(nd,nbui)      ! Sensible heat flux from PV panels [W/m2]
+      real sfrb(nd,nbi)        ! Sensible heat flux from roofs [W/m2]
+      real sfrbpv(nd,nbi)      ! Sensible heat flux from PV panels [W/m2]
       real sfrpv(nd,nz_ui)          ! Sensible heat flux from PV panels [W/m2]
-      real sfrvb(nd,nbui)        ! Sensible heat flux from roofs [W/m2]
-      real lfrvb(nd,nbui)        ! Sensible heat flux from roofs [W/m2]
-      real lfrb(nd,nbui)        ! Sensible heat flux from roofs [W/m2]
+      real sfrvb(nd,nbi)        ! Sensible heat flux from roofs [W/m2]
+      real lfrvb(nd,nbi)        ! Sensible heat flux from roofs [W/m2]
+      real lfrb(nd,nbi)        ! Sensible heat flux from roofs [W/m2]
   
-      real gfrb(nd,nbui)        ! Heat flux flowing inside the roofs [W/m2]
+      real gfrb(nd,nbi)        ! Heat flux flowing inside the roofs [W/m2]
       real sfwb1D(2*nd,nz_ui)    !Sensible heat flux from the walls [W/m2] 
-      real sfwin(2*nd,nz_ui,nbui)!Sensible heat flux from windows [W/m2]
+      real sfwin(2*nd,nz_ui,nbi)!Sensible heat flux from windows [W/m2]
       real sfwinb1D(2*nd,nz_ui)  !Sensible heat flux from windows [W/m2]
       real gfwb1D(2*nd,nz_ui)    !Heat flux flowing inside the walls [W/m2]
 
-      real qlev(nz_ui,nbui)      !specific humidity [kg/kg]
+      real qlev(nz_ui,nbi)      !specific humidity [kg/kg]
       real qlevb1D(nz_ui)         !specific humidity [kg/kg] 
-      real tlev(nz_ui,nbui)      !Indoor temperature [K]
+      real tlev(nz_ui,nbi)      !Indoor temperature [K]
       real tlevb1D(nz_ui)         !Indoor temperature [K]
       real twb1D(2*nd,nwr_u,nz_ui)     !Wall temperature in BEM [K]      
-      real twlev(2*nd,nz_ui,nbui)     !Window temperature in BEM [K]
+      real twlev(2*nd,nz_ui,nbi)     !Window temperature in BEM [K]
       real twlevb1D(2*nd,nz_ui)        !Window temperature in BEM [K]
-      real tglev(nd,ngb_u,nbui)        !Ground temperature below a building in BEM [K]
+      real tglev(nd,ngb_u,nbi)        !Ground temperature below a building in BEM [K]
       real tglevb1D(ngb_u)               !Ground temperature below a building in BEM [K]
-      real tflev(nd,nf_u,nz_ui-1,nbui)!Floor temperature in BEM[K]
+      real tflev(nd,nf_u,nz_ui-1,nbi)!Floor temperature in BEM[K]
       real tflevb1D(nf_u,nz_ui-1)       !Floor temperature in BEM[K]
-      real trb(nd,nwr_u,nbui)         !Roof temperature in BEM [K]
-      real trvb(nd,ngr_u,nbui)         !Roof temperature in BEM [K]
+      real trb(nd,nwr_u,nbi)         !Roof temperature in BEM [K]
+      real trvb(nd,ngr_u,nbi)         !Roof temperature in BEM [K]
       real trb1D(nwr_u) 
 
       real sflev(nz_ui,nz_ui)     ! sensible heat flux due to the air conditioning systems [W]
@@ -1591,30 +1589,30 @@ do iz= kts,kte
       real consumlev1D(nz_ui)     ! consumption due to the air conditioning systems [W]
       real eppvlev(nz_ui)         ! Electricity production of PV panels [W]
 	   real tpvlev(nd,nz_ui)
-      real tpvlevb(nd,nbui)        ! Sensible heat flux from roofs [W/m2]
+      real tpvlevb(nd,nbi)        ! Sensible heat flux from roofs [W/m2]
       real sfvlev(nz_ui,nz_ui)    ! sensible heat flux due to ventilation [W]
       real lfvlev(nz_ui,nz_ui)    ! latent heat flux due to ventilation [W]
       real sfvlev1D(nz_ui)        ! sensible heat flux due to ventilation [W]
       real lfvlev1D(nz_ui)        ! Latent heat flux due to ventilation [W]
 
-      real ptwin(2*nd,nz_ui,nbui)  ! window potential temperature
+      real ptwin(2*nd,nz_ui,nbi)  ! window potential temperature
       real tw_av(2*nd,nz_ui)        ! Averaged temperature of the wall surfaces
       real twlev_av(2*nd,nz_ui)     ! Averaged temperature of the windows
       real sfw_av(2*nd,nz_ui)       ! Averaged sensible heat from walls
       real sfwind_av(2*nd,nz_ui)    ! Averaged sensible heat from windows
       integer flag_pvp
-      integer nurbi                !Total number of different type of buildings in an urban class
+      integer nbui                !Total number of different type of buildings in an urban class
       integer nlev(nz_ui)         !Number of levels in each different type of buildings in an urban class
       integer ibui,ily  
       real :: nhourday   ! Number of hours from midnight, local time
       real :: st4,gamma,fp,lmr,smr,prova
       real hfgr(nd,nz_ui)!heat flux green roof
-      real hfgrb(nd,nbui)
+      real hfgrb(nd,nbi)
       real irri_per_ts
       real irri_now 
       real tr_av(nd,nz_ui)
-      real tr_avb(nd,nbui)
-      real sfr_avb(nd,nbui)
+      real tr_avb(nd,nbi)
+      real sfr_avb(nd,nbi)
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------
@@ -1739,7 +1737,7 @@ do iz= kts,kte
 
        ibui=0
        nlev=0
-       nurbi=0
+       nbui=0
        hfgrb=0. 
        sfrb=0.     !Sensible heat flux from roof
        sfrbpv=0.   !Sensible heat flux from PV panels
@@ -1779,7 +1777,7 @@ do iz= kts,kte
          if(ss(iz).gt.0) then		
            ibui=ibui+1		                
            nlev(ibui)=iz-1
-           nurbi=ibui
+           nbui=ibui
            do id=1,nd
               tr_avb(id,ibui)=tr_av(id,iz)
 	      tpvlevb(id,ibui)=tpvlev(id,iz)
@@ -1805,7 +1803,7 @@ do iz= kts,kte
 !--------------------------------------------------------------------------------
 !--------------------------------------------------------------------------------
 
-       do ibui=1,nurbi
+       do ibui=1,nbui
           do iz=1,nz_ui
              qlevb1D(iz)=qlev(iz,ibui)
              tlevb1D(iz)=tlev(iz,ibui) 
@@ -1948,7 +1946,7 @@ do iz= kts,kte
 
        do id=1,nd
           do iz=1,nzu!nz_ui
-             do ibui=1,nurbi
+             do ibui=1,nbui
                 ptw(2*id-1,iz,ibui)=tw(2*id-1,iz,nwr_u,ibui)*(pr_u(iz)/p0)**(-rcp_u) 
                 ptw(2*id,iz,ibui)=tw(2*id,iz,nwr_u,ibui)*(pr_u(iz)/p0)**(-rcp_u) 
                 ptwin(2*id-1,iz,ibui)=twlev(2*id-1,iz,ibui)*(pr_u(iz)/p0)**(-rcp_u) 
@@ -2293,12 +2291,12 @@ do iz= kts,kte
 !
 !INPUT VARIABLES
 !
-      real tw(2*nd,nz_ui,nwr_u,nbui)        ! Temperature in each layer of the wall [K]
-      real twlev(2*nd,nz_ui,nbui)     ! Window temperature in BEM [K]
+      real tw(2*nd,nz_ui,nwr_u,nbi)        ! Temperature in each layer of the wall [K]
+      real twlev(2*nd,nz_ui,nbi)     ! Window temperature in BEM [K]
       real pb(nz_ui)                    ! Probability to have a building with an height equal or greater h
       real ss(nz_ui)                    ! Probability to have a building with height h
-      real sfw(2*nd,nz_ui,nbui)             ! Surface fluxes from the walls
-      real sfwin(2*nd,nz_ui,nbui)     ! Surface fluxes from the windows
+      real sfw(2*nd,nz_ui,nbi)             ! Surface fluxes from the walls
+      real sfwin(2*nd,nz_ui,nbi)     ! Surface fluxes from the windows
 !
 !OUTPUT VARIABLES
 !
@@ -2312,7 +2310,7 @@ do iz= kts,kte
       real d_urb(nz_ui)    
       integer nlev(nz_ui)            
       integer id,iz
-      integer nurbi,ibui
+      integer nbui,ibui
 !
 !Initialize Variables
 !
@@ -2321,7 +2319,7 @@ do iz= kts,kte
       sfw_av=0.
       sfwind_av=0.
       ibui=0
-      nurbi=0
+      nbui=0
       nlev=0
       d_urb=0.
 
@@ -2330,14 +2328,14 @@ do iz= kts,kte
            ibui=ibui+1
            d_urb(ibui)=ss(iz)
            nlev(ibui)=iz-1
-           nurbi=ibui		               
+           nbui=ibui		               
          endif
       enddo
       
       do id=1,nd
          do iz=1,nz_ui-1
             if (pb(iz+1).gt.0) then
-                do ibui=1,nurbi
+                do ibui=1,nbui
                    if (iz.le.nlev(ibui)) then
                       tw_av(2*id-1,iz)=tw_av(2*id-1,iz)+(d_urb(ibui)/pb(iz+1))*&
                                        tw(2*id-1,iz,nwr_u,ibui)**4
@@ -2767,7 +2765,7 @@ do iz= kts,kte
       real ptg(nd)             ! Ground potential temperatures 
       real ptr(nd,nz_ui)       ! Roof potential temperatures 
       real ptrv(nd,nz_ui)      ! Green Roof potential temperatures 
-      real ptw(2*nd,nz_ui,nbui)     ! Walls potential temperatures 
+      real ptw(2*nd,nz_ui,nbi)     ! Walls potential temperatures 
       real ss(nz_ui)            ! probability to have a building with height h
       real pb(nz_ui)
       real cdrag(nz_ui)
@@ -2791,7 +2789,7 @@ do iz= kts,kte
       real lfvlev(nz_ui,nz_ui)    ! latent heat flux due to ventilation [W]
       real qvb_u(2*nd,nz_ui)
       real qhb_u(nd,nz_ui)
-      real ptwin(2*nd,nz_ui,nbui)  ! window potential temperature
+      real ptwin(2*nd,nz_ui,nbi)  ! window potential temperature
       real pwin
       real tvb_ac(2*nd,nz_ui)
       real gr_frac_roof
@@ -2820,8 +2818,8 @@ do iz= kts,kte
       real uhb(2*nd,nz_ui)
       real vhb(2*nd,nz_ui)
       real ehb(2*nd,nz_ui)
-      real sfw(2*nd,nz_ui,nbui)   ! sensible heat flux from walls
-      real sfwin(2*nd,nz_ui,nbui) ! sensible heat flux form windows
+      real sfw(2*nd,nz_ui,nbi)   ! sensible heat flux from walls
+      real sfwin(2*nd,nz_ui,nbi) ! sensible heat flux form windows
       real sfr(nd,nz_ui)           ! sensible heat flux from roof
       real sfrv(nd,nz_ui)           ! sensible heat flux from roof
       real lfrv(nd,nz_ui)           ! Latent heat flux from roof
@@ -2843,7 +2841,7 @@ do iz= kts,kte
       real vvb_tmp 
       real evb_tmp     
       integer nlev(nz_ui)
-      integer id,iz,ibui,nurbi,il
+      integer id,iz,ibui,nbui,il
       real wfg     !Ground water pool fraction
       real wfr     !Roof water pool fraction 
       real uhbv(2*nd,nz_ui)
@@ -2863,7 +2861,7 @@ do iz= kts,kte
 ! ----------------------------------------------------------------------
       dz=dz_u
       ibui=0
-      nurbi=0
+      nbui=0
       nlev=0
       d_urb=0.
       
@@ -2894,7 +2892,7 @@ do iz= kts,kte
            ibui=ibui+1
            d_urb(ibui)=ss(iz)
            nlev(ibui)=iz-1
-           nurbi=ibui		               
+           nbui=ibui		               
          endif
       enddo
 
@@ -2965,7 +2963,7 @@ do iz= kts,kte
 
 !        Calculation at the wall surfaces        
  
-         do ibui=1,nurbi
+         do ibui=1,nbui
          do iz=1,nlev(ibui)  
                    
             call flux_wall(ua_u(iz),va_u(iz),pt_u(iz),da_u(iz),             &  
