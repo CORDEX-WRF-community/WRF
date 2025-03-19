@@ -4896,7 +4896,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 ! ===6=8===============================================================72
 
-      subroutine icBEP (nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u            &                               
+      subroutine icBEP (nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u,           &
                       nurbi, nz_ui, dz_u)
 
       implicit none

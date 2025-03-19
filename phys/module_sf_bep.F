@@ -63,6 +63,13 @@ use module_wrf_error
 !     nurbmax --> nurbi
 !     ndm --> nd
 !     nz_um --> nz_ui
+                      nurbi, nd, nz_ui, ng_u, nwr_u, dz_u,            &
+                      lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,           &
+                      a_u,a_v,a_t,a_e,b_u,b_v,                        &
+                      b_t,b_e,b_q,dlg,dl_u,sf,vl,                     &
+                      rl_up,rs_abs,emiss,grdflx_urb,                  &
+                      ids,ide, jds,jde, kds,kde,                      &
+                      ims,ime, jms,jme, kms,kme,                      &
                       its,ite, jts,jte, kts,kte)                    
 
       implicit none
@@ -618,10 +625,10 @@ use module_wrf_error
                       a_u,a_v,a_t,a_e,                                &
                       b_u,b_v,b_t,b_e,                                & 
 #ifdef URBANSTATE
-                      ua_u, va_u, pt_u, da_u, pt0_u, pr_u             &
+                      ua_u, va_u, pt_u, da_u, pt0_u, pr_u,            &
 #endif
-                      nurbi, nd, nz_ui, ng_u, nwr_u, dz_u,             &
-                      dlg,dl_u,sf,vl,rl_up,rs_abs,emiss,grdflx_urb)                             
+                      nurbi, nd, nz_ui, ng_u, nwr_u, dz_u,            &
+                      dlg,dl_u,sf,vl,rl_up,rs_abs,emiss,grdflx_urb)   
 
 ! ----------------------------------------------------------------------
 ! This routine computes the effects of buildings on momentum, heat and
