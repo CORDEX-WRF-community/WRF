@@ -835,13 +835,13 @@ use module_wrf_error
                          nz_urb(iurb),z_u, nd, nz_ui, dz_u)
 
          call param(iurb,nz_u(iurb),nz_urb(iurb),nzurban(iurb),nd_u(iurb), &
-                    nurbi, nd, nz_ui, ng_u, nwr_u,                   &
-                    csg_u,csg,alag_u,alag,csr_u,csr,                 &
-                    alar_u,alar,csw_u,csw,alaw_u,alaw,               &
-                    ws_u,ws_urb,ws,bs_u,bs_urb,bs,z0g_u,z0r_u,z0,    &
-                    strd_u,strd,drst_u,drst,ss_u,ss_urb,ss,pb_u,     &
-                    pb_urb,pb,dzw,dzr,dzf,csf,alaf,dzgb,csgb,alagb,  &
-                    lp_urb2d(ix,iy),lb_urb2d(ix,iy),                 &
+                    nurbi, nd, nz_ui, ng_u, nwr_u, ngb_u, nf_u             &
+                    csg_u,csg,alag_u,alag,csr_u,csr,                       &
+                    alar_u,alar,csw_u,csw,alaw_u,alaw,                     &
+                    ws_u,ws_urb,ws,bs_u,bs_urb,bs,z0g_u,z0r_u,z0,          &
+                    strd_u,strd,drst_u,drst,ss_u,ss_urb,ss,pb_u,           &
+                    pb_urb,pb,dzw,dzr,dzf,csf,alaf,dzgb,csgb,alagb,        &
+                    lp_urb2d(ix,iy),lb_urb2d(ix,iy),                       &
                     hgt_urb2d(ix,iy),FRC_URB2D(ix,iy))
          
 !
@@ -1666,6 +1666,7 @@ use module_wrf_error
 ! Compute the modification of the radiation due to the buildings
 
       call averaging_temp(tw,twlev,ss,pb,tw_av,twlev_av, &
+                           nd, nz_ui, nwr_u, nbi,        &
                            sfw_av,sfwind_av,sfw,sfwin)
                            
      do id=1,ndu
@@ -1738,9 +1739,13 @@ use module_wrf_error
      if(gr_flag.eq.1)then
      if(gr_frac_roof.gt.0.)then
      hfgr=0.
-     call roof_temp_veg(ndu,pr_u,dt,                   &
-                    rld,rs,                    &
-                    trv,ptrv,sfrv,lfrv,gfr,qr,rainbl,drain,hfgr,tr,alar(5),dzr(5),csr(5),nzu,irri_now,gr_type,pv_frac_roof,tpvlev)
+     call roof_temp_veg(ndu,pr_u,dt,                     &
+                    rld,rs,                              &
+                    nz_ui, nwr_u, ngr_u,                 &
+                    trv,ptrv,sfrv,lfrv,gfr,qr,rainbl,    &
+                    drain,hfgr,tr,alar(5),dzr(5),csr(5), &
+                    nzu,irri_now,gr_type,pv_frac_roof,   &
+                    tpvlev)
     
      endif
      endif
@@ -2029,7 +2034,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 
        subroutine param(iurb,nzu,nzurb,nzurban,ndu,                   &
-                       nurbi, nd, nz_ui, ng_u, nwr_u,                 &
+                       nurbi, nd, nz_ui, ng_u, nwr_u, ngb_u, nf_u,                 &
                        csg_u,csg,alag_u,alag,csr_u,csr,               &
                        alar_u,alar,csw_u,csw,alaw_u,alaw,             &
                        ws_u,ws_urb,ws,bs_u,bs_urb,bs,z0g_u,z0r_u,z0,  &  
@@ -2051,7 +2056,7 @@ use module_wrf_error
       integer nzu                  ! Number of vertical urban levels in the current class
       integer ndu                  ! Number of street direction for the current urban class
       integer nzurb                ! Number of vertical urban levels in the current class
-      INTEGER, INTENT(in)                                :: nurbi, nd, nz_ui, ng_u, nwr_u
+      INTEGER, INTENT(in)                                :: nurbi, nd, nz_ui, ng_u, nwr_u, ngb_u, nf_u
       real alag_u(nurbi)           ! Ground thermal diffusivity [m^2 s^-1]
       real alar_u(nurbi)           ! Roof thermal diffusivity [m^2 s^-1]
       real alaw_u(nurbi)           ! Wall thermal diffusivity [m^2 s^-1]
@@ -2308,12 +2313,14 @@ use module_wrf_error
 ! ===6=8===============================================================72    
 
       subroutine  averaging_temp(tw,twlev,ss,pb,tw_av,twlev_av,       &
+                                 nd, nz_ui, nwr_u, nbi,               &
                                  sfw_av,sfwind_av,sfw,sfwin) 
 
       implicit none
 !
 !INPUT VARIABLES
 !
+      INTEGER, INTENT(in)                                :: nd, nz_ui, nwr_u, nbi
       real tw(2*nd,nz_ui,nwr_u,nbi)        ! Temperature in each layer of the wall [K]
       real twlev(2*nd,nz_ui,nbi)     ! Window temperature in BEM [K]
       real pb(nz_ui)                    ! Probability to have a building with an height equal or greater h
@@ -2589,6 +2596,7 @@ use module_wrf_error
 
 
       subroutine roof_temp_veg(nd,pr,dt,rl,rsr,              &
+                           nz_ui, nwr_u, ngr_u,              &
                            trv,ptrv,sfrv,lfrv,gfr,qr,rainbl,drain,hfgroof,tr,alar,dzr,csr,nzu,irri_now,gr_type,pv_frac_roof,tpvlev)
 
 ! ----------------------------------------------------------------------
@@ -2602,6 +2610,7 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
       real rainbl
       integer nd                ! Number of street direction for the current urban class
+      INTEGER, INTENT(in)                                :: nz_ui, nwr_u, ngr_u
 
       integer nzu                ! Number of urban layers
       real irho(24)                ! Which hour of irrigation\
