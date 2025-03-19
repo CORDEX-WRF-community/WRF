@@ -1062,7 +1062,7 @@ use module_wrf_error
                    ua_u1D, va_u1D, pt_u1D, da_u1D, pt0_u1D, pr_u1D, &
                    qv_u1D,                                          &
 #endif
-                   nurbi, nd, nz_ui, ng_u, nwr_u, ngr_u, nf_u,      &
+                   nurbi, nd, nz_ui, ng_u, nwr_u, nbi, ngr_u, nf_u, &
                    ngb_u, dz_u, h_water,                            &
                    dlg1D,dl_u1D,sf1D,vl1D,rl_up(ix,iy),             &
                    rs_abs(ix,iy),emiss(ix,iy),grdflx_urb(ix,iy),    &
@@ -1319,7 +1319,7 @@ use module_wrf_error
 #ifdef URBANSTATE
                       ua_u, va_u, pt_u, da_u, pt0_u, pr_u, qv_u,       &
 #endif                      
-                      nurbi, nd, nz_ui, ng_u, nwr_u, ngr_u, nf_u,      &
+                      nurbi, nd, nz_ui, ng_u, nwr_u, nbi, gr_u, nf_u,  &
                       ngb_u, dz_u, h_water,                            &
                       dlg,dl_u,sf,vl,rl_up,rs_abs,emiss,grdflx_urb,    &
                       qv,tlev,qlev,sflev,lflev,consumlev,              &
@@ -1360,8 +1360,8 @@ use module_wrf_error
 
       integer iurb               ! Current urban class
 
-      INTEGER, INTENT(in)                                :: nurbi, nd, nz_ui, ng_u, nwr_u, ngr_u,     &
-        nf_u, ngb_u
+      INTEGER, INTENT(in)                                :: nurbi, nd, nz_ui, ng_u, nwr_u, nbi,       &
+        ngr_u, nf_u, ngb_u
       REAL, INTENT(in)                                   :: dz_u, h_water
 
 !    Radiation parameters
