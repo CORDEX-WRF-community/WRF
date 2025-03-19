@@ -828,13 +828,24 @@ BENCH_START(surf_driver_tim)
      &        ,SFWIN2_URB3D=grid%sfwin2_urb3d                           & !multi-layer urban
      &        ,SFW1_URB3D=grid%sfw1_urb3d,SFW2_URB3D=grid%sfw2_urb3d      & !multi-layer urban
      &        ,SFR_URB3D=grid%sfr_urb3d,SFG_URB3D=grid%sfg_urb3d          & !multi-layer urban
-#ifdef URBANSTATE
      &        ,num_urban_nz=config_flags%num_urban_nz                   &
+#ifdef URBANSTATE
      &        ,ua_u3D=grid%UAURB, va_u3D=grid%VAURB                     &
      &        ,pt_u3D=grid%THAURB, da_u3D=grid%RHOURB                   &
      &        ,pt0_u3D=grid%THA0URB, pr_u3D=grid%PRESSURB               &
      &        ,qv_u3D=grid%QVURB                                        &
 #endif
+     &        ,nurbi=config_flags%num_urban                             &
+     &        ,nd=config_flags%num_urban_nd                             &
+     &        ,nz_ui=config_flags%num_urban_nz                          &
+     &        ,ng_u=config_flags%num_urban_ng                           &
+     &        ,ngr_u=config_flags%num_urban_ngr                         &
+     &        ,nwr_u=config_flags%num_urban_nwr                         &
+     &        ,nf_u=config_flags%num_urban_nf                           &
+     &        ,ngb_u=config_flags%num_urban_ngb                         &
+     &        ,nbi=config_flags%num_urban_nbui                          &
+     &        ,p_num=config_flags%p_num, q_num=config_flags%q_num       &
+     &        ,dz_u=config_flags%dz_u, h_water=config_flags%h_water     &
      &        ,EP_PV_URB3D=grid%ep_pv_urb3d                               & !GRZ
      &        ,T_PV_URB3D=grid%t_pv_urb3d                                 & !GRZ
      &        ,TRV_URB4D=grid%trv_urb4d                                   & !GRZ
