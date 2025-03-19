@@ -678,6 +678,10 @@ CONTAINS
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::sf_bep  !Fraction air at the face of grid cell
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::dl_u_bep  !Length scale
 
+   INTEGER, INTENT(in)                                   :: num_urban_nz
+   INTEGER, INTENT(in)                                   :: nurbi, nd, nz_ui, ng_u, ngr_u, nwr_u,     &
+     nf_u, ngb_u, nbi, p_num, q_num
+   REAL, INTENT(in)                                      :: dz_u, h_water
 #ifdef URBANSTATE
 ! Data interpolated from the "mesoscale grid" to the "urban grid"
 ! ua_u3D: Wind speed in the x direction [ms-1]
@@ -687,10 +691,6 @@ CONTAINS
 ! pt0_u3D: Reference potential temperature [K]
 ! pr_u3D: Air pressure [Pa]
 ! qv_u3D: water vapour mixing ratio [kgkg-1]
-   INTEGER, INTENT(in)                                   :: num_urban_nz
-   INTEGER, INTENT(in)                                   :: nurbi, nd, nz_ui, ng_u, ngr_u, nwr_u,     &
-     nf_u, ngb_u, nbi, p_num, q_num
-   REAL, INTENT(in)                                      :: dz_u, h_water
    REAL, OPTIONAL,                                                                                    &
     DIMENSION(ims:ime,1:num_urban_nz,jms:jme),                                                        &
      INTENT(inout)                                       :: ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D,  &
@@ -1638,7 +1638,6 @@ CONTAINS
                 num_urban_nz,                                          &
 #ifdef URBANSTATE
                 ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,       &
-                qv_u3D,                                                &
 #endif
                 nurbi, nd, nz_ui, ng_u, nwr_u, dz_u,                   &
                 lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,                  &
@@ -2464,11 +2463,14 @@ SUBROUTINE lsm_mosaic(DZ8W,QV3D,P8W3D,T3D,TSK,                      &
                   sfvent_urb3d,lfvent_urb3d,                    & !H multi-layer urban
                   sfwin1_urb3d,sfwin2_urb3d,                    & !H multi-layer urban
                   sfw1_urb3d,sfw2_urb3d,sfr_urb3d,sfg_urb3d,    & !H multi-layer urban
-#ifdef URBANSTATE
                   num_urban_nz,                                   &
+#ifdef URBANSTATE
                   ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,&
                   qv_u3D,                                         &
 #endif
+                  nurbi, nd, nz_ui, ng_u, ngr_u,                  &
+                  nwr_u, nf_u, ngb_u, nbi, p_num, q_num,          &
+                  dz_u, h_water,                                  &
                   ep_pv_urb3d,t_pv_urb3d,                         & !RMS
                   trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !RMS
                   drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !RMS
@@ -3031,6 +3033,10 @@ SUBROUTINE lsm_mosaic(DZ8W,QV3D,P8W3D,T3D,TSK,                      &
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::sf_bep  !Fraction air at the face of grid cell
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::dl_u_bep  !Length scale
 
+   INTEGER, INTENT(in)                                   :: num_urban_nz
+   INTEGER, INTENT(in)                                   :: nurbi, nd, nz_ui, ng_u, ngr_u, nwr_u,     &
+     nf_u, ngb_u, nbi, p_num, q_num
+   REAL, INTENT(in)                                      :: dz_u, h_water
 #ifdef URBANSTATE
 ! Data interpolated from the "mesoscale grid" to the "urban grid" (num_urban_nz)
 ! ua_u3D: Wind speed in the x direction [ms-1]
@@ -3040,7 +3046,6 @@ SUBROUTINE lsm_mosaic(DZ8W,QV3D,P8W3D,T3D,TSK,                      &
 ! pt0_u3D: Reference potential temperature [K]
 ! pr_u3D: Air pressure [Pa]
 ! qv_u3D: water vapour mixing ratio [kgkg-1]
-   INTEGER, INTENT(in)                                   :: num_urban_nz
    REAL, OPTIONAL, DIMENSION(ims:ime,1:num_urban_nz,jms:jme),                                         &
      INTENT(inout)                                       :: ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D,  &
      pr_u3D, qv_u3D
