@@ -78,7 +78,7 @@ use module_wrf_error
 !     nurbmax --> nurbi
 !     ndm --> nd
 !     nz_um --> nz_ui
-!     nbui_max --> nbui
+!     nbui_max --> nbi
 ! However, they are kept insiude the definition in order to faciliate the comprehension of the 
 !   compilation error
                       nurbi, nd, nz_ui, ng_u, ngr_u,                               &
@@ -220,7 +220,7 @@ use module_wrf_error
 
    INTEGER, INTENT(in)                                            :: num_urban_nz
    INTEGER, INTENT(in)                                            :: nurbi, nd, nz_u, ng_u, ngr_u,&
-     nwr_u, nf_u, ngb_u, nbui, p_num, q_num
+     nwr_u, nf_u, ngb_u, nbi, p_num, q_num
    REAL, INTENT(in)                                               :: dz_u, h_water
 #ifdef URBANSTATE
    REAL, DIMENSION(1:num_urban_nz)                                :: ua_u1D, va_u1D, pt_u1D, da_u1D,  &
@@ -494,7 +494,7 @@ use module_wrf_error
 
 
 
-      real tw1D(2*nd,nz_ui,nwr_u,nbui) ! temperature in each layer of the wall
+      real tw1D(2*nd,nz_ui,nwr_u,nbi) ! temperature in each layer of the wall
       real tg1D(nd,ng_u)                   ! temperature in each layer of the ground
       real tr1D(nd,nz_ui,nwr_u)   ! temperature in each layer of the roof
       real trv1D(nd,nz_ui,ngr_u)   ! temperature in each layer of the GREEN roof
@@ -503,16 +503,16 @@ use module_wrf_error
 !
 !New variable for BEM
 !
-      real tlev1D(nz_ui,nbui)            ! temperature in each floor and in each different type of building
-      real qlev1D(nz_ui,nbui)            ! specific humidity in each floor and in each different type of building
-      real twlev1D(2*nd,nz_ui,nbui)     ! temperature in each window in each floor in each different type of building
-      real tglev1D(nd,ngb_u,nbui)       ! temperature in each layer of the ground below of a type of building
-      real tflev1D(nd,nf_u,nz_ui-1,nbui)! temperature in each layer of the floors in each building
+      real tlev1D(nz_ui,nbi)            ! temperature in each floor and in each different type of building
+      real qlev1D(nz_ui,nbi)            ! specific humidity in each floor and in each different type of building
+      real twlev1D(2*nd,nz_ui,nbi)     ! temperature in each window in each floor in each different type of building
+      real tglev1D(nd,ngb_u,nbi)       ! temperature in each layer of the ground below of a type of building
+      real tflev1D(nd,nf_u,nz_ui-1,nbi)! temperature in each layer of the floors in each building
       real lflev1D(nz_ui,nz_ui)           ! latent heat flux due to the air conditioning systems
       real sflev1D(nz_ui,nz_ui)           ! sensible heat flux due to the air conditioning systems
       real lfvlev1D(nz_ui,nz_ui)          ! latent heat flux due to ventilation
       real sfvlev1D(nz_ui,nz_ui)          ! sensible heat flux due to ventilation
-      real sfwin1D(2*nd,nz_ui,nbui)     ! sensible heat flux from windows
+      real sfwin1D(2*nd,nz_ui,nbi)     ! sensible heat flux from windows
       real consumlev1D(nz_ui,nz_ui)       ! consumption due to the air conditioning systems
       real eppvlev1D(nz_ui)               ! electricity production of PV panels 
       real tair1D(nz_ui)
@@ -530,13 +530,13 @@ use module_wrf_error
 !End new variables
 !
 
-      real sfw1D(2*nd,nz_ui,nbui)      ! sensible heat flux from walls
+      real sfw1D(2*nd,nz_ui,nbi)      ! sensible heat flux from walls
       real sfg1D(nd)              ! sensible heat flux from ground (road)
       real sfr1D(nd,nz_ui)      ! sensible heat flux from roofs
       real sfrpv1D(nd,nz_ui)
 
-      real tpv1D(nbui)
-      real sfr_indoor1D(nbui) 
+      real tpv1D(nbi)
+      real sfr_indoor1D(nbi) 
       real sfrv1D(nd,nz_ui)      ! sensible heat flux from roofs
       real lfrv1D(nd,nz_ui)      ! latent heat flux from roofs
       real dg1D(nd)              ! water depth from ground
@@ -561,17 +561,17 @@ use module_wrf_error
       real gfr1D(nd,nz_ui)
       real time_bep
 ! arrays used to collapse indexes
-      integer ind_zwd(nbui,nz_ui,nwr_u,nd)
+      integer ind_zwd(nbi,nz_ui,nwr_u,nd)
       integer ind_gd(ng_u,nd)
-      integer ind_zd(nbui,nz_ui,nd)
+      integer ind_zd(nbi,nz_ui,nd)
       integer ind_zdf(nz_ui,nd)
       integer ind_zrd(nz_ui,nwr_u,nd)
       integer ind_grd(nz_ui,ngr_u,nd)
 !
-      integer ind_bd(nbui,nz_ui)
-      integer ind_wd(nbui,nz_ui,nd)
-      integer ind_gbd(nbui,ngb_u,nd)  
-      integer ind_fbd(nbui,nf_u,nz_ui-1,nd)
+      integer ind_bd(nbi,nz_ui)
+      integer ind_wd(nbi,nz_ui,nd)
+      integer ind_gbd(nbi,ngb_u,nd)  
+      integer ind_fbd(nbi,nf_u,nz_ui-1,nd)
 
       integer ix,iy,iz,iurb,id,iz_u,iw,ig,ir,ix1,iy1,k
       integer it, nint
@@ -609,30 +609,30 @@ use module_wrf_error
 
 
 !
-     if(urban_map_zwd.lt.nbui*nz_ui*nd*max(nwr_u,ng_u))then
-        write(*,*)'urban_map_zwd too small, please increase to at least ', nbui*nz_ui*nd*max(nwr_u,ng_u)
+     if(urban_map_zwd.lt.nbi*nz_ui*nd*max(nwr_u,ng_u))then
+        write(*,*)'urban_map_zwd too small, please increase to at least ', nbi*nz_ui*nd*max(nwr_u,ng_u)
         stop
       endif
 !
 !New conditions for BEM
 !
-      if(urban_map_bd.lt.nbui*nz_ui)then !limit for indoor temperature and indoor humidity
-        write(*,*)'urban_map_bd too small, please increase to at least ', nbui*nz_ui
+      if(urban_map_bd.lt.nbi*nz_ui)then !limit for indoor temperature and indoor humidity
+        write(*,*)'urban_map_bd too small, please increase to at least ', nbi*nz_ui
         stop
       endif
 
-      if(urban_map_wd.lt.nbui*nz_ui*nd)then !limit for window temperature
-        write(*,*)'urban_map_wd too small, please increase to at least ', nbui*nz_ui*nd
+      if(urban_map_wd.lt.nbi*nz_ui*nd)then !limit for window temperature
+        write(*,*)'urban_map_wd too small, please increase to at least ', nbi*nz_ui*nd
         stop
       endif
 
-      if(urban_map_gbd.lt.nbui*nd*ngb_u)then !limit for ground temperature below a building
-        write(*,*)'urban_map_gbd too small, please increase to at least ', nbui*nd*ngb_u
+      if(urban_map_gbd.lt.nbi*nd*ngb_u)then !limit for ground temperature below a building
+        write(*,*)'urban_map_gbd too small, please increase to at least ', nbi*nd*ngb_u
         stop
       endif
 
-      if(urban_map_fbd.lt.(nz_ui-1)*nbui*nd*nf_u)then !limit for floor temperature
-        write(*,*)'urban_map_fbd too small, please increase to at least ', nbui*nd*nf_u*(nz_ui-1)
+      if(urban_map_fbd.lt.(nz_ui-1)*nbi*nd*nf_u)then !limit for floor temperature
+        write(*,*)'urban_map_fbd too small, please increase to at least ', nbi*nd*nf_u*(nz_ui-1)
         stop
       endif
 
@@ -661,7 +661,7 @@ use module_wrf_error
 !End initialization indexes
 !
       iii=0
-      do ibui=1,nbui
+      do ibui=1,nbi
       do iz_u=1,nz_ui
       do iw=1,nwr_u
       do id=1,nd
@@ -681,7 +681,7 @@ use module_wrf_error
       enddo
 
       iii=0
-      do ibui=1,nbui
+      do ibui=1,nbi
       do iz_u=1,nz_ui
       do id=1,nd
        iii=iii+1
@@ -722,7 +722,7 @@ use module_wrf_error
       enddo ! iz_u
 
       iii=0
-      do ibui=1,nbui  !Type of building
+      do ibui=1,nbi  !Type of building
       do iz_u=1,nz_ui     !vertical levels
          iii=iii+1
          ind_bd(ibui,iz_u)=iii
@@ -732,7 +732,7 @@ use module_wrf_error
 
 
       iii=0
-      do ibui=1,nbui !type of building
+      do ibui=1,nbi !type of building
       do iz_u=1,nz_ui !vertical levels
       do id=1,nd !direction
          iii=iii+1
@@ -742,7 +742,7 @@ use module_wrf_error
       enddo !ibui
 
       iii=0
-      do ibui=1,nbui!type of building
+      do ibui=1,nbi!type of building
       do iw=1,ngb_u !layers in the wall (ground below a building)
       do id=1,nd !direction
          iii=iii+1
@@ -752,7 +752,7 @@ use module_wrf_error
       enddo !ibui    
 
       iii=0
-      do ibui=1,nbui !type of building
+      do ibui=1,nbi !type of building
       do iw=1,nf_u !layers in the wall (floor)
       do iz_u=1,nz_ui-1 !vertical levels
       do id=1,nd  !direction
@@ -792,8 +792,8 @@ use module_wrf_error
              iii=iii+1
           endif
        enddo !iz_u
-       if (iii.gt.nbui) then
-          write(*,*) 'nbui too small, please increase to at least ',iii
+       if (iii.gt.nbi) then
+          write(*,*) 'nbi too small, please increase to at least ',iii
           stop
        endif
       enddo
@@ -851,19 +851,19 @@ do ix=its,ite
 
          ibui=0
          nlev=0
-         nurbi=0
+         nbui=0
          d_urb=0.
          do iz=1,nz_ui		   
          if(ss_urb(iz,iurb).gt.0) then		
            ibui=ibui+1		                
            nlev(ibui)=iz-1
            d_urb(ibui)=ss_urb(iz,iurb)
-           nurbi=ibui
+           nbui=ibui
 	 endif	  
          end do  !iz
 
-         if (nurbi.gt.nbui) then
-            write (*,*) 'nbui must be increased to',nurbi
+         if (nbui.gt.nbi) then
+            write (*,*) 'nbi must be increased to',nbui
             stop
          endif
 
@@ -895,7 +895,7 @@ do iz= kts,kte
          do id=1,nd
          do iz_u=1,nz_ui
          do iw=1,nwr_u
-         do ibui=1,nbui
+         do ibui=1,nbi
           tw1D(2*id-1,iz_u,iw,ibui)=tw1_urb4d(ix,ind_zwd(ibui,iz_u,iw,id),iy)
           tw1D(2*id,iz_u,iw,ibui)=tw2_urb4d(ix,ind_zwd(ibui,iz_u,iw,id),iy)
          enddo
@@ -946,7 +946,7 @@ do iz= kts,kte
          sfw1D=0.      !Sensible heat flux from walls         
 
          do iz_u=1,nz_ui    !vertical levels
-         do ibui=1,nbui !Type of building
+         do ibui=1,nbi !Type of building
             tlev1D(iz_u,ibui)= tlev_urb3d(ix,ind_bd(ibui,iz_u),iy)  
             qlev1D(iz_u,ibui)= qlev_urb3d(ix,ind_bd(ibui,iz_u),iy)  
          enddo !ibui
@@ -956,7 +956,7 @@ do iz= kts,kte
 
          do id=1,nd  !direction
             do iz_u=1,nz_ui !vertical levels
-               do ibui=1,nbui !type of building
+               do ibui=1,nbi !type of building
                   twlev1D(2*id-1,iz_u,ibui)=tw1lev_urb3d(ix,ind_wd(ibui,iz_u,id),iy)
                   twlev1D(2*id,iz_u,ibui)=tw2lev_urb3d(ix,ind_wd(ibui,iz_u,id),iy)
                   sfwin1D(2*id-1,iz_u,ibui)=sfwin1_urb3d(ix,ind_wd(ibui,iz_u,id),iy)
@@ -967,7 +967,7 @@ do iz= kts,kte
 
          do id=1,nd !direction
             do iw=1,ngb_u !layer in the wall
-               do ibui=1,nbui !type of building
+               do ibui=1,nbi !type of building
                   tglev1D(id,iw,ibui)=tglev_urb3d(ix,ind_gbd(ibui,iw,id),iy)
                enddo !ibui
             enddo !iw
@@ -976,7 +976,7 @@ do iz= kts,kte
          do id=1,nd !direction
             do iw=1,nf_u !layer in the walls
                do iz_u=1,nz_ui-1 !verticals levels
-                  do ibui=1,nbui !type of building
+                  do ibui=1,nbi !type of building
                      tflev1D(id,iw,iz_u,ibui)=tflev_urb3d(ix,ind_fbd(ibui,iw,iz_u,id),iy)
                      
                   enddo !ibui
@@ -990,7 +990,7 @@ do iz= kts,kte
 
         do id=1,nd
           do iz=1,nz_ui
-            do ibui=1,nbui !type of building
+            do ibui=1,nbi !type of building
           !!  sfw1D(2*id-1,iz)=sfw1(ix,iy,ind_zd(iz,id))
           !!  sfw1D(2*id,iz)=sfw2(ix,iy,ind_zd(iz,id))
               sfw1D(2*id-1,iz,ibui)=sfw1_urb3d(ix,ind_zd(ibui,iz,id),iy)
