@@ -835,7 +835,7 @@ use module_wrf_error
                          nz_urb(iurb),z_u, nd, nz_ui, dz_u)
 
          call param(iurb,nz_u(iurb),nz_urb(iurb),nzurban(iurb),nd_u(iurb), &
-                    nurbi, nd, nz_ui, ng_u, nwr_u, ngb_u, nf_u             &
+                    nurbi, nd, nz_ui, ng_u, nwr_u, ngb_u, nf_u,            &
                     csg_u,csg,alag_u,alag,csr_u,csr,                       &
                     alar_u,alar,csw_u,csw,alaw_u,alaw,                     &
                     ws_u,ws_urb,ws,bs_u,bs_urb,bs,z0g_u,z0r_u,z0,          &
@@ -2687,14 +2687,23 @@ use module_wrf_error
       integer gr_type
       real drain(nd,nz_ui)
 
-      dzgr_u = (/0.1,0.003,0.06,0.003,0.05,0.04,0.02,0.0125,0.005,0.0025/)
-      qrmax = (/0.0,0.0,0.0,0.0,0.439,0.37,0.37,0.37,0.37,0.37/)
-      smax = (/0,0,0,0,-0.01,-0.1,-0.1,-0.1,-0.1,-0.1/)
-      kmax = (/0,0,0,0,3.32e-3,2.162e-3,2.162e-3,2.162e-3,2.162e-3,2.162e-3/)
-      b = (/0,0,0,0,2.7,3.9,3.9,3.9,3.9,3.9/)
-      cd = (/0,0,0,0,331500,1.342e6,1.342e6,1.342e6,1.342e6,1.342e6/)
-      csa = (/7.5e4,2.1e6,4.48e4,2.1e6/)
-      ka = (/0.035,0.7,0.024,0.7/)
+! This does not work yet for flexible amount of layers
+      IF (ngr_u == 10) THEN
+        dzgr_u = (/ 0.1,0.003,0.06,0.003,0.05,0.04,0.02,0.0125,0.005,0.0025/)
+        qrmax = (/ 0.0,0.0,0.0,0.0,0.439,0.37,0.37,0.37,0.37,0.37 /)
+        smax = (/ 0.0,0.0,0.0,0.0,-0.01,-0.1,-0.1,-0.1,-0.1,-0.1 /)
+        kmax = (/ 0.0,0.0,0.0,0.0,3.32e-3,2.162e-3,2.162e-3,2.162e-3,2.162e-3,2.162e-3 /)
+        b = (/ 0.0,0.0,0.0,0.0,2.7,3.9,3.9,3.9,3.9,3.9 /)
+        cd = (/ 0.0,0.0,0.0,0.0,331500.,1.342e6,1.342e6,1.342e6,1.342e6,1.342e6 /)
+      ELSE
+        PRINT *,'ERROR -- error -- ERROR -- error'
+        PRINT *,"   In phys/module_sf_bep_bem.F, subroutine 'surf_temp_veg' wrong amount of grid " // & 
+          "levels in green roofs"
+        PRINT *,'    by now only works with 10 levels, you passed:', ngr_u
+        FATAL_ERROR('modify code or namelist parameter num_urban_ngr')
+      END IF 
+      csa = (/ 7.5e4,2.1e6,4.48e4,2.1e6 /)
+      ka = (/ 0.035,0.7,0.024,0.7 /)
 
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
