@@ -373,7 +373,6 @@ use module_wrf_error
       real twini_u(nurbi)                   ! Initial temperature inside the building's wall [K]
       real trini_u(nurbi)                   ! Initial temperature inside the building's roof [K]
       real tgini_u(nurbi)                   ! Initial road temperature
-
 !
 !   Building materials
 !
@@ -804,6 +803,7 @@ use module_wrf_error
       if (first) then                           ! True only on first call
 
          call init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,&
+                nurbi, nz_ui, nd,                                         &
                 twini_u,trini_u,tgini_u,albg_u,albw_u,albr_u,albwin_u,emg_u,emw_u,&
                 emr_u,emwind_u,z0g_u,z0r_u,nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b,  &
                 cop_u,pwin_u,beta_u,sw_cond_u,time_on_u,time_off_u,targtemp_u,    &
@@ -813,13 +813,14 @@ use module_wrf_error
                 hsesf_u,hsequip,irho,gr_flag_u,gr_type_u)
  
 !Initialisation of the urban parameters and calculation of the view factor
-        call icBEP(nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u)
+        call icBEP(nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u,                    &
+                      nurbi, nz_ui, dz_u)
    
       first=.false.
 
       endif ! first
 
-do ix=its,ite
+      do ix=its,ite
       do iy=jts,jte
         if (FRC_URB2D(ix,iy).gt.0.) then    ! Calling BEP only for existing urban classes.
 	
@@ -827,15 +828,15 @@ do ix=its,ite
 
          hi_urb1D=0.
          do iz_u=1,nz_ui
-            hi_urb1D(iz_u)=hi_urb(ix,iz_u,iy)
-           
+           hi_urb1D(iz_u)=hi_urb(ix,iz_u,iy)
          enddo
 
          call icBEPHI_XY(iurb,hb_u,hi_urb1D,ss_urb,pb_urb,    &
-                         nz_urb(iurb),z_u)
+                         nz_urb(iurb),z_u, nd, nz_ui, dz_u)
 
-         call param(iurb,nz_u(iurb),nz_urb(iurb),nzurban(iurb),      &
-                    nd_u(iurb),csg_u,csg,alag_u,alag,csr_u,csr,      &
+         call param(iurb,nz_u(iurb),nz_urb(iurb),nzurban(iurb),nd_u(iurb), &
+                    nurbi, nd, nz_ui, ng_u, nwr_u,                   &
+                    csg_u,csg,alag_u,alag,csr_u,csr,                 &
                     alar_u,alar,csw_u,csw,alaw_u,alaw,               &
                     ws_u,ws_urb,ws,bs_u,bs_urb,bs,z0g_u,z0r_u,z0,    &
                     strd_u,strd,drst_u,drst,ss_u,ss_urb,ss,pb_u,     &
@@ -847,8 +848,9 @@ do ix=its,ite
 !We compute the view factors in the icBEP_XY routine
 !  
 
-         call icBEP_XY(iurb,fww_u,fwg_u,fgw_u,fsw_u,fws_u,fsg_u,   &
-                         nd_u(iurb),strd,ws,nzurban(iurb),z_u)   
+         call icBEP_XY(iurb,fww_u,fwg_u,fgw_u,fsw_u,                   &
+                         nurbi, nd, nz_ui,                             &
+                         fws_u,fsg_u,nd_u(iurb),strd,ws,nzurban(iurb),z_u)   
 
          ibui=0
          nlev=0
@@ -870,7 +872,7 @@ do ix=its,ite
 
 
 
-do iz= kts,kte
+         do iz= kts,kte
           ua1D(iz)=u_phy(ix,iz,iy)
           va1D(iz)=v_phy(ix,iz,iy)
 	  pt1D(iz)=th_phy(ix,iz,iy)
@@ -1059,7 +1061,8 @@ do iz= kts,kte
 #ifdef URBANSTATE
                    ua_u1D, va_u1D, pt_u1D, da_u1D, pt0_u1D, pr_u1D, &
                    qv_u1D,                                          &
-#endif                   
+#endif
+                   nurbi, nd, nz_ui, ng_u, nwr_u, dz_u,              &
                    dlg1D,dl_u1D,sf1D,vl1D,rl_up(ix,iy),             &
                    rs_abs(ix,iy),emiss(ix,iy),grdflx_urb(ix,iy),    &
                    qv1D,tlev1D,qlev1D,sflev1D,lflev1D,consumlev1D,  &
@@ -1313,6 +1316,7 @@ do iz= kts,kte
 #ifdef URBANSTATE
                       ua_u, va_u, pt_u, da_u, pt0_u, pr_u, qv_u,       &
 #endif                      
+                      nurbi, nd, nz_ui, ng_u, nwr_u, dz_u,             &
                       dlg,dl_u,sf,vl,rl_up,rs_abs,emiss,grdflx_urb,    &
                       qv,tlev,qlev,sflev,lflev,consumlev,              &
                       eppvlev,tpvlev,sfvlev,lfvlev,twlev,tglev,tflev,sfwin,tmp_u,sfr_indoor,sfrpv,gfr)    
@@ -1337,7 +1341,7 @@ do iz= kts,kte
       real da(kms:kme)                ! Air density
       real pr(kms:kme)                ! Air pressure
       real pt0(kms:kme)               ! Reference potential temperature (could be equal to "pt")
-      real qv(kms:kme)              ! Specific humidity
+      real qv(kms:kme)                ! Specific humidity
       real dt                    ! Time step
       real zr                    ! Zenith angle
       real deltar                ! Declination of the sun
@@ -1351,6 +1355,9 @@ do iz= kts,kte
 ! Data relative to the "urban grid"
 
       integer iurb               ! Current urban class
+
+      INTEGER, INTENT(in)                                :: nurbi, nd, nz_ui, ng_u, nwr_u
+      REAL, INTENT(in)                                   :: dz_u
 
 !    Radiation parameters
       real albg                  ! Albedo of the ground
@@ -1457,8 +1464,7 @@ do iz= kts,kte
 ! ----------------------------------------------------------------------
 
       real dz(kms:kme)               ! vertical space steps of the "mesoscale grid"
-! Data interpolated from the "mesoscale grid" to the "urban grid" (nz_ui)
-
+! Data interpolated from the "mesoscale grid" to the "urban grid" (num_urban_nz or nz_ui)
 #ifdef URBANSTATE
       REAL, DIMENSION(nz_ui), INTENT(out)                :: ua_u, va_u, pt_u, da_u, pt0_u, pr_u, qv_u
 #else
@@ -1521,7 +1527,7 @@ do iz= kts,kte
       real tvb_u(2*nd,nz_ui)   ! Temperature          Vertical surfaces, B (explicit) term
 
 
- real tvb_ac(2*nd,nz_ui)
+      real tvb_ac(2*nd,nz_ui)
       real ehb_u(nd,nz_ui)   ! Energy (TKE)       Horizontal surfaces, B (explicit) term
       real evb_u(2*nd,nz_ui)   ! Energy (TKE)         Vertical surfaces, B (explicit) term
       real qhb_u(nd,nz_ui)     ! Humidity      Horizontal surfaces, B (explicit) term
@@ -1645,15 +1651,14 @@ do iz= kts,kte
          dz(iz)=z(iz+1)-z(iz)
       end do
 ! Interpolation on the "urban grid"
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,ua,ua_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,va,va_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,pt,pt_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,pt0,pt0_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,pr,pr_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,da,da_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,qv,qv_u)
+      call interpol(kms,kme,kts,kte,nz_ui,z,z_u,ua,ua_u)
+      call interpol(kms,kme,kts,kte,nz_ui,z,z_u,va,va_u)
+      call interpol(kms,kme,kts,kte,nz_ui,z,z_u,pt,pt_u)
+      call interpol(kms,kme,kts,kte,nz_ui,z,z_u,pt0,pt0_u)
+      call interpol(kms,kme,kts,kte,nz_ui,z,z_u,pr,pr_u)
+      call interpol(kms,kme,kts,kte,nz_ui,z,z_u,da,da_u)
+      call interpol(kms,kme,kts,kte,nz_ui,z,z_u,qv,qv_u)
 ! Compute the modification of the radiation due to the buildings
-      
 
       call averaging_temp(tw,twlev,ss,pb,tw_av,twlev_av, &
                            sfw_av,sfwind_av,sfw,sfwin)
@@ -1672,12 +1677,13 @@ do iz= kts,kte
 
 
    
-     call modif_rad(iurb,ndu,nzu,z_u,ws,           &
-                    drst,strd,ss,pb,                &
-                    tw_av,tg_av,twlev_av,albg,albw,    &
-                    emw,emg,pwin_u(iurb),albwin,    &
-                    emwind,fww,fwg,fgw,fsw,fsg,     &
-                    zr,deltar,ah,xlat,swddir,swddif,      &  !_gl  
+     call modif_rad(iurb,ndu,nzu,z_u,ws,                &
+                    drst,strd,ss,pb,                    &
+                    nurbi, nz_ui, ng_u, nwr_u,          &
+                    tw_av,tg_av,twlev_av,albg,albw,     &
+                    emw,emg,pwin_u(iurb),albwin,        &
+                    emwind,fww,fwg,fgw,fsw,fsg,         &
+                    zr,deltar,ah,xlat,swddir,swddif,    &  !_gl  
                     rs,rld,rsw,rsd,rsg,rlw,rlg)  
 
 
@@ -1686,10 +1692,11 @@ do iz= kts,kte
 ! calculation of the urban albedo and the upward long wave radiation
 
 
-       call upward_rad(ndu,nzu,ws,bs,sigma,pb,ss,                 &
-                       tg_av,emg,albg,rlg,rsg,sfg,lfg,                   & 
-                       tw_av,emw,albw,rlw,rsw,sfw_av,             & 
-                       tr_av,emr,albr,emwind,                        &
+       call upward_rad(ndu,nzu,ws,bs,sigma,pb,ss,                                       &
+                       nd, nz_ui, ng_u, nwr_u, dz_u,                                    &
+                       tg_av,emg,albg,rlg,rsg,sfg,lfg,                                  &
+                       tw_av,emw,albw,rlw,rsw,sfw_av,                                   &
+                       tr_av,emr,albr,emwind,                                           &
                        albwin,twlev_av,pwin_u(iurb),sfwind_av,rld,rs,sfr,sfrv,lfr,lfrv, & 
                        rs_abs,rl_up,emiss,grdflx_urb,gr_frac_roof,tpvlev,pv_frac_roof)          
    
@@ -1719,8 +1726,9 @@ do iz= kts,kte
   
 
 
-     call surf_temp(ndu,pr_u,dt,                   & 
-                    rld,rsg,rlg,                    &
+     call surf_temp(ndu,pr_u,dt,                         & 
+                    rld,rsg,rlg,                         &
+                    nz_ui, ng_u, nwr_u,                  &
                     tg,alag,csg,emg,albg,ptg,sfg,lfg,gfg)
      if(gr_flag.eq.1)then
      if(gr_frac_roof.gt.0.)then
@@ -1976,12 +1984,14 @@ do iz= kts,kte
         
 ! Compute the implicit and explicit components of the sources or sinks on the "urban grid"
 
-      call buildings(iurb,ndu,nzu,z0,cdrag,ua_u,va_u,                               & 
-                     pt_u,pt0_u,ptg,ptr,ptrv,da_u,qv_u,pr_u,tmp_u,ptw,ptwin,pwin_u(iurb),drst,     &                      
-                     uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,qvb_u,qhb_u,   & 
-                     uhb_u,vhb_u,thb_u,ehb_u,ss,dt,sfw,sfg,sfr,sfrpv,sfrv,lfrv,   &
-                     dgr,dg,lfr,lfg,                                                                    &
-                     sfwin,pb,bs_u,dz_u,sflev,lflev,sfvlev,lfvlev,tvb_ac,ix,iy,rsg,rs,qr,gr_frac_roof,  &
+      call buildings(iurb,ndu,nzu,z0,cdrag,ua_u,va_u,                                                 &
+                     pt_u,pt0_u,                                                                      &
+                     nz_ui, dz_u,                                                                     &
+                     ptg,ptr,ptrv,da_u,qv_u,pr_u,tmp_u,ptw,ptwin,pwin_u(iurb),drst,                   &
+                     uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,qvb_u,qhb_u,                           &
+                     uhb_u,vhb_u,thb_u,ehb_u,ss,dt,sfw,sfg,sfr,sfrpv,sfrv,lfrv,                       &
+                     dgr,dg,lfr,lfg,                                                                  &
+                     sfwin,pb,bs_u,dz_u,sflev,lflev,sfvlev,lfvlev,tvb_ac,ix,iy,rsg,rs,qr,gr_frac_roof,&
                      pv_frac_roof,gr_flag,gr_type)  
       
 
@@ -1994,14 +2004,18 @@ do iz= kts,kte
 ! Interpolation on the "mesoscale grid"
 
       call urban_meso(ndu,kms,kme,kts,kte,nzu,z,dz,z_u,pb,ss,bs,ws,sf, & 
-                     vl,uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,     &
+                     vl,                                               &
+                     nz_ui,                                            &
+                     uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,        &
                      uhb_u,vhb_u,thb_u,ehb_u,qhb_u,qvb_u,              &
                      a_u,a_v,a_t,a_e,b_u,b_v,b_t,b_e,b_q,tvb_ac,b_ac)                    
        
 
 ! Calculation of the length scale taking into account the buildings effects
 
-      call interp_length(ndu,kms,kme,kts,kte,nzu,z_u,z,ss,ws,bs,dlg,dl_u)
+      call interp_length(ndu,kms,kme,kts,kte,nzu,z_u,z,ss,ws,bs,      &
+        nz_ui,                                                        &
+        dlg,dl_u)
       
       return
       end subroutine BEP1D
@@ -2010,6 +2024,7 @@ do iz= kts,kte
 ! ===6=8===============================================================72
 
        subroutine param(iurb,nzu,nzurb,nzurban,ndu,                   &
+                       nurbi, nd, nz_ui, ng_u, nwr_u,                 &
                        csg_u,csg,alag_u,alag,csr_u,csr,               &
                        alar_u,alar,csw_u,csw,alaw_u,alaw,             &
                        ws_u,ws_urb,ws,bs_u,bs_urb,bs,z0g_u,z0r_u,z0,  &  
@@ -2031,6 +2046,7 @@ do iz= kts,kte
       integer nzu                  ! Number of vertical urban levels in the current class
       integer ndu                  ! Number of street direction for the current urban class
       integer nzurb                ! Number of vertical urban levels in the current class
+      INTEGER, INTENT(in)                                :: nurbi, nd, nz_ui, ng_u, nwr_u
       real alag_u(nurbi)           ! Ground thermal diffusivity [m^2 s^-1]
       real alar_u(nurbi)           ! Roof thermal diffusivity [m^2 s^-1]
       real alaw_u(nurbi)           ! Wall thermal diffusivity [m^2 s^-1]
@@ -2234,8 +2250,7 @@ do iz= kts,kte
 ! ===6=8===============================================================72
 ! ===6=8===============================================================72
 
-      subroutine interpol(kms,kme,kts,kte,nz_u,z,z_u,c,c_u)
-
+      subroutine interpol(kms,kme,kts,kte,nz_ui,z,z_u,c,c_u)
 ! ----------------------------------------------------------------------
 !  This routine interpolate para
 !  meters from the "mesoscale grid" to
@@ -2253,7 +2268,7 @@ do iz= kts,kte
       real z(kms:kme)          ! Altitude of the cell interface
       real c(kms:kme)            ! Parameter which has to be interpolated
 ! Data relative to the "urban grid"
-      integer nz_u          ! Number of levels
+      integer nz_ui          ! Number of levels
 !!    real z_u(nz_u+1)      ! Altitude of the cell interface
       real z_u(nz_ui)      ! Altitude of the cell interface
 
@@ -2261,7 +2276,7 @@ do iz= kts,kte
 ! OUTPUT:
 ! ----------------------------------------------------------------------
 !!    real c_u(nz_u)        ! Interpolated paramters in the "urban grid"
-      real c_u(nz_ui)        ! Interpolated paramters in the "urban grid"      
+      real c_u(nz_ui)       ! Interpolated paramters in the "urban grid"      
  
 ! LOCAL:
 ! ----------------------------------------------------------------------
@@ -2272,7 +2287,7 @@ do iz= kts,kte
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------
 
-       do iz_u=1,nz_u
+       do iz_u=1,nz_ui
         ctot=0.
         do iz=kts,kte
          dz=max(min(z(iz+1),z_u(iz_u+1))-max(z(iz),z_u(iz_u)),0.)
@@ -2366,10 +2381,11 @@ do iz= kts,kte
 ! ===6=8===============================================================72       
 ! ===6=8===============================================================72    
 
-      subroutine modif_rad(iurb,nd,nz_u,z,ws,drst,strd,ss,pb,    &
+      subroutine modif_rad(iurb,nd,nz_u,z,ws,drst,strd,ss,pb,             &
+                          nurbi, nz_ui, ng_u, nwr_u,                      &
                           tw,tg_av,twlev,albg,albw,emw,emg,pwin,albwin,   &
-                          emwin,fww,fwg,fgw,fsw,fsg,             &
-                          zr,deltar,ah,xlat,swddir,swddif,           &    
+                          emwin,fww,fwg,fgw,fsw,fsg,                      &
+                          zr,deltar,ah,xlat,swddir,swddif,                &    
                           rs,rl,rsw,rsd,rsg,rlw,rlg)                       
  
 ! ----------------------------------------------------------------------
@@ -2386,6 +2402,7 @@ do iz= kts,kte
       integer iurb              ! current urban class
       integer nd                ! Number of street direction for the current urban class
       integer nz_u              ! Number of layer in the urban grid
+      INTEGER, INTENT(in)                                            :: nurbi, nz_ui, ng_u, nwr_u
       real z(nz_ui)           ! Height of the urban grid levels
       real ws(nd)              ! Street widths of the current urban class
       real drst(nd)            ! street directions for the current urban class
@@ -2438,31 +2455,36 @@ do iz= kts,kte
 
 !  Calculation of the shadow effects
 
-      call shadow_mas(nd,nz_u,zr,deltar,ah,drst,ws,ss,pb,z,        &
+      call shadow_mas(nd,nz_u,zr,deltar,ah,drst,ws,ss,pb,z,           &
+                     nz_ui,                                           &
                      swddir,rsw,rsg,xlat)
       rsd=rsw
 
 ! Calculation of the reflection effects          
       do id=1,nd
-         call long_rad(iurb,nz_u,id,emw,emg,emwin,pwin,twlev,      &
+         call long_rad(iurb,nz_u,id,emw,emg,                          &
+                      nurbi, nz_ui, nd, ng_u, nwr_u,                  &
+                      emwin,pwin,twlev,                               &
                       fwg,fww,fgw,fsw,fsg,tg_av,tw,rlg,rlw,rl,pb)
 
          alb_av=pwin*albwin+(1.-pwin)*albw
          
         call short_rad_dd(iurb,nz_u,id,alb_av,                        &
+                           nurbi, nz_ui, nd, ng_u,                    &
                            albg,swddif,fwg,fww,fgw,fsw,fsg,rsg,rsw,pb)
  
  
       enddo
+      
       return
       end subroutine modif_rad
-
 
 
 ! ===6=8===============================================================72  
 ! ===6=8===============================================================72     
 
-      subroutine surf_temp(nd,pr,dt,rl,rsg,rlg,              &
+      subroutine surf_temp(nd,pr,dt,rl,rsg,rlg,                  &
+                          nz_ui, ng_u, nwr_u,                    &
                            tg,alag,csg,emg,albg,ptg,sfg,lfg,gfg) 
 
 ! ----------------------------------------------------------------------
@@ -2476,6 +2498,7 @@ do iz= kts,kte
 ! ----------------------------------------------------------------------
 
       integer nd                ! Number of street direction for the current urban class
+      INTEGER, INTENT(in)                                :: nz_ui, ng_u, nwr_u
       real alag(ng_u)           ! Ground thermal diffusivity for the current urban class [m^2 s^-1] 
 
       real albg                 ! Albedo of the ground for the current urban class
@@ -2516,9 +2539,16 @@ do iz= kts,kte
 
       real dzg_u(ng_u)          ! Layer sizes in the ground
       
-      dzg_u = (/ 0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025 /)
+! This does not work yet for flexible amount of layers
+      IF (ng_u == 10) THEN
+        dzg_u = (/ 0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025 /)
+      ELSE
+        PRINT *,'ERROR -- error -- ERROR -- error'
+        PRINT *,"   In phys/module_sf_bep.F, subroutine 'surf_temp' wrong amount of ground layers"
+        PRINT *,'    by now only works with 10 ground layers, you passed:', ng_u
+        FATAL_ERROR('modify code or namelist parameter num_urban_ng')
+      END IF
 
-     
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------
@@ -2733,12 +2763,13 @@ do iz= kts,kte
 ! ===6=8===============================================================72     
 ! ===6=8===============================================================72  
 
-      subroutine buildings(iurb,nd,nz,z0,cdrag,ua_u,va_u,pt_u,pt0_u,       &
-                        ptg,ptr,ptrv,da_u,qv_u,pr_u,tmp_u,ptw,ptwin,pwin,                 &
-                        drst,uva_u,vva_u,uvb_u,vvb_u,                &
-                        tva_u,tvb_u,evb_u,qvb_u,qhb_u,               &
-                        uhb_u,vhb_u,thb_u,ehb_u,ss,dt,sfw,sfg,sfr,sfrpv,sfrv,lfrv,   &
-                        dgr,dg,lfr,lfg,                                               &
+      subroutine buildings(iurb,nd,nz,z0,cdrag,ua_u,va_u,pt_u,pt0_u,                                       &
+                        nz_ui, dz_u,                                                                       &
+                        ptg,ptr,ptrv,da_u,qv_u,pr_u,tmp_u,ptw,ptwin,pwin,                                  &
+                        drst,uva_u,vva_u,uvb_u,vvb_u,                                                      &
+                        tva_u,tvb_u,evb_u,qvb_u,qhb_u,                                                     &
+                        uhb_u,vhb_u,thb_u,ehb_u,ss,dt,sfw,sfg,sfr,sfrpv,sfrv,lfrv,                         &
+                        dgr,dg,lfr,lfg,                                                                    &
                         sfwin,pb,bs_u,dz_u,sflev,lflev,sfvlev,lfvlev,tvb_ac,ix,iy,rsg,rs,qr,gr_frac_roof,  &
                         pv_frac_roof,gr_flag,gr_type)                  
 
@@ -2757,6 +2788,8 @@ do iz= kts,kte
       integer nd                ! Number of street direction for the current urban class
       integer ix,iy
       integer nz                ! number of vertical space steps
+      INTEGER, INTENT(in)                                :: nz_ui
+      REAL, INTENT(in)                                   :: dz_u
       real ua_u(nz_ui)          ! Wind speed in the x direction on the urban grid
       real va_u(nz_ui)          ! Wind speed in the y direction on the urban grid
       real da_u(nz_ui)          ! air density on the urban grid
@@ -3036,6 +3069,7 @@ do iz= kts,kte
 ! ===6=8===============================================================72
 
         subroutine urban_meso(nd,kms,kme,kts,kte,nz_u,z,dz,z_u,pb,ss,bs,ws,sf,vl,    &
+                             nz_ui,                                     &
                              uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u, &       
                              uhb_u,vhb_u,thb_u,ehb_u,qhb_u,qvb_u,       &      
                              a_u,a_v,a_t,a_e,b_u,b_v,b_t,b_e,b_q,tvb_ac,b_ac)           
@@ -3059,6 +3093,7 @@ do iz= kts,kte
 ! Data relative to the "uban grid"
       integer nz_u              ! Number of layer in the urban grid
       integer nd                ! Number of street direction for the current urban class
+      INTEGER, INTENT(in)                                :: nz_ui
       real bs(nd)              ! Building widths of the current urban class
       real ws(nd)              ! Street widths of the current urban class
       real z_u(nz_ui)         ! Height of the urban grid levels
@@ -3259,6 +3294,7 @@ do iz= kts,kte
 ! ===6=8===============================================================72 
 
       subroutine interp_length(nd,kms,kme,kts,kte,nz_u,z_u,z,ss,ws,bs,              &
+                             nz_ui,                                                 &
                              dlg,dl_u)
 
 ! ----------------------------------------------------------------------     
@@ -3276,6 +3312,7 @@ do iz= kts,kte
       real z(kms:kme)              ! Altitude above the ground of the cell interface
       integer nd                ! Number of street direction for the current urban class
       integer nz_u              ! Number of levels in the "urban grid"
+      INTEGER, INTENT(in)                                :: nz_ui
       real z_u(nz_ui)         ! Height of the urban grid levels
       real bs(nd)              ! Building widths of the current urban class
       real ss(nz_ui)          ! Probability to have a building with height h
@@ -3344,6 +3381,7 @@ do iz= kts,kte
 ! ===6=8===============================================================72   
 
       subroutine shadow_mas(nd,nz_u,zr,deltar,ah,drst,ws,ss,pb,z,    &
+                           nz_ui,                                    &
                            swddir,rsw,rsg,xlat)
         
 ! ----------------------------------------------------------------------
@@ -3358,6 +3396,7 @@ do iz= kts,kte
 ! ----------------------------------------------------------------------
       integer nd                ! Number of street direction for the current urban class
       integer nz_u              ! number of vertical layers defined in the urban grid
+      INTEGER, INTENT(in)                                :: nz_ui
       real ah                   ! Hour angle (it should come from the radiation routine)
       real deltar               ! Declination of the sun
       real drst(nd)            ! street directions for the current urban class
@@ -3461,18 +3500,12 @@ do iz= kts,kte
         else
             rsg(id)=swddir
         endif
-
-
             
          enddo
       endif
          
       return
       end subroutine shadow_mas
-
-
-
-
          
 ! ===6=8===============================================================72     
 ! ===6=8===============================================================72     
@@ -3532,7 +3565,9 @@ do iz= kts,kte
 ! ===6=8===============================================================72     
 ! ===6=8===============================================================72     
 
-      subroutine long_rad(iurb,nz_u,id,emw,emg,emwin,pwin,twlev,&
+      subroutine long_rad(iurb,nz_u,id,emw,emg,                      &
+                         nurbi, nz_ui, nd, ng_u, nwr_u,              &
+                         emwin,pwin,twlev,                           &
                          fwg,fww,fgw,fsw,fsg,tg_av,tw,rlg,rlw,rl,pb)
 
 ! ----------------------------------------------------------------------
@@ -3553,6 +3588,7 @@ do iz= kts,kte
 ! ----------------------------------------------------------------------
       real emg                        ! Emissivity of ground for the current urban class
       real emw                        ! Emissivity of wall for the current urban class
+      INTEGER, INTENT(in)                                :: nurbi, nz_ui, nd, ng_u, nwr_u
       real fgw(nz_ui,nd,nurbi)       ! View factors from ground to wall
       real fsg(nd,nurbi)             ! View factors from sky to ground
       real fsw(nz_ui,nd,nurbi)       ! View factors from sky to wall
@@ -3689,7 +3725,8 @@ do iz= kts,kte
 ! ===6=8===============================================================72
 
  
-      subroutine short_rad_dd(iurb,nz_u,id,albw,                        & 
+      subroutine short_rad_dd(iurb,nz_u,id,albw,                       & 
+                           nurbi, nz_ui, nd, ng_u,                     &
                            albg,rsdif,fwg,fww,fgw,fsw,fsg,rsg,rsw,pb)
 
 ! ----------------------------------------------------------------------
@@ -3711,6 +3748,7 @@ do iz= kts,kte
       real albg                 ! Albedo of the ground for the current urban class
       real albw                 ! Albedo of the wall for the current urban class
       real rsdif                ! diffused short wave radiation
+      INTEGER, INTENT(in)                                :: nurbi, nz_ui, nd, ng_u
       real fgw(nz_ui,nd,nurbi)       ! View factors from ground to wall
       real fwg(nz_ui,nd,nurbi)       ! View factors from wall to ground
       real fww(nz_ui,nz_ui,nd,nurbi) ! View factors from wall to wall
@@ -3774,7 +3812,6 @@ do iz= kts,kte
 
       enddo
 
-
 ! ground
       do j=1,nz_u
          aaa(2*nz_u+1,j)=-albw*fwg(j,id,iurb)*pb(j+1)
@@ -3798,7 +3835,6 @@ do iz= kts,kte
       enddo
 
       rsg(id)=bbb(2*nz_u+1)
-
        
       return
       end subroutine short_rad_dd
@@ -4188,11 +4224,9 @@ do iz= kts,kte
        gf=(1.-alb)*rs+em*rl-em*sigma*(tsig**4.)+sf                                   
       return
       end subroutine soil_temp
-      
 
 ! ===6=8===============================================================72 
 ! ===6=8===============================================================72 
-
 
       subroutine invert(n,a,c,x)
 
@@ -4352,6 +4386,9 @@ do iz= kts,kte
 
       implicit none
 
+! ----------------------------------------------------------------------
+! INPUT:
+! ----------------------------------------------------------------------
       real dz                   ! first vertical level
       real pt                   ! potential temperature
       real pt0                  ! reference potential temperature
@@ -4364,8 +4401,6 @@ do iz= kts,kte
       real pr                   ! pressure
       real rsg                  ! solar radiation
       real qg(ng_u)         ! Ground Soil Moisture
-
-     
 
 ! ----------------------------------------------------------------------
 ! OUTPUT:
@@ -4861,9 +4896,13 @@ do iz= kts,kte
 ! ===6=8===============================================================72
 ! ===6=8===============================================================72
 
-      subroutine icBEP (nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u)
+      subroutine icBEP (nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u            &                               
+                      nurbi, nz_ui, dz_u)
 
       implicit none
+
+      INTEGER, INTENT(in)                                :: nurbi, nz_ui
+      REAL, INTENT(in)                                   :: dz_u
 
 !    Street parameters
       integer nd_u(nurbi)     ! Number of street direction for each urban class
@@ -4958,19 +4997,16 @@ do iz= kts,kte
          enddo
       end do
 
-
       return
       end subroutine icBEP
 
 ! ===6=8===============================================================72
 ! ===6=8===============================================================72
-    
 
-      subroutine view_factors(iurb,nz_u,id,dxy,z,ws,fww,fwg,fgw,fsg,fsw,fws) 
+      subroutine view_factors(iurb,nz_u,id,dxy,z,ws,fww,fwg,fgw,fsg,fsw,fws,   &
+                      nurbi, nz_ui, nd) 
      
       implicit none
-
- 
 
 ! -----------------------------------------------------------------------
 !     Input
@@ -4979,10 +5015,10 @@ do iz= kts,kte
       integer iurb            ! Number of the urban class
       integer nz_u            ! Number of levels in the urban grid
       integer id              ! Street direction number
+      INTEGER, INTENT(in)                                :: nurbi, nz_ui, nd
       real ws                 ! Street width
       real z(nz_ui)         ! Height of the urban grid levels
       real dxy                ! Street lenght
-
 
 ! -----------------------------------------------------------------------
 !     Output
@@ -5130,17 +5166,13 @@ do iz= kts,kte
 ! ===6=8===============================================================72
 ! ===6=8===============================================================72
 
-
       SUBROUTINE fprls (fprl,a,b,c)
 
       implicit none
-
-     
             
       real a,b,c
       real x,y
       real fprl
-
 
       x=a/c
       y=b/c
@@ -5164,8 +5196,6 @@ do iz= kts,kte
       SUBROUTINE fnrms (fnrm,a,b,c)
 
       implicit none
-
-
 
       real a,b,c
       real x,y,z,a1,a2,a3,a4,a5,a6
@@ -5192,20 +5222,24 @@ do iz= kts,kte
       end subroutine fnrms
   ! ===6=8===============================================================72  
      
-        SUBROUTINE init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,&
-        twini_u,trini_u,tgini_u,albg_u,albw_u,albr_u,albwin_u,emg_u,emw_u,&
-        emr_u,emwind_u,z0g_u,z0r_u,nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b,  &
-        cop_u,pwin_u,beta_u,sw_cond_u,time_on_u,time_off_u,targtemp_u,    &
-        bldac_frc_u,cooled_frc_u,                                         &
-        gaptemp_u, targhum_u,gaphum_u,perflo_u,                           &
-        gr_frac_roof_u,pv_frac_roof_u,                   &
-        hsesf_u,hsequip,irho,gr_flag_u,gr_type_u)
+        SUBROUTINE init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,         &
+          nurbi, nz_ui, nd,                                                  &
+          twini_u,trini_u,tgini_u,albg_u,albw_u,albr_u,albwin_u,emg_u,emw_u, &
+          emr_u,emwind_u,z0g_u,z0r_u,nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b,   &
+          cop_u,pwin_u,beta_u,sw_cond_u,time_on_u,time_off_u,targtemp_u,     &
+          bldac_frc_u,cooled_frc_u,                                          &
+          gaptemp_u, targhum_u,gaphum_u,perflo_u,                            &
+          gr_frac_roof_u,pv_frac_roof_u,                                     &
+          hsesf_u,hsequip,irho,gr_flag_u,gr_type_u)
 
  
 ! initialization routine, where the variables from the table are read
 
       implicit none
+      
       integer iurb            ! urban class number
+      INTEGER, INTENT(in)                                :: nurbi, nz_ui, nd
+
 !    Building parameters      
       real alag_u(nurbi)      ! Ground thermal diffusivity [m^2 s^-1]
       real alaw_u(nurbi)      ! Wall thermal diffusivity [m^2 s^-1]
@@ -5353,16 +5387,15 @@ do iz= kts,kte
        
        return
        end subroutine init_para
-!==============================================================
-!==============================================================
 !====6=8===============================================================72         
 !====6=8===============================================================72 
 
-       subroutine upward_rad(ndu,nzu,ws,bs,sigma,pb,ss,                &
-                       tg_av,emg_u,albg_u,rlg,rsg,sfg,lfg,                   & 
-                       tw,emw_u,albw_u,rlw,rsw,sfw,                   & 
-                       tr_av,emr_u,albr_u,emwind,albwind,twlev,pwin,     &
-                       sfwind,rld,rs, sfr,sfrv,lfr,lfrv,                            & 
+       subroutine upward_rad(ndu,nzu,ws,bs,sigma,pb,ss,                               &
+                       nd, nz_ui, ng_u, nwr_u, dz_u,                                  &
+                       tg_av,emg_u,albg_u,rlg,rsg,sfg,lfg,                            & 
+                       tw,emw_u,albw_u,rlw,rsw,sfw,                                   & 
+                       tr_av,emr_u,albr_u,emwind,albwind,twlev,pwin,                  &
+                       sfwind,rld,rs, sfr,sfrv,lfr,lfrv,                              & 
                        rs_abs,rl_up,emiss,grdflx_urb,gr_frac_roof,tpvlev,pv_frac_roof)
 !
 ! IN this surboutine we compute the upward longwave flux, and the albedo
@@ -5373,6 +5406,9 @@ do iz= kts,kte
 !
 !INPUT VARIABLES
 !
+      INTEGER, INTENT(in)                                            :: nd, nz_ui, ng_u, nwr_u
+      REAL, INTENT(in)                                               :: dz_u
+
       real rsw(2*nd,nz_ui)        ! Short wave radiation at the wall for a given canyon direction [W/m2]
       real rlw(2*nd,nz_ui)         ! Long wave radiation at the walls for a given canyon direction [W/m2]
       real rsg(nd)                   ! Short wave radiation at the canyon for a given canyon direction [W/m2]
@@ -5599,6 +5635,7 @@ do iz= kts,kte
 !====================================================================72  
 
       subroutine icBEP_XY(iurb,fww_u,fwg_u,fgw_u,fsw_u,             &
+                          nurbi, nd, nz_ui,                          &
                           fws_u,fsg_u,ndu,strd,ws,nzu,z_u)                               
 
       implicit none       
@@ -5606,6 +5643,8 @@ do iz= kts,kte
 !    Street parameters
       integer ndu     ! Number of street direction for each urban class
       integer iurb
+
+      INTEGER, INTENT(in)                                            :: nurbi, nd, nz_ui
 
       real strd(nd)        ! Street length (fix to greater value to the horizontal length of the cells)
       real ws(nd)          ! Street width [m]
@@ -5649,15 +5688,21 @@ do iz= kts,kte
       
       do id=1,ndu
 
-            call view_factors(iurb,nzu,id,strd(id),z_u,ws(id),  &    
-                              fww_u,fwg_u,fgw_u,fsg_u,fsw_u,fws_u) 
+            call view_factors(iurb,nzu,id,strd(id),z_u,ws(id),     &    
+                              fww_u,fwg_u,fgw_u,fsg_u,fsw_u,fws_u, &
+                              nurbi, nz_ui, nd) 
       
       enddo               
+
       return       
+
       end subroutine icBEP_XY
-!====================================================================72
-!====================================================================72  
-      subroutine icBEPHI_XY(iurb,hb_u,hi_urb1D,ss_u,pb_u,nzu,z_u)
+
+! ===6=8===============================================================72
+! ===6=8===============================================================72
+
+      subroutine icBEPHI_XY(hb_u,hi_urb1D,ss_u,pb_u,nzu,z_u,                                          &
+                      nd, nz_ui, dz_u)
 
       implicit none   
 !-----------------------------------------------------------------------
@@ -5665,6 +5710,9 @@ do iz= kts,kte
 !-----------------------------------------------------------------------
 !    Street parameters
 !
+      INTEGER, INTENT(in)                                :: nd, nz_ui
+      REAL, INTENT(in)                                   :: dz_u
+
       real hi_urb1D(nz_ui)    ! The probability that a building has an height h_b
       integer iurb            ! Number of the urban class
 !

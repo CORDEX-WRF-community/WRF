@@ -54,7 +54,7 @@ use module_wrf_error
                       num_urban_nz,                                   &
 #ifdef URBANSTATE
                       ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D,        &
-                      pr_u3D, qv_u3D,                                 &
+                      pr_u3D,                                         &
 #endif
 ! These dimensions are no longer depending no activation of DURBANSTATE, it would complicate
 !   too much the lecture of the code. By now own, all the uses of the following dimensions
@@ -63,15 +63,6 @@ use module_wrf_error
 !     nurbmax --> nurbi
 !     ndm --> nd
 !     nz_um --> nz_ui
-! However, they are kept insiude the definition in order to faciliate the comprehension of the 
-!   compilation error
-                      nurbi, nd, nz_ui, ng_u, nwr_u, dz_u,             &
-                      lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,           &
-                      a_u,a_v,a_t,a_e,b_u,b_v,                        &
-                      b_t,b_e,b_q,dlg,dl_u,sf,vl,                     &
-                      rl_up,rs_abs,emiss,grdflx_urb,                  &
-                      ids,ide, jds,jde, kds,kde,                      &
-                      ims,ime, jms,jme, kms,kme,                      &
                       its,ite, jts,jte, kts,kte)                    
 
       implicit none
@@ -139,9 +130,9 @@ use module_wrf_error
    REAL, INTENT(in)                                               :: dz_u
 #ifdef URBANSTATE
    REAL, DIMENSION(1:num_urban_nz)                                :: ua_u1D, va_u1D, pt_u1D, da_u1D,  &
-     pt0_u1D, pr_u1D, qv_u1D
+     pt0_u1D, pr_u1D
    REAL, DIMENSION(ims:ime,1:num_urban_nz,jms:jme), INTENT(out)   :: ua_u3D, va_u3D, pt_u3D, da_u3D,  &
-     pt0_u3D, pr_u3D, qv_u3D
+     pt0_u3D, pr_u3D
 #endif
       
 !      real zr(ims:ime,jms:jme)                ! Solar zenith angle
@@ -255,7 +246,6 @@ use module_wrf_error
       real pb(nz_ui)               ! Probability to have a building with an height equal
 
 !    Grid parameters
-
       integer nz_u(nurbi)     ! Number of layer in the urban grid
       
       real z_u(nz_ui)         ! Height of the urban grid levels
@@ -628,7 +618,7 @@ use module_wrf_error
                       a_u,a_v,a_t,a_e,                                &
                       b_u,b_v,b_t,b_e,                                & 
 #ifdef URBANSTATE
-                      ua_u, va_u, pt_u, da_u, pt0_u, pr_u,            &
+                      ua_u, va_u, pt_u, da_u, pt0_u, pr_u             &
 #endif
                       nurbi, nd, nz_ui, ng_u, nwr_u, dz_u,             &
                       dlg,dl_u,sf,vl,rl_up,rs_abs,emiss,grdflx_urb)                             
@@ -692,6 +682,7 @@ use module_wrf_error
       real da(kms:kme)                ! Air density
       real pr(kms:kme)                ! Air pressure
       real pt0(kms:kme)               ! Reference potential temperature (could be equal to "pt")
+      real qv(kms:kme)                ! Specific humidity
       real dt                    ! Time step
       real zr                    ! Zenith angle
       real deltar                ! Declination of the sun
@@ -801,7 +792,7 @@ use module_wrf_error
       real pt_u(nz_ui)          ! Potential temperature
       real da_u(nz_ui)          ! Air density
       real pt0_u(nz_ui)         ! Reference potential temperature
-      real pr_u(nz_iu)          ! Air pressure
+      real pr_u(nz_ui)          ! Air pressure
 #endif
 
 ! Solar radiation at each level of the "urban grid"
@@ -957,7 +948,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 
        subroutine param(iurb,nzu,nzurb,nzurban,ndu,                   &
-                       nurbi, nd, nz_ui, ng_u, nwr_u,                  &
+                       nurbi, nd, nz_ui, ng_u, nwr_u,                 &
                        csg_u,csg,alag_u,alag,csr_u,csr,               &
                        alar_u,alar,csw_u,csw,alaw_u,alaw,             &
                        ws_u,ws,bs_u,bs,z0g_u,z0r_u,z0,                &  
@@ -1276,9 +1267,7 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
 
       implicit none
-      
-      
-      
+                  
 ! ----------------------------------------------------------------------
 ! INPUT:
 ! ----------------------------------------------------------------------
@@ -1343,7 +1332,7 @@ use module_wrf_error
          
       real dzw_u(nwr_u)          ! Layer sizes in the wall
       
-! This does not work for flexible amount of layers
+! This does not work yet for flexible amount of layers
       IF (ng_u == 10) THEN
         dzg_u = (/ 0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025 /)
       ELSE
@@ -1587,7 +1576,6 @@ use module_wrf_error
       integer nz_u              ! Number of layer in the urban grid
       integer nd                ! Number of street direction for the current urban class
       INTEGER, INTENT(in)                                :: nz_ui
-
       real bs(nd)              ! Building widths of the current urban class
       real ws(nd)              ! Street widths of the current urban class
       real z_u(nz_ui)         ! Height of the urban grid levels
@@ -1763,7 +1751,6 @@ use module_wrf_error
       end subroutine urban_meso
 
 ! ===6=8===============================================================72 
-
 ! ===6=8===============================================================72 
 
       subroutine interp_length(nd,kms,kme,kts,kte,nz_u,z_u,z,ss,ws,bs,              &
@@ -1786,7 +1773,6 @@ use module_wrf_error
       integer nd                ! Number of street direction for the current urban class
       integer nz_u              ! Number of levels in the "urban grid"
       INTEGER, INTENT(in)                                :: nz_ui
-
       real z_u(nz_ui)         ! Height of the urban grid levels
       real bs(nd)              ! Building widths of the current urban class
       real ss(nz_ui)          ! Probability to have a building with height h
@@ -2033,7 +2019,7 @@ use module_wrf_error
 ! ===6=8===============================================================72     
 ! ===6=8===============================================================72     
 
-      subroutine long_rad(iurb,nz_u,id,emw,emg,                  &
+      subroutine long_rad(iurb,nz_u,id,emw,emg,                   &
                          nurbi, nz_ui, nd, ng_u, nwr_u,           &
                          fwg,fww,fgw,fsw,fsg,tg,tw,rlg,rlw,rl,pb)
 
@@ -2181,7 +2167,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 ! ===6=8===============================================================72
 
-       subroutine short_rad(iurb,nz_u,id,albw,                        & 
+       subroutine short_rad(iurb,nz_u,id,albw,                         & 
                            nurbi, nz_ui, nd, ng_u,                     &
                            albg,fwg,fww,fgw,rsg,rsw,pb)
 
@@ -2266,7 +2252,6 @@ use module_wrf_error
       enddo
 
 ! ground
-
       do j=1,nz_u
          aaa(2*nz_u+1,j)=-albw*fwg(j,id,iurb)*pb(j+1)
       enddo
@@ -2487,7 +2472,6 @@ use module_wrf_error
       
       call invert(nz,a,c,temp)
 
-           
       pt=temp(nz)*(press/1.e+5)**(-rcp_u)
 
       rt=(1.-alb)*rs+em*rl-em*sigma*(tsig**4)
@@ -2627,7 +2611,6 @@ use module_wrf_error
       end subroutine flux_wall
          
 ! ===6=8===============================================================72
-
 ! ===6=8===============================================================72
 
       subroutine flux_flat(dz,z0,ua,va,pt,pt0,ptg,                     &
@@ -2639,8 +2622,6 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
 
       implicit none
-
-     
 
 ! ----------------------------------------------------------------------
 ! INPUT:
@@ -2759,7 +2740,6 @@ use module_wrf_error
 
       implicit none       
         
-
       INTEGER, INTENT(in)                                :: nurbi, nz_ui
       REAL, INTENT(in)                                   :: dz_u
 
@@ -2787,9 +2767,6 @@ use module_wrf_error
 
       real dtot
       real hbmax
-
-!------------------------------------------------------------------------
-     
 
 ! -----------------------------------------------------------------------
 !     This routine initialise the urban paramters for the BEP module
@@ -2858,7 +2835,6 @@ use module_wrf_error
          enddo
       end do
      
-                  
       return       
       end subroutine icBEP
 
@@ -3031,13 +3007,10 @@ use module_wrf_error
       SUBROUTINE fprls (fprl,a,b,c)
 
       implicit none
-
-     
             
       real a,b,c
       real x,y
       real fprl
-
 
       x=a/c
       y=b/c
@@ -3061,8 +3034,6 @@ use module_wrf_error
       SUBROUTINE fnrms (fnrm,a,b,c)
 
       implicit none
-
-
 
       real a,b,c
       real x,y,z,a1,a2,a3,a4,a5,a6
@@ -3089,9 +3060,9 @@ use module_wrf_error
       end subroutine fnrms
   ! ===6=8===============================================================72  
      
-      SUBROUTINE init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,       &
+      SUBROUTINE init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,        &
                 nurbi, nz_ui, nd,                                         &
-                twini_u,trini_u,tgini_u,albg_u,albw_u,albr_u,emg_u,emw_u,&
+                twini_u,trini_u,tgini_u,albg_u,albw_u,albr_u,emg_u,emw_u, &
                 emr_u,z0g_u,z0r_u,nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b)
 
 ! initialization routine, where the variables from the table are read
@@ -3202,7 +3173,6 @@ use module_wrf_error
        return
       END SUBROUTINE init_para
 !==============================================================
-
 !==============================================================
       subroutine angle(along,alat,day,realt,zr,deltar,ah)
 !     ----------------     
@@ -3296,7 +3266,7 @@ use module_wrf_error
 ! IN this surboutine we compute the upward longwave flux, and the albedo
 ! needed for the radiation scheme
 !
-                       implicit none
+      implicit none
 
 !
 !INPUT VARIABLES
@@ -3414,8 +3384,6 @@ use module_wrf_error
 
 !====6=8===============================================================72         
 !====6=8===============================================================72 
-! ===6=8===============================================================72
-! ===6=8===============================================================72
 
       subroutine icBEP_XY(iurb,fww_u,fwg_u,fgw_u,fsw_u,             &
                           nurbi, nd, nz_ui,                          &
@@ -3471,13 +3439,16 @@ use module_wrf_error
       
       do id=1,ndu
 
-            call view_factors(iurb,nzu,id,strd(id),z_u,ws(id),    &
-                              fww_u,fwg_u,fgw_u,fsg_u,fsw_u,fws_u,&
+            call view_factors(iurb,nzu,id,strd(id),z_u,ws(id),     &
+                              fww_u,fwg_u,fgw_u,fsg_u,fsw_u,fws_u, &
                               nurbi, nz_ui, nd)
       
       enddo               
+
       return       
+
       end subroutine icBEP_XY
+
 ! ===6=8===============================================================72
 ! ===6=8===============================================================72
 
@@ -3580,7 +3551,7 @@ use module_wrf_error
          nzu=iz_u+1
 
          if ((nzu+1).gt.nz_ui) then 
-             write(*,*) 'error, nz_u has to be increased to at least',nzu+1
+             write(*,*) 'error, nz_ui has to be increased to at least',nzu+1
              stop
          endif
 
