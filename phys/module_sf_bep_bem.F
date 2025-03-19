@@ -1319,7 +1319,7 @@ use module_wrf_error
 #ifdef URBANSTATE
                       ua_u, va_u, pt_u, da_u, pt0_u, pr_u, qv_u,       &
 #endif                      
-                      nurbi, nd, nz_ui, ng_u, nwr_u, nbi, gr_u, nf_u,  &
+                      nurbi, nd, nz_ui, ng_u, nwr_u, nbi, ngr_u, nf_u, &
                       ngb_u, dz_u, h_water,                            &
                       dlg,dl_u,sf,vl,rl_up,rs_abs,emiss,grdflx_urb,    &
                       qv,tlev,qlev,sflev,lflev,consumlev,              &
