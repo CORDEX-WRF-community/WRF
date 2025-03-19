@@ -831,8 +831,8 @@ use module_wrf_error
            hi_urb1D(iz_u)=hi_urb(ix,iz_u,iy)
          enddo
 
-         call icBEPHI_XY(iurb,hb_u,hi_urb1D,ss_urb,pb_urb,    &
-                         nz_urb(iurb),z_u, nd, nz_ui, dz_u)
+         call icBEPHI_XY(iurb,hb_u,hi_urb1D,ss_urb,pb_urb,                 &
+                         nz_urb(iurb),z_u, nd, nz_ui, nurbi, dz_u)
 
          call param(iurb,nz_u(iurb),nz_urb(iurb),nzurban(iurb),nd_u(iurb), &
                     nurbi, nd, nz_ui, ng_u, nwr_u, ngb_u, nf_u,            &
@@ -2995,8 +2995,8 @@ use module_wrf_error
                  qr_tmp(il)=qr(id,iz,il)
                enddo
                call flux_flat_roof(dz,z0v,ua_u(iz),va_u(iz),pt_u(iz),pt0_u(iz),&
-                   ngr_u,                                                      &
-                   ptrv(id,iz),uhbv(id,iz),                                    &
+                   ptrv(id,iz), ngr_u,                                         &
+                   uhbv(id,iz),                                                &
                    vhbv(id,iz),sfrv(id,iz),lfrv(id,iz),ehbv(id,iz),da_u(iz),   &
                    qv_u(iz),pr_u(iz),rs,qr_tmp,resg,rsveg,f1,f2,f3,f4,         &
                    gr_type,pv_frac_roof)
@@ -5585,7 +5585,7 @@ use module_wrf_error
 ! -------------------------------------------------------------------
 !Input
 !-----
-         REAL, INTENT(in)                                :: p_num, q_num	
+         INTEGER, INTENT(in)                             :: p_num, q_num	
         
 !Output
 !------
@@ -5737,7 +5737,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 
       subroutine icBEPHI_XY(iurb,hb_u,hi_urb1D,ss_u,pb_u,nzu,z_u,                                          &
-                      nd, nz_ui, dz_u)
+                      nd, nz_ui, nurbi, dz_u)
 
       implicit none   
 !-----------------------------------------------------------------------
@@ -5745,7 +5745,7 @@ use module_wrf_error
 !-----------------------------------------------------------------------
 !    Street parameters
 !
-      INTEGER, INTENT(in)                                :: nd, nz_ui
+      INTEGER, INTENT(in)                                :: nd, nz_ui, nurbi
       REAL, INTENT(in)                                   :: dz_u
 
       real hi_urb1D(nz_ui)    ! The probability that a building has an height h_b
