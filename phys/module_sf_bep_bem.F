@@ -802,18 +802,18 @@ use module_wrf_error
 
       if (first) then                           ! True only on first call
 
-         call init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,&
-                nurbi, nz_ui, nd,                                         &
+         call init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,                   &
+                nurbi, nz_ui, nd, p_num, q_num,                                   &
                 twini_u,trini_u,tgini_u,albg_u,albw_u,albr_u,albwin_u,emg_u,emw_u,&
                 emr_u,emwind_u,z0g_u,z0r_u,nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b,  &
                 cop_u,pwin_u,beta_u,sw_cond_u,time_on_u,time_off_u,targtemp_u,    &
                 bldac_frc_u,cooled_frc_u,                                         &
                 gaptemp_u,targhum_u,gaphum_u,perflo_u,                            &
-                gr_frac_roof_u,pv_frac_roof_u,                   & 
+                gr_frac_roof_u,pv_frac_roof_u,                                    &
                 hsesf_u,hsequip,irho,gr_flag_u,gr_type_u)
  
 !Initialisation of the urban parameters and calculation of the view factor
-        call icBEP(nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u,                    &
+        call icBEP(nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u,                               &
                       nurbi, nz_ui, dz_u)
    
       first=.false.
@@ -2977,48 +2977,53 @@ use module_wrf_error
          ehb_u(id,1)=ehb(id,1)
          qhb_u(id,1)=-lfg(id)/(da_u(1)*latent)
          do iz=2,nz
-            if(ss(iz).gt.0)then
+           if (ss(iz).gt.0) then
             
-               call flux_flat(dz,z0(id,iz),ua_u(iz),&
-                       va_u(iz),pt_u(iz),pt0_u(iz), &
+               call flux_flat(dz,z0(id,iz),ua_u(iz),         &
+                       va_u(iz),pt_u(iz),pt0_u(iz),          &
                        ptr(id,iz),qv_u(iz),uhb(id,iz),       &
-                       vhb(id,iz),sfr(id,iz),lfr(id,iz),ehb(id,iz),da_u(iz),pr_u(iz))
-         if(dgr(id,iz).gt.0)then
-          wfr=dgr(id,iz)/drmax
-          lfr(id,iz)=-da_u(iz)*latent*(-(wfr*lfr(id,iz))/(da_u(iz)*latent))
-         else
-          lfr(id,iz)=0.
-         endif
-         if(gr_flag.eq.1.and.gr_frac_roof.gt.0.)then  
-         do il=1,ngr_u
-           qr_tmp(il)=qr(id,iz,il)
-         enddo
-               call flux_flat_roof(dz,z0v,ua_u(iz),va_u(iz),pt_u(iz),pt0_u(iz),  &
-                       ptrv(id,iz),uhbv(id,iz),                            &
-                       vhbv(id,iz),sfrv(id,iz),lfrv(id,iz),ehbv(id,iz),da_u(iz),qv_u(iz),pr_u(iz),rs,qr_tmp,resg,rsveg,f1,f2,f3,f4,gr_type,pv_frac_roof)
-         sfr(id,iz)=sfr(id,iz)+pv_frac_roof*sfrpv(id,iz) 
-         thb_u(id,iz)=-((1.-gr_frac_roof)*sfr(id,iz)+gr_frac_roof*sfrv(id,iz))/(da_u(iz)*cp_u)
-         vhb_u(id,iz)=(1.-gr_frac_roof)*vhb(id,iz)+gr_frac_roof*vhbv(id,iz)
-         uhb_u(id,iz)=(1.-gr_frac_roof)*uhb(id,iz)+gr_frac_roof*uhbv(id,iz)
-         ehb_u(id,iz)=(1.-gr_frac_roof)*ehb(id,iz)+gr_frac_roof*ehbv(id,iz)
-         qhb_u(id,iz)=-(gr_frac_roof*lfrv(id,iz)+(1.-gr_frac_roof)*lfr(id,iz))/(da_u(iz)*latent)
-         sfr(id,iz)=sfr(id,iz)-pv_frac_roof*sfrpv(id,iz)
-         else
-         sfr(id,iz)=sfr(id,iz)+pv_frac_roof*sfrpv(id,iz)
-         thb_u(id,iz)=-sfr(id,iz)/(da_u(iz)*cp_u)
-         vhb_u(id,iz)=vhb(id,iz)
-         uhb_u(id,iz)=uhb(id,iz)
-         ehb_u(id,iz)=ehb(id,iz)
-         qhb_u(id,iz)=-lfr(id,iz)/(da_u(iz)*latent)
-         sfr(id,iz)=sfr(id,iz)-pv_frac_roof*sfrpv(id,iz)
-         endif
-            else
-               uhb_u(id,iz) = 0.0
-               vhb_u(id,iz) = 0.0
-               thb_u(id,iz) = 0.0
-               ehb_u(id,iz) = 0.0
-               qhb_u(id,iz) = 0.0
-            endif
+                       vhb(id,iz),sfr(id,iz),lfr(id,iz),     &
+                       ehb(id,iz),da_u(iz),pr_u(iz))
+             if (dgr(id,iz).gt.0) then
+               wfr=dgr(id,iz)/drmax
+               lfr(id,iz)=-da_u(iz)*latent*(-(wfr*lfr(id,iz))/(da_u(iz)*latent))
+             else
+               lfr(id,iz)=0.
+             endif
+             if (gr_flag.eq.1.and.gr_frac_roof.gt.0.) then
+               do il=1,ngr_u
+                 qr_tmp(il)=qr(id,iz,il)
+               enddo
+               call flux_flat_roof(dz,z0v,ua_u(iz),va_u(iz),pt_u(iz),pt0_u(iz),&
+                   ngr_u,                                                      &
+                   ptrv(id,iz),uhbv(id,iz),                                    &
+                   vhbv(id,iz),sfrv(id,iz),lfrv(id,iz),ehbv(id,iz),da_u(iz),   &
+                   qv_u(iz),pr_u(iz),rs,qr_tmp,resg,rsveg,f1,f2,f3,f4,         &
+                   gr_type,pv_frac_roof)
+
+               sfr(id,iz)=sfr(id,iz)+pv_frac_roof*sfrpv(id,iz) 
+               thb_u(id,iz)=-((1.-gr_frac_roof)*sfr(id,iz)+gr_frac_roof*sfrv(id,iz))/(da_u(iz)*cp_u)
+               vhb_u(id,iz)=(1.-gr_frac_roof)*vhb(id,iz)+gr_frac_roof*vhbv(id,iz)
+               uhb_u(id,iz)=(1.-gr_frac_roof)*uhb(id,iz)+gr_frac_roof*uhbv(id,iz)
+               ehb_u(id,iz)=(1.-gr_frac_roof)*ehb(id,iz)+gr_frac_roof*ehbv(id,iz)
+               qhb_u(id,iz)=-(gr_frac_roof*lfrv(id,iz)+(1.-gr_frac_roof)*lfr(id,iz))/(da_u(iz)*latent)
+               sfr(id,iz)=sfr(id,iz)-pv_frac_roof*sfrpv(id,iz)
+             else
+               sfr(id,iz)=sfr(id,iz)+pv_frac_roof*sfrpv(id,iz)
+               thb_u(id,iz)=-sfr(id,iz)/(da_u(iz)*cp_u)
+               vhb_u(id,iz)=vhb(id,iz)
+               uhb_u(id,iz)=uhb(id,iz)
+               ehb_u(id,iz)=ehb(id,iz)
+               qhb_u(id,iz)=-lfr(id,iz)/(da_u(iz)*latent)
+               sfr(id,iz)=sfr(id,iz)-pv_frac_roof*sfrpv(id,iz)
+             endif
+           else
+             uhb_u(id,iz) = 0.0
+             vhb_u(id,iz) = 0.0
+             thb_u(id,iz) = 0.0
+             ehb_u(id,iz) = 0.0
+             qhb_u(id,iz) = 0.0
+           endif
          enddo
          
          
@@ -4604,7 +4609,9 @@ use module_wrf_error
 ! ===6=8===============================================================72
 ! ===6=8===============================================================72
       subroutine flux_flat_roof(dz,z0,ua,va,pt,pt0,ptg,                     &
-                          uhb,vhb,sf,lf,ehb,da,qv,pr,rsg,qr,resg,rsveg,f1,f2,f3,f4,gr_type,pv_frac_roof)
+                          ngr_u,                                            &
+                          uhb,vhb,sf,lf,ehb,da,qv,pr,rsg,qr,resg,rsveg,f1,  &
+                          f2,f3,f4,gr_type,pv_frac_roof)
 
 ! ----------------------------------------------------------------------
 !           Calculation of the flux at the ground 
@@ -4612,6 +4619,8 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
 
       implicit none
+
+      INTEGER, INTENT(in)                                :: ngr_u
 
       real dz                   ! first vertical level
       real pt                   ! potential temperature
@@ -5248,7 +5257,7 @@ use module_wrf_error
   ! ===6=8===============================================================72  
      
         SUBROUTINE init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,         &
-          nurbi, nz_ui, nd,                                                  &
+          nurbi, nz_ui, nd, p_num, q_num,                                    &
           twini_u,trini_u,tgini_u,albg_u,albw_u,albr_u,albwin_u,emg_u,emw_u, &
           emr_u,emwind_u,z0g_u,z0r_u,nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b,   &
           cop_u,pwin_u,beta_u,sw_cond_u,time_on_u,time_off_u,targtemp_u,     &
@@ -5263,7 +5272,7 @@ use module_wrf_error
       implicit none
       
       integer iurb            ! urban class number
-      INTEGER, INTENT(in)                                :: nurbi, nz_ui, nd
+      INTEGER, INTENT(in)                                :: nurbi, nz_ui, nd, p_num, q_num
 
 !    Building parameters      
       real alag_u(nurbi)      ! Ground thermal diffusivity [m^2 s^-1]
