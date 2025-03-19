@@ -685,6 +685,9 @@ CONTAINS
 ! pr_u3D: Air pressure [Pa]
 ! qv_u3D: water vapour mixing ratio [kgkg-1]
    INTEGER, INTENT(in)                                   :: num_urban_nz
+   INTEGER, INTENT(in)                                   :: nurbi, nd, nz_ui, ng_u, ngr_u, nwr_u,     &
+     nf_u, ngb_u, nbi, p_num, q_num
+   REAL, INTENT(in)                                      :: dz_u, h_water
    REAL, OPTIONAL,                                                                                    &
     DIMENSION(ims:ime,1:num_urban_nz,jms:jme),                                                        &
      INTENT(inout)                                       :: ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D,  &
@@ -1629,11 +1632,12 @@ CONTAINS
            urban_map_gbd, urban_map_fbd,  num_urban_hi,                &
                 trb_urb4d,tw1_urb4d,tw2_urb4d,tgb_urb4d,               &
                 sfw1_urb3d,sfw2_urb3d,sfr_urb3d,sfg_urb3d,             &
-#ifdef URBANSTATE
                 num_urban_nz,                                          &
+#ifdef URBANSTATE
                 ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,       &
                 qv_u3D,                                                &
 #endif
+                nurbi, nd, nz_ui, ng_u, nwr_u, dz_u,                   &
                 lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,                  &
                 a_u_bep,a_v_bep,a_t_bep,                               &
                 a_e_bep,b_u_bep,b_v_bep,                               &
@@ -1678,11 +1682,13 @@ CONTAINS
                 drain_urb4d,draingr_urb3d,sfrv_urb3d,                  & !RMS
                 lfrv_urb3d,dgr_urb3d,dg_urb3d,lfr_urb3d,lfg_urb3d,     & !RMS
                 rainbl,swddir,swddif,                                  & !RMS
-#ifdef URBANSTATE
                 num_urban_nz,                                          &
+#ifdef URBANSTATE
                 ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,       &
                 qv_u3D,                                                &
 #endif
+                nurbi, nd, nz_ui, ng_u, ngr_u,                         &
+                nwr_u, nf_u, ngb_u, nbi, p_num, q_num, dz_u, h_wate,   &
                 lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,                  &
                 a_u_bep,a_v_bep,a_t_bep,                               &
                 a_e_bep,b_u_bep,b_v_bep,                               &
