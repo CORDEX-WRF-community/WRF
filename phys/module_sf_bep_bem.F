@@ -217,7 +217,7 @@ use module_wrf_error
    REAL, INTENT(IN )::   DT      ! Time step
 
    INTEGER, INTENT(in)                                            :: num_urban_nz
-   INTEGER, INTENT(in)                                            :: nurbi, nd, nz_u, ng_u, ngr_u,&
+   INTEGER, INTENT(in)                                            :: nurbi, nd, nz_ui, ng_u, ngr_u,   &
      nwr_u, nf_u, ngb_u, nbi, p_num, q_num
    REAL, INTENT(in)                                               :: dz_u, h_water
 #ifdef URBANSTATE
