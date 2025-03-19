@@ -1996,7 +1996,7 @@ use module_wrf_error
 
       call buildings(iurb,ndu,nzu,z0,cdrag,ua_u,va_u,                                                 &
                      pt_u,pt0_u,                                                                      &
-                     nz_ui,                                                                           &
+                     nz_ui, nurbi, nbi, ngr_u,                                                        &
                      ptg,ptr,ptrv,da_u,qv_u,pr_u,tmp_u,ptw,ptwin,pwin_u(iurb),drst,                   &
                      uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,qvb_u,qhb_u,                           &
                      uhb_u,vhb_u,thb_u,ehb_u,ss,dt,sfw,sfg,sfr,sfrpv,sfrv,lfrv,                       &
@@ -2787,7 +2787,7 @@ use module_wrf_error
 ! ===6=8===============================================================72  
 
       subroutine buildings(iurb,nd,nz,z0,cdrag,ua_u,va_u,pt_u,pt0_u,                                       &
-                        nz_ui,                                                                             &
+                        nz_ui, nurbi, nbi, ngr_u,                                                          &
                         ptg,ptr,ptrv,da_u,qv_u,pr_u,tmp_u,ptw,ptwin,pwin,                                  &
                         drst,uva_u,vva_u,uvb_u,vvb_u,                                                      &
                         tva_u,tvb_u,evb_u,qvb_u,qhb_u,                                                     &
@@ -2811,7 +2811,7 @@ use module_wrf_error
       integer nd                ! Number of street direction for the current urban class
       integer ix,iy
       integer nz                ! number of vertical space steps
-      INTEGER, INTENT(in)                                :: nz_ui
+      INTEGER, INTENT(in)                                :: nz_ui, nurbi, nbi, ngr_u
       real ua_u(nz_ui)          ! Wind speed in the x direction on the urban grid
       real va_u(nz_ui)          ! Wind speed in the y direction on the urban grid
       real da_u(nz_ui)          ! air density on the urban grid
@@ -4399,7 +4399,9 @@ use module_wrf_error
 ! ===6=8===============================================================72
 
       subroutine flux_flat_ground(dz,z0,ua,va,pt,pt0,ptg,                     &
-                          uhb,vhb,sf,ehb,da,qv,pr,rsg,qg,resg,rsveg,f1,f2,f3,f4,fh,ric,utot,gr_type)
+                          ng_u,                                               &
+                          uhb,vhb,sf,ehb,da,qv,pr,rsg,qg,resg,rsveg,f1,f2,f3, &
+                          f4,fh,ric,utot,gr_type)
                                 
 ! ----------------------------------------------------------------------
 !           Calculation of the flux at the ground 
@@ -4411,6 +4413,7 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
 ! INPUT:
 ! ----------------------------------------------------------------------
+      INTEGER, INTENT(in)                                :: ng_u
       real dz                   ! first vertical level
       real pt                   ! potential temperature
       real pt0                  ! reference potential temperature
@@ -5404,7 +5407,7 @@ use module_wrf_error
 
        do iu=1,nurb  
           emwind_u(iu)=0.9                       
-          call albwindow(albwin_u(iu))  
+          call albwindow(albwin_u(iu), p_num, q_num)  
        enddo
        
        return
@@ -5559,7 +5562,7 @@ use module_wrf_error
 ! ===6================================================================72
 ! ===6================================================================72
 
-         subroutine albwindow(albwin)
+         subroutine albwindow(albwin, p_num, q_num)
 		
 !-------------------------------------------------------------------
 	 implicit none
@@ -5572,7 +5575,8 @@ use module_wrf_error
 !Solar Energy Vol.69,No.4,pp. 321-329.      
 ! -------------------------------------------------------------------
 !Input
-!-----	
+!-----
+         REAL, INTENT(in)                                :: p_num, q_num	
         
 !Output
 !------
@@ -5829,7 +5833,7 @@ use module_wrf_error
 
             do iz_u=1,nzu
                ss_u(iz_u,iurb)=0.
-               do ilu=1,nz_umi
+               do ilu=1,nz_ui
                   if(z_u(iz_u).le.hb_u(ilu)                      &    
                     .and.z_u(iz_u+1).gt.hb_u(ilu))then            
                         ss_u(iz_u,iurb)=ss_u(iz_u,iurb)+hi_urb1D(ilu)
