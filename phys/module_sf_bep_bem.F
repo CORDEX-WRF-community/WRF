@@ -576,17 +576,20 @@ use module_wrf_error
       integer iii
       logical first
       character(len=80) :: text
+
       data first/.true./
       save first,time_bep
        
-      save alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,                       &
-           albg_u,albw_u,albr_u,emg_u,emw_u,emr_u,                       &
-           z0g_u,z0r_u, nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b,ss_u,pb_u,  &
-           nz_u,z_u,albwin_u,emwind_u,cop_u,pwin_u,beta_u,sw_cond_u,     &
-           bldac_frc_u,cooled_frc_u,                                     &
-           time_on_u,time_off_u,targtemp_u,gaptemp_u,targhum_u,gaphum_u, &
-           perflo_u,gr_frac_roof_u,                    &
-           pv_frac_roof_u,hsesf_u,hsequip,irho,gr_flag_u,gr_type_u
+!L. Fita, CIMA/IFAECI, March 2025
+! Removing save, .... will it work ?
+!      save alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,                       &
+!           albg_u,albw_u,albr_u,emg_u,emw_u,emr_u,                       &
+!           z0g_u,z0r_u, nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b,ss_u,pb_u,  &
+!           nz_u,z_u,albwin_u,emwind_u,cop_u,pwin_u,beta_u,sw_cond_u,     &
+!           bldac_frc_u,cooled_frc_u,                                     &
+!           time_on_u,time_off_u,targtemp_u,gaptemp_u,targhum_u,gaphum_u, &
+!           perflo_u,gr_frac_roof_u,                    &
+!           pv_frac_roof_u,hsesf_u,hsequip,irho,gr_flag_u,gr_type_u
 
 !------------------------------------------------------------------------
 !    Calculation of the momentum, heat and turbulent kinetic fluxes
@@ -2513,7 +2516,7 @@ do iz= kts,kte
 
       real dzg_u(ng_u)          ! Layer sizes in the ground
       
-      data dzg_u /0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025/
+      dzg_u = (/ 0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025 /)
 
      
 ! ----------------------------------------------------------------------
@@ -2618,7 +2621,6 @@ do iz= kts,kte
       real qr_tmp_old(ngr_u)
       real dzgr_u(ngr_u)          ! Layer sizes in the green roof
 !MODIFICA
-      data dzgr_u /0.1,0.003,0.06,0.003,0.05,0.04,0.02,0.0125,0.005,0.0025/
       real cs(ngr_u)  ! Specific heat of the ground material
       real cw
       parameter(cw=4.295e6)
@@ -2635,18 +2637,21 @@ do iz= kts,kte
       real ka(4)
       real qref
       parameter(qref=0.37)
-      data qrmax /0.0,0.0,0.0,0.0,0.439,0.37,0.37,0.37,0.37,0.37/
-      data smax /0,0,0,0,-0.01,-0.1,-0.1,-0.1,-0.1,-0.1/
-      data kmax /0,0,0,0,3.32e-3,2.162e-3,2.162e-3,2.162e-3,2.162e-3,2.162e-3/
-      data b /0,0,0,0,2.7,3.9,3.9,3.9,3.9,3.9/
-      data cd /0,0,0,0,331500,1.342e6,1.342e6,1.342e6,1.342e6,1.342e6/
-      data csa /7.5e4,2.1e6,4.48e4,2.1e6/
-      data ka /0.035,0.7,0.024,0.7/
       real em_gr(1)
       real alb_gr(1)
       real irri_now
       integer gr_type
       real drain(nd,nz_ui)
+
+      dzgr_u = (/0.1,0.003,0.06,0.003,0.05,0.04,0.02,0.0125,0.005,0.0025/)
+      qrmax = (/0.0,0.0,0.0,0.0,0.439,0.37,0.37,0.37,0.37,0.37/)
+      smax = (/0,0,0,0,-0.01,-0.1,-0.1,-0.1,-0.1,-0.1/)
+      kmax = (/0,0,0,0,3.32e-3,2.162e-3,2.162e-3,2.162e-3,2.162e-3,2.162e-3/)
+      b = (/0,0,0,0,2.7,3.9,3.9,3.9,3.9,3.9/)
+      cd = (/0,0,0,0,331500,1.342e6,1.342e6,1.342e6,1.342e6,1.342e6/)
+      csa = (/7.5e4,2.1e6,4.48e4,2.1e6/)
+      ka = (/0.035,0.7,0.024,0.7/)
+
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
 
@@ -2854,8 +2859,10 @@ do iz= kts,kte
       real f1,f2,f3,f4
       integer rsv(2)
       real qr_tmp(ngr_u)
-      data rsv /0,1/
       real fh,ric,utot
+
+      rsv = (/0,1/)
+
 !------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------
@@ -4421,11 +4428,12 @@ do iz= kts,kte
       parameter(hs=36.35)
  
       real dzg_u(ng_u)          ! Layer sizes in the ground
-
-      data dzg_u /0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025/
       
       real gx,dzg_tot
       integer gr_type,iz
+
+      dzg_u = (/0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025/) 
+
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------
@@ -4622,10 +4630,11 @@ do iz= kts,kte
 
       real dzgr_u(ngr_u)          ! Layer sizes in the ground
 
-      data dzgr_u /0.1,0.003,0.06,0.003,0.05,0.04,0.02,0.0125,0.005,0.0025/
-
       real gx,dzgr_tot
       integer gr_type,iz
+
+      dzgr_u = (/0.1,0.003,0.06,0.003,0.05,0.04,0.02,0.0125,0.005,0.0025/)
+
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
 
