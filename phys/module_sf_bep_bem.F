@@ -1050,23 +1050,26 @@ use module_wrf_error
                    nzurban(iurb),z_u,cop_u,pwin_u,beta_u,           & 
                    sw_cond_u,time_on_u,time_off_u,targtemp_u,       &
                    gaptemp_u,targhum_u,gaphum_u,perflo_u,           &
-                   gr_frac_roof_u(iurb),pv_frac_roof_u(iurb),  & 
+                   gr_frac_roof_u(iurb),pv_frac_roof_u(iurb),       & 
                    hsesf_u,hsequip,irho,gr_flag_u,gr_type_u,        &
-                   tw1D,tg1D,tr1D,trv1D,sfw1D,sfg1D,sfr1D,    &
-                   sfrv1D,lfrv1D,    &
-                   dgr1D,dg1D,lfr1D,lfg1D,                       &
-                   drain1D,rainbl(ix,iy),qr1D,                   &
+                   tw1D,tg1D,tr1D,trv1D,sfw1D,sfg1D,sfr1D,          &
+                   sfrv1D,lfrv1D,                                   &
+                   dgr1D,dg1D,lfr1D,lfg1D,                          &
+                   drain1D,rainbl(ix,iy),qr1D,                      &
                    a_u1D,a_v1D,a_t1D,a_e1D,                         & 
                    b_u1D,b_v1D,b_t1D,b_ac1D,b_e1D,b_q1D,            & 
 #ifdef URBANSTATE
                    ua_u1D, va_u1D, pt_u1D, da_u1D, pt0_u1D, pr_u1D, &
                    qv_u1D,                                          &
 #endif
-                   nurbi, nd, nz_ui, ng_u, nwr_u, dz_u,              &
+                   nurbi, nd, nz_ui, ng_u, nwr_u, ngr_u, nf_u,      &
+                   ngb_u, dz_u, h_water,                            &
                    dlg1D,dl_u1D,sf1D,vl1D,rl_up(ix,iy),             &
                    rs_abs(ix,iy),emiss(ix,iy),grdflx_urb(ix,iy),    &
                    qv1D,tlev1D,qlev1D,sflev1D,lflev1D,consumlev1D,  &
-                   eppvlev1D,tpvlev1D,sfvlev1D,lfvlev1D,twlev1D,tglev1D,tflev1D,sfwin1D,tair1D,sfr_indoor1D,sfrpv1D,gfr1D) 
+                   eppvlev1D,tpvlev1D,sfvlev1D,lfvlev1D,twlev1D,    &
+                   tglev1D,tflev1D,sfwin1D,tair1D,sfr_indoor1D,     &
+                   sfrpv1D,gfr1D) 
            
           do ibui=1,nbi !type of building
 	    do iz=1,nz_ui   !vertical levels
@@ -1307,16 +1310,17 @@ use module_wrf_error
                       nzu,z_u,cop_u,pwin_u,beta_u,sw_cond_u,           & 
                       time_on_u,time_off_u,targtemp_u,                 &
                       gaptemp_u,targhum_u,gaphum_u,perflo_u,           &
-                      gr_frac_roof,pv_frac_roof,        & 
-                      hsesf_u,hsequip,irho,gr_flag,gr_type,                    &
-                      tw,tg,tr,trv,sfw,sfg,sfr,            &
-                      sfrv,lfrv,dgr,dg,lfr,lfg,drain,rainbl,qr,      & 
+                      gr_frac_roof,pv_frac_roof,                       & 
+                      hsesf_u,hsequip,irho,gr_flag,gr_type,            &
+                      tw,tg,tr,trv,sfw,sfg,sfr,                        &
+                      sfrv,lfrv,dgr,dg,lfr,lfg,drain,rainbl,qr,        & 
                       a_u,a_v,a_t,a_e,                                 &
                       b_u,b_v,b_t,b_ac,b_e,b_q,                        & 
 #ifdef URBANSTATE
                       ua_u, va_u, pt_u, da_u, pt0_u, pr_u, qv_u,       &
 #endif                      
-                      nurbi, nd, nz_ui, ng_u, nwr_u, dz_u,             &
+                      nurbi, nd, nz_ui, ng_u, nwr_u, ngr_u, nf_u,      &
+                      ngb_u, dz_u, h_water,                            &
                       dlg,dl_u,sf,vl,rl_up,rs_abs,emiss,grdflx_urb,    &
                       qv,tlev,qlev,sflev,lflev,consumlev,              &
                       eppvlev,tpvlev,sfvlev,lfvlev,twlev,tglev,tflev,sfwin,tmp_u,sfr_indoor,sfrpv,gfr)    
@@ -1356,8 +1360,9 @@ use module_wrf_error
 
       integer iurb               ! Current urban class
 
-      INTEGER, INTENT(in)                                :: nurbi, nd, nz_ui, ng_u, nwr_u
-      REAL, INTENT(in)                                   :: dz_u
+      INTEGER, INTENT(in)                                :: nurbi, nd, nz_ui, ng_u, nwr_u, ngr_u,     &
+        nf_u, ngb_u
+      REAL, INTENT(in)                                   :: dz_u, h_water
 
 !    Radiation parameters
       real albg                  ! Albedo of the ground
