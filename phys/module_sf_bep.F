@@ -3634,10 +3634,11 @@ END MODULE module_sf_bep
          bep_val_ng_u = ng_u
       END FUNCTION bep_ng_u
       
-      FUNCTION bep_nwr_u () RESULT (bep_val_nwr_u)
-         USE module_sf_bep
-         IMPLICIT NONE
-         INTEGER :: bep_val_nwr_u
-         bep_val_nwr_u = nwr_u
-      END FUNCTION bep_nwr_u
+! This might not be required anymore
+!      FUNCTION bep_nwr_u () RESULT (bep_val_nwr_u)
+!         USE module_sf_bep
+!         IMPLICIT NONE
+!         INTEGER :: bep_val_nwr_u
+!         bep_val_nwr_u = nwr_u
+!      END FUNCTION bep_nwr_u
       

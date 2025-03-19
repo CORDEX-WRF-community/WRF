@@ -82,7 +82,7 @@ use module_wrf_error
 ! However, they are kept insiude the definition in order to faciliate the comprehension of the 
 !   compilation error
                       nurbi, nd, nz_ui, ng_u, ngr_u,                               &
-                      nwr_u, nf_u, ngb_u, nbui, p_num, q_num, dz_u,                &
+                      nwr_u, nf_u, ngb_u, nbui, p_num, q_num, dz_u, h_water,       &
 #ifdef URBANCOLAPSE                      
                       urban_map_zrd_mask, urban_map_zwd_mask,                      &
                       urban_map_gd_mask, urban_map_zd_mask,                        &
@@ -5796,19 +5796,20 @@ END MODULE module_sf_bep_bem
          bep_bem_val_nz_um = nz_um
       END FUNCTION bep_bem_nz_um
 
-      FUNCTION bep_bem_ng_u () RESULT (bep_bem_val_ng_u)
-         USE module_sf_bep_bem
-         IMPLICIT NONE
-         INTEGER :: bep_bem_val_ng_u
-         bep_bem_val_ng_u = ng_u
-      END FUNCTION bep_bem_ng_u
+! This might not be required anymore...
+!      FUNCTION bep_bem_ng_u () RESULT (bep_bem_val_ng_u)
+!         USE module_sf_bep_bem
+!         IMPLICIT NONE
+!         INTEGER :: bep_bem_val_ng_u
+!         bep_bem_val_ng_u = ng_u
+!      END FUNCTION bep_bem_ng_u
 
-      FUNCTION bep_bem_nwr_u () RESULT (bep_bem_val_nwr_u)
-         USE module_sf_bep_bem
-         IMPLICIT NONE
-         INTEGER :: bep_bem_val_nwr_u
-         bep_bem_val_nwr_u = nwr_u
-      END FUNCTION bep_bem_nwr_u
+!      FUNCTION bep_bem_nwr_u () RESULT (bep_bem_val_nwr_u)
+!         USE module_sf_bep_bem
+!         IMPLICIT NONE
+!         INTEGER :: bep_bem_val_nwr_u
+!         bep_bem_val_nwr_u = nwr_u
+!      END FUNCTION bep_bem_nwr_u
 
       FUNCTION bep_bem_nf_u () RESULT (bep_bem_val_nf_u)
          USE module_sf_bep_bem

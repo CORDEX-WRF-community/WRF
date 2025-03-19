@@ -78,11 +78,12 @@
          INTEGER FUNCTION bep_nz_um()
          END FUNCTION bep_nz_um
 
-         INTEGER FUNCTION bep_ng_u()
-         END FUNCTION bep_ng_u
+! This might not be required anymore...
+!         INTEGER FUNCTION bep_ng_u()
+!         END FUNCTION bep_ng_u
 
-         INTEGER FUNCTION bep_nwr_u()
-         END FUNCTION bep_nwr_u
+!         INTEGER FUNCTION bep_nwr_u()
+!         END FUNCTION bep_nwr_u
 
          INTEGER FUNCTION bep_bem_nurbm()
          END FUNCTION bep_bem_nurbm
