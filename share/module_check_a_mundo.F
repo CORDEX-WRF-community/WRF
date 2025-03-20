@@ -68,51 +68,52 @@
       !  not within the confines of the modules. Since we are in the share
       !  directory, we need to break possible circular build dependencies.
 
-      INTERFACE
-         INTEGER FUNCTION bep_nurbm()
-         END FUNCTION bep_nurbm
-
-         INTEGER FUNCTION bep_ndm()
-         END FUNCTION bep_ndm
-
-         INTEGER FUNCTION bep_nz_um()
-         END FUNCTION bep_nz_um
-
 ! This might not be required anymore...
+!      INTERFACE
+
+!         INTEGER FUNCTION bep_nurbm()
+!         END FUNCTION bep_nurbm
+
+!         INTEGER FUNCTION bep_ndm()
+!         END FUNCTION bep_ndm
+
+!         INTEGER FUNCTION bep_nz_um()
+!         END FUNCTION bep_nz_um
+
 !         INTEGER FUNCTION bep_ng_u()
 !         END FUNCTION bep_ng_u
 
 !         INTEGER FUNCTION bep_nwr_u()
 !         END FUNCTION bep_nwr_u
 
-         INTEGER FUNCTION bep_bem_nurbm()
-         END FUNCTION bep_bem_nurbm
+!         INTEGER FUNCTION bep_bem_nurbm()
+!         END FUNCTION bep_bem_nurbm
 
-         INTEGER FUNCTION bep_bem_ndm()
-         END FUNCTION bep_bem_ndm
+!         INTEGER FUNCTION bep_bem_ndm()
+!         END FUNCTION bep_bem_ndm
 
-         INTEGER FUNCTION bep_bem_nz_um()
-         END FUNCTION bep_bem_nz_um
+!         INTEGER FUNCTION bep_bem_nz_um()
+!         END FUNCTION bep_bem_nz_um
 
-         INTEGER FUNCTION bep_bem_ng_u()
-         END FUNCTION bep_bem_ng_u
+!         INTEGER FUNCTION bep_bem_ng_u()
+!         END FUNCTION bep_bem_ng_u
 
-         INTEGER FUNCTION bep_bem_nwr_u()
-         END FUNCTION bep_bem_nwr_u
+!         INTEGER FUNCTION bep_bem_nwr_u()
+!         END FUNCTION bep_bem_nwr_u
 
-         INTEGER FUNCTION bep_bem_nf_u()
-         END FUNCTION bep_bem_nf_u
+!         INTEGER FUNCTION bep_bem_nf_u()
+!         END FUNCTION bep_bem_nf_u
 
-         INTEGER FUNCTION bep_bem_ngb_u()
-         END FUNCTION bep_bem_ngb_u
+!         INTEGER FUNCTION bep_bem_ngb_u()
+!         END FUNCTION bep_bem_ngb_u
 
-         INTEGER FUNCTION bep_bem_nbui_max() 
-         END FUNCTION bep_bem_nbui_max
+!         INTEGER FUNCTION bep_bem_nbui_max() 
+!         END FUNCTION bep_bem_nbui_max
          
-         INTEGER FUNCTION bep_bem_ngr_u()
-         END FUNCTION bep_bem_ngr_u
+!         INTEGER FUNCTION bep_bem_ngr_u()
+!         END FUNCTION bep_bem_ngr_u
 
-      END INTERFACE
+!      END INTERFACE
 
 !-----------------------------------------------------------------------
 ! Set up the WRF Hydro namelist option to allow dynamic allocation of
@@ -459,7 +460,7 @@
       IF      ( model_config_rec%use_wudapt_lcz .EQ. 0 ) THEN
          nurbm = 3
       ELSE IF ( model_config_rec%use_wudapt_lcz .EQ. 1 ) THEN
-         nurbm = 11
+         nurbm = model_config_rec%num_urban
       END IF
 
 !-----------------------------------------------------------------------
@@ -3202,40 +3203,100 @@
 
       INTEGER :: numsoiltemp , nummosaictemp
       INTEGER :: i
-
-
+      INTEGER                                            :: prodv
+      CHARACTER (LEN=8)                                  :: ISa, ISb
+      CHARACTER (LEN=128)                                :: labS
+      CHARACTER (LEN=1000)                               :: msg
 !-----------------------------------------------------------------------
 ! Set the namelist urban dimensions if sf_urban_physics > 0  
 !-----------------------------------------------------------------------
 
       IF ( any(model_config_rec%sf_urban_physics > 0 ) ) THEN
-      
-         model_config_rec%urban_map_zrd = model_config_rec%num_urban_ndm * &
-                                          model_config_rec%num_urban_nwr * &
-                                          model_config_rec%num_urban_nz
-         model_config_rec%urban_map_zwd = model_config_rec%num_urban_ndm * &
-                                          model_config_rec%num_urban_nwr * &
-                                          model_config_rec%num_urban_nz  * &
-                                          model_config_rec%num_urban_nbui
-         model_config_rec%urban_map_gd  = model_config_rec%num_urban_ndm * &
-                                          model_config_rec%num_urban_ng
-         model_config_rec%urban_map_zd  = model_config_rec%num_urban_ndm * &
-                                          model_config_rec%num_urban_nz  * &
-                                          model_config_rec%num_urban_nbui
-         model_config_rec%urban_map_zdf = model_config_rec%num_urban_ndm * &
-                                          model_config_rec%num_urban_nz 
+
+        ! urban_map_zrd
+        prodv = model_config_rec%num_urban_nd *                  &
+          model_config_rec%num_urban_nwr *                       &
+          model_config_rec%num_urban_nz
+        IF (model_config_ref%urban_map_zrd /= prodv) THEN
+          labS='urban_map_zrd'
+          prodS='num_urban_nd * num_urban_nwr * num_urban_nz'
+          WRITE(ISa,'(A8)')model_config_rec%urban_map_zrd
+          WRITE(ISb,'(A8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+            TRIM(ISb) // " provided value " // TRIM(ISa)
+          CALL wrf_error_fatal (msg)
+        END IF
+
+        ! urban_map_zwd
+        prodv = model_config_rec%num_urban_nd *                  &
+          model_config_rec%num_urban_nwr *                       &
+          model_config_rec%num_urban_nz  *                       &
+          model_config_rec%num_urban_nbui
+        IF (model_config_rec%urban_map_zwd /= prodv) THEN
+          labS = 'urban_map_zwd'
+          prodS = 'num_urban_nd * num_urban_nwr * num_urban_nz * num_urban_nbui'
+          WRITE(ISa,'(A8)')model_config_rec%urban_map_zwd
+          WRITE(ISb,'(A8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+            TRIM(ISb) // " provided value " // TRIM(ISa)
+          CALL wrf_error_fatal (msg)
+        END IF
+
+        ! urban_map_gd
+        prodv  = model_config_rec%num_urban_nd *                 &
+          model_config_rec%num_urban_ng
+        IF (model_config_rec%urban_map_gd /= prodv) THEN
+          labS = 'urban_map_gd'
+          prodS = 'num_urban_nd * num_urban_ng'
+          WRITE(ISa,'(A8)')model_config_rec%urban_map_gd
+          WRITE(ISb,'(A8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+            TRIM(ISb) // " provided value " // TRIM(ISa)
+          CALL wrf_error_fatal (msg)
+        END IF
+        ! urban_map_zd
+        prodv  = model_config_rec%num_urban_nd *                 &
+          model_config_rec%num_urban_nz *                        &
+          model_config_rec%num_urban_nbui
+        IF (model_config_rec%urban_map_zd /= prodv) THEN
+          labS = 'urban_map_zd'
+          prodS = 'num_urban_nd * num_urban_nz * num_urban_nbui'
+          WRITE(ISa,'(A8)')model_config_rec%urban_map_zd
+          WRITE(ISb,'(A8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+            TRIM(ISb) // " provided value " // TRIM(ISa)
+          CALL wrf_error_fatal (msg)
+        END IF
+        ! urban_map_zdf
+        prodv = model_config_rec%num_urban_ndm *                 &
+          model_config_rec%num_urban_nz 
+        IF (model_config_rec%urban_map_zdf /= prodv) THEN
+          labS = 'urban_map_zdf'
+          prodS = 'num_urban_ndm * num_urban_nz'
+          WRITE(ISa,'(A8)')model_config_rec%urban_map_zdf
+          WRITE(ISb,'(A8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+            TRIM(ISb) // " provided value " // TRIM(ISa)
+          CALL wrf_error_fatal (msg)
+        END IF
+
+         ! urban_map_bd
          model_config_rec%urban_map_bd  = model_config_rec%num_urban_nz  * &
                                           model_config_rec%num_urban_nbui
+         ! urban_map_wd
          model_config_rec%urban_map_wd  = model_config_rec%num_urban_ndm * &
                                           model_config_rec%num_urban_nz  * &
                                           model_config_rec%num_urban_nbui
+         ! urban_map_gbd
          model_config_rec%urban_map_gbd = model_config_rec%num_urban_ndm * &
                                           model_config_rec%num_urban_ngb * &
                                           model_config_rec%num_urban_nbui
+         ! urban_map_fbd
          model_config_rec%urban_map_fbd = model_config_rec%num_urban_ndm       * &
                                           (model_config_rec%num_urban_nz - 1)  * &
                                           model_config_rec%num_urban_nf        * &
                                           model_config_rec%num_urban_nbui
+        ! urban_map_zgrd
         model_config_rec%urban_map_zgrd = model_config_rec%num_urban_ndm * &
                                           model_config_rec%num_urban_ngr  * &
                                           model_config_rec%num_urban_nz
