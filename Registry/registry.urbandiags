@@ -24,7 +24,7 @@ rconfig   integer    q_num                namelist,physics      1               
 
 rconfig   integer    urban_map_zrd        namelist,physics      1              360    rh{12}  "urban_map_zrd"                "dimension used by module BEP as num_urban_nd*num_urban_nwr*num_urban_nz"   ""
 rconfig   integer    urban_map_zwd        namelist,physics      1              5400   rh{12}  "urban_map_zwd"                "dimension used by module BEP as num_urban_nd*num_urban_nwr*num_urban_nz*num_urban_nbui"  ""
-rconfig   integer    urban_map_gd         namelist,physics      1              20     rh{12}  "urban_map_gd"                 "dimension used by module BEP as num_urban_ndm*num_urban_ng"   ""
+rconfig   integer    urban_map_gd         namelist,physics      1              20     rh{12}  "urban_map_gd"                 "dimension used by module BEP as num_urban_nd*num_urban_ng"   ""
 rconfig   integer    urban_map_zd         namelist,physics      1              540    rh{12}  "urban_map_zd"                 "dimension used by module BEP as num_urban_nd*num_urban_nz*num_urban_nbui"   ""
 rconfig   integer    urban_map_zdf        namelist,physics      1              36     rh{12}  "urban_map_zdf"                "dimension used by module BEP as num_urban_nd*num_urban_nz"   ""
 rconfig   integer    urban_map_bd         namelist,physics      1              270    rh{12}  "urban_map_bd"                 "dimension used by module BEP as num_urban_nz*num_urban_nbui"   ""
