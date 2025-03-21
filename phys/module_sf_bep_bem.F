@@ -610,34 +610,39 @@ use module_wrf_error
 
 !
      if(urban_map_zwd.lt.nbi*nz_ui*nd*max(nwr_u,ng_u))then
-        write(*,*)'urban_map_zwd too small, please increase to at least ', nbi*nz_ui*nd*max(nwr_u,ng_u)
+        write(*,*)'urban_map_zwd too small, please increase to at least ', nbi*nz_ui*nd*max(nwr_u,ng_u),&
+         ' num_urban_nbui*num_urban_nz*num_urban_nd*max(num_urban_nwr,num_urban_ng)'
         stop
       endif
 !
 !New conditions for BEM
 !
       if(urban_map_bd.lt.nbi*nz_ui)then !limit for indoor temperature and indoor humidity
-        write(*,*)'urban_map_bd too small, please increase to at least ', nbi*nz_ui
+        write(*,*)'urban_map_bd too small, please increase to at least ', nbi*nz_ui,                  &
+         ' num_urban_nbui*num_urban_nz'
         stop
       endif
 
       if(urban_map_wd.lt.nbi*nz_ui*nd)then !limit for window temperature
-        write(*,*)'urban_map_wd too small, please increase to at least ', nbi*nz_ui*nd
+        write(*,*)'urban_map_wd too small, please increase to at least ', nbi*nz_ui*nd,               &
+         ' num_urban_nbui*num_urban_nz*num_urban_nd'
         stop
       endif
 
       if(urban_map_gbd.lt.nbi*nd*ngb_u)then !limit for ground temperature below a building
-        write(*,*)'urban_map_gbd too small, please increase to at least ', nbi*nd*ngb_u
+        write(*,*)'urban_map_gbd too small, please increase to at least ', nbi*nd*ngb_u,              &
+         ' num_urban_nbui*num_urban_nd*num_urban_ngb'
         stop
       endif
 
       if(urban_map_fbd.lt.(nz_ui-1)*nbi*nd*nf_u)then !limit for floor temperature
-        write(*,*)'urban_map_fbd too small, please increase to at least ', nbi*nd*nf_u*(nz_ui-1)
+        write(*,*)'urban_map_fbd too small, please increase to at least ', nbi*nd*nf_u*(nz_ui-1),     &
+         ' num_urban_nbui*num_urban_nd*num_urban_nf*(num_urban_nz-1)'
         stop
       endif
 
       if (nd.ne.2)then
-         write(*,*) 'number of directions is not correct',nd
+         write(*,*) 'number of directions num_urban_nd is not correct',nd
          stop
       endif
 
@@ -767,7 +772,8 @@ use module_wrf_error
       !End of new indexes
    
       if (num_urban_hi.ge.nz_ui)then
-          write(*,*)'nz_ui too small, please increase to at least ', num_urban_hi+1
+          write(*,*)'num_urban_nz too small, please increase to at least ', num_urban_hi+1,           &
+            '(num_urban_hi+1)'
           stop         
       endif
    
@@ -793,7 +799,7 @@ use module_wrf_error
           endif
        enddo !iz_u
        if (iii.gt.nbi) then
-          write(*,*) 'nbi too small, please increase to at least ',iii
+          write(*,*) 'num_urban_nbui too small, please increase to at least ',iii
           stop
        endif
       enddo
@@ -866,7 +872,7 @@ use module_wrf_error
          end do  !iz
 
          if (nbui.gt.nbi) then
-            write (*,*) 'nbi must be increased to',nbui
+            write (*,*) 'num_urban_nbui must be increased to',nbui
             stop
          endif
 
@@ -5386,8 +5392,10 @@ use module_wrf_error
        gr_type_u=gr_type_tbl
        do iu=1,icate
               if(nd.lt.nd_u(iu))then
-                write(*,*)'nd too small in module_sf_bep_bem, please increase to at least ', nd_u(iu)
-                write(*,*)'remember also that num_urban_layers should be equal or greater than nz_ui*nd*nwr-u!'
+                write(*,*)'num_urban_nd too small in module_sf_bep_bem, please increase to at least ',&
+                  nd_u(iu)
+                write(*,*)'remember also that num_urban_layers should be equal or greater ' //        &
+                  'than num_urban_nz*num_urban_nd*num_urban_nwr !'
                 stop
               endif
          do i=1,nd_u(iu)
@@ -5398,8 +5406,10 @@ use module_wrf_error
        enddo
        do iu=1,ICATE
           if(nz_ui.lt.numhgt_tbl(iu)+3)then
-              write(*,*)'nz_ui too small in module_sf_bep, please increase to at least ',numhgt_tbl(iu)+3
-              write(*,*)'remember also that num_urban_layers should be equal or greater than nz_ui*nd*nwr-u!'
+              write(*,*)'num_urban_nz too small in module_sf_bep, please increase to at least ',      &
+                numhgt_tbl(iu)+3, '(amount building heights from URBPARM_LZ.TBL + 3)'
+              write(*,*)'remember also that num_urban_layers should be equal or greater than ' //     &
+                'num_urban_nz*num_urban_nd*num_urban_nwr !'
               stop
           endif
          do i=1,NUMHGT_TBL(iu)
@@ -5836,7 +5846,7 @@ use module_wrf_error
          nzu=iz_u+1
       
          if ((nzu+1).gt.nz_ui) then 
-             write(*,*) 'error, nz_ui has to be increased to at least',nzu+1
+             write(*,*) 'error, num_urban_nz has to be increased to at least',nzu+1
              stop
          endif
 

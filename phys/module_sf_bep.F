@@ -327,7 +327,8 @@ use module_wrf_error
 !prepare the arrays to collapse indexes
 
       if(urban_map_zrd.lt.nz_ui*nd*nwr_u)then
-        write(*,*)'urban_map_zrd too small, please increase to at least ', nz_ui*nd*nwr_u
+        write(*,*)'urban_map_zrd too small, please increase to at least ', nz_ui*nd*nwr_u,            &
+          '(num_urban_nz*num_urban_nd*num_urban_nwr)'
         stop
       endif
       iii=0
@@ -357,7 +358,8 @@ use module_wrf_error
       enddo
 
       if (num_urban_hi.ge.nz_ui)then
-          write(*,*)'nz_ui too small, please increase to at least ', num_urban_hi+1
+          write(*,*)'num_urban_nz too small, please increase to at least ', num_urban_hi+1,           &
+            ' (num_urban_hi+1)'
           stop         
       endif
 
@@ -3149,8 +3151,10 @@ use module_wrf_error
        nd_u=NUMDIR_TBL
        do iu=1,icate
               if(nd.lt.nd_u(iu))then
-                write(*,*)'nd too small in module_sf_bep, please increase to at least ', nd_u(iu)
-                write(*,*)'remember also that urban_map_zrd should be equal or greater than nz_ui*nd*nwr-u!'
+                write(*,*)'num_urban_nd too small in module_sf_bep, please increase to at least ',    &
+                  nd_u(iu)
+                write(*,*)'remember also that urban_map_zrd should be equal or greater than ' //      &
+                  'num_urban_nz*num_urban_nd*num_urban_nwr !'
                 stop
               endif
          do i=1,nd_u(iu)
@@ -3161,8 +3165,10 @@ use module_wrf_error
        enddo
        do iu=1,ICATE
           if(nz_ui.lt.numhgt_tbl(iu)+3)then
-              write(*,*)'nz_ui too small in module_sf_bep, please increase to at least ',numhgt_tbl(iu)+3
-              write(*,*)'remember also that urban_map_zrd should be equal or greater than nz_ui*nd*nwr-u!'
+              write(*,*)'num_urban_nz too small in module_sf_bep, please increase to at least ',      &
+                numhgt_tbl(iu)+3, '(amount building heights from URBPARM_LZ.TBL + 3)'
+              write(*,*)'remember also that urban_map_zrd should be equal or greater than ' //        &
+                'num_urban_nz*num_urban_nd*num_urban_nwr-u!'
               stop
           endif
          do i=1,NUMHGT_TBL(iu)
@@ -3558,7 +3564,7 @@ use module_wrf_error
          nzu=iz_u+1
 
          if ((nzu+1).gt.nz_ui) then 
-             write(*,*) 'error, nz_ui has to be increased to at least',nzu+1
+             write(*,*) 'error, num_urban_nz has to be increased to at least',nzu+1
              stop
          endif
 
