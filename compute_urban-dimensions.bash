@@ -6,10 +6,10 @@
 num_urban=11
 
 # amount of vertical layers used by the urban module BEP
-num_urban_nz=18
+num_urban_nz=6
 
 # amount of types of buildings per LCZ used by the urban module BEP
-num_urban_nbui=15
+num_urban_nbui=1
 
 # amount of directions of streets used by module BEP
 num_urban_nd=2
@@ -48,16 +48,16 @@ urban_map_gbd=`expr ${num_urban_nd} '*' ${num_urban_ngb} '*' ${num_urban_nbui}`
 urban_map_fbd=`expr ${num_urban_nd} '*' \( ${num_urban_nz} - ${one} \) '*' ${num_urban_nf} '*' ${num_urban_nbui}`
 urban_map_zgrd=`expr ${num_urban_nd} '*' ${num_urban_ngr} '*' ${num_urban_nz}`
 
-echo "urban_map_zrd= "${urban_map_zrd}
-echo "urban_map_zwd= "${urban_map_zwd}
-echo "urban_map_gd= "${urban_map_gd}
-echo "urban_map_zd= "${urban_map_zd}
-echo "urban_map_zdf= "${urban_map_zdf}
-echo "urban_map_bd= "${urban_map_bd}
-echo "urban_map_wd= "${urban_map_wd}
-echo "urban_map_gbd= "${urban_map_gbd}
-echo "urban_map_fbd= "${urban_map_fbd}
-echo "urban_map_zgrd= "${urban_map_zgrd}
+echo " urban_map_zrd   = "${urban_map_zrd}
+echo " urban_map_zwd   = "${urban_map_zwd}
+echo " urban_map_gd    = "${urban_map_gd}
+echo " urban_map_zd    = "${urban_map_zd}
+echo " urban_map_zdf   = "${urban_map_zdf}
+echo " urban_map_bd    = "${urban_map_bd}
+echo " urban_map_wd    = "${urban_map_wd}
+echo " urban_map_gbd   = "${urban_map_gbd}
+echo " urban_map_fbd   = "${urban_map_fbd}
+echo " urban_map_zgrd  = "${urban_map_zgrd}
 
 
 
