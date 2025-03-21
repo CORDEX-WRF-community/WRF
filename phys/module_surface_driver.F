@@ -257,7 +257,7 @@ CONTAINS
      &          ,bldt,curr_secs,adapt_step_flag,bldtacttime           & 
          ! Optional urban with BEP
      &          ,sf_urban_physics,gmt,xlat,xlong,julday               &
-     &          ,num_urban_ndm                                        & !multi-layer urban
+     &          ,num_urban_nd                                         & !multi-layer urban
      &          ,urban_map_zrd                                        & !multi-layer urban
      &          ,urban_map_zwd                                        & !multi-layer urban
      &          ,urban_map_gd                                         & !multi-layer urban
@@ -949,7 +949,7 @@ CONTAINS
    REAL, OPTIONAL, INTENT(IN  )   ::                                   GMT 
    INTEGER, OPTIONAL, INTENT(IN  ) ::                               JULDAY
    REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(IN   )        ::XLAT, XLONG
-   INTEGER , INTENT(IN)        ::     num_urban_ndm
+   INTEGER , INTENT(IN)        ::     num_urban_nd
    INTEGER , INTENT(IN)        ::     urban_map_zrd
    INTEGER , INTENT(IN)        ::     urban_map_zwd
    INTEGER , INTENT(IN)        ::     urban_map_gd
@@ -984,7 +984,7 @@ CONTAINS
    REAL, OPTIONAL, DIMENSION( ims:ime, 1:urban_map_zd,  jms:jme ), INTENT(INOUT) :: sfw1_urb3d
    REAL, OPTIONAL, DIMENSION( ims:ime, 1:urban_map_zd,  jms:jme ), INTENT(INOUT) :: sfw2_urb3d
    REAL, OPTIONAL, DIMENSION( ims:ime, 1:urban_map_zdf, jms:jme ), INTENT(INOUT) :: sfr_urb3d
-   REAL, OPTIONAL, DIMENSION( ims:ime, 1:num_urban_ndm, jms:jme ), INTENT(INOUT) :: sfg_urb3d
+   REAL, OPTIONAL, DIMENSION( ims:ime, 1:num_urban_nd, jms:jme ), INTENT(INOUT)  :: sfg_urb3d
    REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: ep_pv_urb3d !GRZ
    REAL, OPTIONAL, DIMENSION( ims:ime, 1:urban_map_zdf, jms:jme ), INTENT(INOUT) :: t_pv_urb3d !GRZ
    REAL, OPTIONAL, DIMENSION( ims:ime, 1:urban_map_zgrd, jms:jme ),INTENT(INOUT) :: trv_urb4d !GRZ
@@ -996,9 +996,9 @@ CONTAINS
    REAL, OPTIONAL, DIMENSION( ims:ime, 1:urban_map_zdf, jms:jme ),INTENT(INOUT) :: sfrv_urb3d !GRZ
    REAL, OPTIONAL, DIMENSION( ims:ime, 1:urban_map_zdf, jms:jme ),INTENT(INOUT) :: lfrv_urb3d !GRZ
    REAL, OPTIONAL, DIMENSION( ims:ime, 1:urban_map_zdf, jms:jme ),INTENT(INOUT) :: dgr_urb3d !GRZ
-   REAL, OPTIONAL, DIMENSION( ims:ime, 1:num_urban_ndm, jms:jme ),INTENT(INOUT) :: dg_urb3d !GRZ
+   REAL, OPTIONAL, DIMENSION( ims:ime, 1:num_urban_nd, jms:jme ),INTENT(INOUT)  :: dg_urb3d !GRZ
    REAL, OPTIONAL, DIMENSION( ims:ime, 1:urban_map_zdf, jms:jme ),INTENT(INOUT) :: lfr_urb3d !GRZ
-   REAL, OPTIONAL, DIMENSION( ims:ime, 1:num_urban_ndm, jms:jme ),INTENT(INOUT) :: lfg_urb3d !GRZ
+   REAL, OPTIONAL, DIMENSION( ims:ime, 1:num_urban_nd, jms:jme ),INTENT(INOUT)  :: lfg_urb3d !GRZ
    REAL, OPTIONAL, DIMENSION( ims:ime, 1:num_urban_hi, jms:jme ), INTENT(IN)  :: hi_urb2d  !urban
    REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(IN)  :: lp_urb2d  !urban
    REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(IN)  :: lb_urb2d  !urban
@@ -2747,7 +2747,7 @@ CONTAINS
                 DRELR_URB2D,DRELB_URB2D,DRELG_URB2D,            & !H urban
                 FLXHUMR_URB2D,FLXHUMB_URB2D,FLXHUMG_URB2D,      & !H urban
                 FRC_URB2D, UTYPE_URB2D,                         & !I urban
-                num_urban_ndm,                                  & !I multi-layer urban
+                num_urban_nd,                                   & !I multi-layer urban
                 urban_map_zrd,                                  & !I multi-layer urban
                 urban_map_zwd,                                  & !I multi-layer urban
                 urban_map_gd,                                   & !I multi-layer urban
@@ -2888,7 +2888,7 @@ CONTAINS
                 FLXHUMR_URB2D,FLXHUMB_URB2D,FLXHUMG_URB2D,      & !H urban
                 julian, julyr,                                  & !H urban
                 FRC_URB2D, UTYPE_URB2D,                         & !I urban
-                num_urban_ndm,                                  & !I multi-layer urban
+                num_urban_nd,                                   & !I multi-layer urban
                 urban_map_zrd,                                  & !I multi-layer urban
                 urban_map_zwd,                                  & !I multi-layer urban
                 urban_map_gd,                                   & !I multi-layer urban
@@ -3242,7 +3242,7 @@ CONTAINS
                              julian,          julyr,                                        & !H urban
                           frc_urb2d,    utype_urb2d,                                        & !I urban
                                 chs,           chs2,           cqs2,                        & !H
-                      num_urban_ndm,  urban_map_zrd,  urban_map_zwd, urban_map_gd,          & !I multi-layer urban
+                      num_urban_nd,  urban_map_zrd,  urban_map_zwd, urban_map_gd,           & !I multi-layer urban
                        urban_map_zd,  urban_map_zdf,   urban_map_bd, urban_map_wd,          & !I multi-layer urban
                       urban_map_gbd,  urban_map_fbd, urban_map_zgrd,                        & !I multi-layer urban
                        num_urban_hi,                                                        & !I multi-layer urban

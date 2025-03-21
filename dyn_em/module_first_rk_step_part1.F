@@ -797,7 +797,7 @@ BENCH_START(surf_driver_tim)
      &        ,SWDDIR=grid%swddir,SWDDIF=grid%swddif                      & !multi-layer urban _gl
          ! Optional urban for BEP scheme
      &        ,SF_URBAN_PHYSICS=config_flags%sf_urban_physics             &
-     &        ,num_urban_ndm = config_flags%num_urban_ndm                 & !multi-layer urban
+     &        ,num_urban_nd = config_flags%num_urban_nd                  & !multi-layer urban
      &        ,urban_map_zrd = config_flags%urban_map_zrd                 & !multi-layer urban
      &        ,urban_map_zwd = config_flags%urban_map_zwd                 & !multi-layer urban
      &        ,urban_map_gd  = config_flags%urban_map_gd                  & !multi-layer urban
