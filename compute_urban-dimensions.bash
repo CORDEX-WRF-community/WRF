@@ -48,6 +48,7 @@ urban_map_gbd=`expr ${num_urban_nd} '*' ${num_urban_ngb} '*' ${num_urban_nbui}`
 urban_map_fbd=`expr ${num_urban_nd} '*' \( ${num_urban_nz} - ${one} \) '*' ${num_urban_nf} '*' ${num_urban_nbui}`
 urban_map_zgrd=`expr ${num_urban_nd} '*' ${num_urban_ngr} '*' ${num_urban_nz}`
 
+echo "Copy/paste these values into the &physics section of the namelist.input _______" 
 echo " urban_map_zrd   = "${urban_map_zrd}
 echo " urban_map_zwd   = "${urban_map_zwd}
 echo " urban_map_gd    = "${urban_map_gd}
