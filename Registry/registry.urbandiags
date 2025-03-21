@@ -1,6 +1,6 @@
 # Dimensions
 rconfig   integer    num_urban            namelist,physics      1              11     rh{12}  "num_urban"                    "amount of urban categories used by module BEP"   ""
-rconfig   real       dz_u                 namelist,physics      1              5.     rh{12}  "dz_u"                         "amount of vertical layers used by the urban module BEP"   ""
+rconfig   real       dz_urban             namelist,physics      1              5.     rh{12}  "dz_urban"                     "amount of vertical layers used by the urban module BEP"   ""
 rconfig   integer    num_urban_nz         namelist,physics      1              18     rh{12}  "num_urban_nz"                 "amount of vertical layers used by the urban module BEP"   ""
 rconfig   integer    num_urban_nbui       namelist,physics      1              15     rh{12}  "num_urban_nbui"               "amount of types of buildings per LCZ used by the urban module BEP"   ""
 rconfig   integer    num_urban_nd         namelist,physics      1              2      rh{12}  "num_urban_nd"                 "amount of directions of streets used by module BEP"   ""

@@ -845,7 +845,7 @@ BENCH_START(surf_driver_tim)
      &        ,ngb_u=config_flags%num_urban_ngb                         &
      &        ,nbi=config_flags%num_urban_nbui                          &
      &        ,p_num=config_flags%p_num, q_num=config_flags%q_num       &
-     &        ,dz_u=config_flags%dz_u, h_water=config_flags%h_water     &
+     &        ,dz_u=config_flags%dz_urban, h_water=config_flags%h_water &
      &        ,EP_PV_URB3D=grid%ep_pv_urb3d                               & !GRZ
      &        ,T_PV_URB3D=grid%t_pv_urb3d                                 & !GRZ
      &        ,TRV_URB4D=grid%trv_urb4d                                   & !GRZ
