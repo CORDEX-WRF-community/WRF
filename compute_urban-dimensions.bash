@@ -6,9 +6,11 @@
 num_urban=11
 
 # amount of vertical layers used by the urban module BEP
+#  NOTE: make sure that num_urban_nz * dz_urban >= 
 num_urban_nz=6
 
 # amount of types of buildings per LCZ used by the urban module BEP
+#  NOTE: remember to modify accordingly BUILDING HEIGHTS section of URBPARM_LZ.TBL 
 num_urban_nbui=1
 
 # amount of directions of streets used by module BEP
