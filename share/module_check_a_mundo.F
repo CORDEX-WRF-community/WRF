@@ -3206,6 +3206,7 @@
       INTEGER                                            :: prodv
       CHARACTER (LEN=8)                                  :: ISa, ISb
       CHARACTER (LEN=128)                                :: labS
+      CHARACTER (LEN=256)                                :: prodS
       CHARACTER (LEN=1000)                               :: msg
 !-----------------------------------------------------------------------
 ! Set the namelist urban dimensions if sf_urban_physics > 0  
@@ -3217,7 +3218,7 @@
         prodv = model_config_rec%num_urban_nd *                  &
           model_config_rec%num_urban_nwr *                       &
           model_config_rec%num_urban_nz
-        IF (model_config_ref%urban_map_zrd /= prodv) THEN
+        IF (model_config_rec%urban_map_zrd /= prodv) THEN
           labS='urban_map_zrd'
           prodS='num_urban_nd * num_urban_nwr * num_urban_nz'
           WRITE(ISa,'(A8)')model_config_rec%urban_map_zrd
@@ -3268,11 +3269,11 @@
           CALL wrf_error_fatal (msg)
         END IF
         ! urban_map_zdf
-        prodv = model_config_rec%num_urban_ndm *                 &
+        prodv = model_config_rec%num_urban_nd *                  &
           model_config_rec%num_urban_nz 
         IF (model_config_rec%urban_map_zdf /= prodv) THEN
           labS = 'urban_map_zdf'
-          prodS = 'num_urban_ndm * num_urban_nz'
+          prodS = 'num_urban_nd * num_urban_nz'
           WRITE(ISa,'(A8)')model_config_rec%urban_map_zdf
           WRITE(ISb,'(A8)')prodv 
           msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
@@ -3280,26 +3281,75 @@
           CALL wrf_error_fatal (msg)
         END IF
 
-         ! urban_map_bd
-         model_config_rec%urban_map_bd  = model_config_rec%num_urban_nz  * &
-                                          model_config_rec%num_urban_nbui
-         ! urban_map_wd
-         model_config_rec%urban_map_wd  = model_config_rec%num_urban_ndm * &
-                                          model_config_rec%num_urban_nz  * &
-                                          model_config_rec%num_urban_nbui
-         ! urban_map_gbd
-         model_config_rec%urban_map_gbd = model_config_rec%num_urban_ndm * &
-                                          model_config_rec%num_urban_ngb * &
-                                          model_config_rec%num_urban_nbui
-         ! urban_map_fbd
-         model_config_rec%urban_map_fbd = model_config_rec%num_urban_ndm       * &
-                                          (model_config_rec%num_urban_nz - 1)  * &
-                                          model_config_rec%num_urban_nf        * &
-                                          model_config_rec%num_urban_nbui
+        ! urban_map_bd
+        prodv  = model_config_rec%num_urban_nz *                 &
+          model_config_rec%num_urban_nbui
+        IF (model_config_rec%urban_map_bd/= prodv) THEN
+          labS = 'urban_map_bd'
+          prodS = 'num_urban_nz * num_urban_nbui'
+          WRITE(ISa,'(A8)')model_config_rec%urban_map_bd
+          WRITE(ISb,'(A8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+            TRIM(ISb) // " provided value " // TRIM(ISa)
+          CALL wrf_error_fatal (msg)
+        END IF
+
+        ! urban_map_wd
+        prodv  = model_config_rec%num_urban_nd *                 &
+          model_config_rec%num_urban_nz *                        &
+          model_config_rec%num_urban_nbui
+        IF (model_config_rec%urban_map_wd /= prodv) THEN
+          labS = 'urban_map_wd'
+          prodS = 'num_urban_nd * num_urban_nz * num_urban_nbui'
+          WRITE(ISa,'(A8)')model_config_rec%urban_map_wd
+          WRITE(ISb,'(A8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+            TRIM(ISb) // " provided value " // TRIM(ISa)
+          CALL wrf_error_fatal (msg)
+        END IF
+
+        ! urban_map_gbd
+        prodv = model_config_rec%num_urban_nd *                  &
+          model_config_rec%num_urban_ngb *                       &
+          model_config_rec%num_urban_nbui
+        IF (model_config_rec%urban_map_gbd /= prodv) THEN
+          labS = 'urban_map_gbd'
+          prodS = 'num_urban_nd * num_urban_ngb * num_urban_nbui'
+          WRITE(ISa,'(A8)')model_config_rec%urban_map_gbd
+          WRITE(ISb,'(A8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+            TRIM(ISb) // " provided value " // TRIM(ISa)
+          CALL wrf_error_fatal (msg)
+        END IF
+
+        ! urban_map_fbd
+        prodv = model_config_rec%num_urban_nd *                  &
+          (model_config_rec%num_urban_nz - 1) *                  &
+          model_config_rec%num_urban_nf *                        &
+          model_config_rec%num_urban_nbui
+        IF (model_config_rec%urban_map_fbd /= prodv) THEN
+          labS = 'urban_map_fbd'
+          prodS = 'num_urban_nd * (num_urban_nz - 1) * num_urban_nf * num_urban_nbui'
+          WRITE(ISa,'(A8)')model_config_rec%urban_map_fbd
+          WRITE(ISb,'(A8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+            TRIM(ISb) // " provided value " // TRIM(ISa)
+          CALL wrf_error_fatal (msg)
+        END IF
+
         ! urban_map_zgrd
-        model_config_rec%urban_map_zgrd = model_config_rec%num_urban_ndm * &
-                                          model_config_rec%num_urban_ngr  * &
-                                          model_config_rec%num_urban_nz
+        prodv = model_config_rec%num_urban_nd *                  &
+          model_config_rec%num_urban_ngr *                       &
+          model_config_rec%num_urban_nz
+        IF (model_config_rec%urban_map_zgrd /= prodv) THEN
+          labS = 'urban_map_zgrd'
+          prodS = 'num_urban_nd * num_urban_ngr * num_urban_nz'
+          WRITE(ISa,'(A8)')model_config_rec%urban_map_zgrd
+          WRITE(ISb,'(A8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+            TRIM(ISb) // " provided value " // TRIM(ISa)
+          CALL wrf_error_fatal (msg)
+        END IF
 
       END IF     
       
