@@ -88,7 +88,8 @@ iii.- Is available to retrieve the atmospheric 3D state variables (temperature, 
  - PRESSURB: AIR PRESSURE WITHIN URBAN CANOPY [Pa]
  - QVURB: MIXING RATIO WITHIN URBAN CANOPY [kgm-3]
 
-iv.- individual urban fractions for each LCZ, this is still experimental
+iv.- individual urban fractions for each LCZ, this is still experimental, (by now) user should also follow instructions from the following GIT
+  https://github.com/CORDEX-WRF-community/fps-urb-rcc/tree/main/urbanModule
 
 v.- New urban diagnostics: Not started yet
 
