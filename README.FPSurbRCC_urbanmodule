@@ -1,4 +1,4 @@
-# L. Fita, UBA/CIMA/IFAECI, MArch 2025
+# L. Fita, UBA/CIMA/IFAECI, March 2025
 This is a new experimental development related to the CORDEX FPS URB RCC initiative focused in the enhancing of WRF capabilities when simulating in urban environments, which are:
  i.- Mangement of the urban related dimensions from the namelist
  ii.- Inclusion of a new WRF output called 'wrfurban_d[nn]' at auxhist12
@@ -10,4 +10,98 @@ See more details in the GIT repository
 https://github.com/CORDEX-WRF-community/fps-urb-rcc/tree/main/urbanModule
 
 i.- Extense modifications have been made in order to faciltate the management of urban dimensions from the namelist. Changes in Registry/Registry.EM_COMMON and Registry/registry.dimspec file have been introduced. A new file called Registry/registry.urbandiags has been created. As well as numerous modifications in phys/module_sf_bep.F phys/module_sf_bep_bem.F, phys/module_sf_noahmplsm.F phys/noahmp/drivers/wrf/module_sf_noahmpdrv.F, phys/module_surface_driver.F and dyn_em/module_first_rk_step_part1.F. New parameters in the namelist.input (&physics section) can be used to set-up the different 'urban' dimensions:
+ - num_urban: amount of urban categories used by module BEP (default, 11)
+ - dz_urban: distance [m] between layers used by the urban module BEP (default, 5.)
+ - num_urban_nz: amount of vertical layers used by the urban module BEP (default, 18)
+ - num_urban_nbui: amount of types of buildings per LCZ used by the urban module BEP (default, 15)
+ - num_urban_nd: amount of directions of streets used by module BEP (defatul, 2)
+#! The change of ng_u (num_urban_ng), nwr_u (num_urban_nwr) should be done in agreement with the block data
+#!  in the routine "surf_temp" 
+ - num_urban_ng: amount of ground layers used by module BEP (default, 10)
+ - num_urban_ngr: amount of grid levels in green roofs used by module BEM (default, 10)
+ - num_urban_nwr: amount of grid levels in the walls or roofs used by module BEM (defatul, 10)
+ - num_urban_nf: amount of grid levels in floors used by module BEM (default, 10)
+ - num_urban_ngb: amount of grid levels in the ground below building used by module BEM (deftault, 10)
+ - h_water: mm of irrigation per hour (default, 0.0009722)
+ - p_num: number of panes in the windows (1,2 or 3) (defatul, 2)
+ - q_num: category number for the windows (q_num= 4, standard glasses) [max=10] (default, 4)
+ 
+  output related to the urban schemes uses combinations of these dimensions, from which restarts files become too large for some systems and they have to be written using the value of 102 in the namelist.input (io_form_restart = 102) and this is the origin of all these changes. These dimensions now have to be set from the namelist
+ - urban_map_zrd: dimension used by module BEP as num_urban_nd*num_urban_nwr*num_urban_nz (default, 360)
+ - urban_map_zwd: dimension used by module BEP as num_urban_nd*num_urban_nwr*num_urban_nz*num_urban_nbui (default, 5400)
+ - urban_map_gd: dimension used by module BEP as num_urban_nd*num_urban_ng (default, 20)
+ - urban_map_zd: dimension used by module BEP as num_urban_nd*num_urban_nz*num_urban_nbui (default, 540)
+ - urban_map_zdf: dimension used by module BEP as num_urban_nd*num_urban_nz (default, 36)
+ - urban_map_bd: dimension used by module BEP as num_urban_nz*num_urban_nbui (default, 270)
+ - urban_map_wd: dimension used by module BEP as num_urban_nd*num_urban_nz*num_urban_nbui (default, 540)
+ - urban_map_gbd: dimension used by module BEP as num_urban_nd*num_urban_ngb*num_urban_nbui (default, 300)
+ - urban_map_fbd: dimension used by module BEP as num_urban_nd*(num_urban_nz - 1)*num_urban_nf*num_urban_nbui (default, 5100)
+ - urban_map_zgrd: dimension used by module BEP as num_urban_nd*num_urban_ngr*num_urban_nz (default, 360)
 
+ The bash script 'compute_urban-dimensions.bash' provides the necessary values for the 'urban_map_[nnn]' dimensions
+
+ii.- New WRF output 'wrfurban_d[nn]' at auxhist12 has been introduced. User needs to set-up its specific values in the '&time_control' section of the namelist.input, see for example:
+ auxhist12_outname                   = "wrfurban_d<domain>_<date>"
+ auxhist12_interval                  = 180, 60, 60, 30,
+ frames_per_auxhist12                =   8, 24, 24, 12,
+ io_form_auxhist12                   = 2
+
+  There is directly written out (by now) the following 2D diagnostic variables:
+ - XLAT: LATITUDE, SOUTH IS NEGATIVE [degree_north]
+ - XLONG: LONGITUDE, WEST IS NEGATIVE [degree_east]
+ - TSK_RURAL: TSK for rural fraction [K]
+ - TR_URB: URBAN ROOF SKIN TEMPERATURE [K]
+ - TB_URB: URBAN WALL SKIN TEMPERATURE [K] 
+ - TG_URB: URBAN ROAD SKIN TEMPERATURE [K] 
+ - TC_URB: URBAN CANOPY TEMPERATURE [K]
+ - QC_URB: URBAN CANOPY HUMIDITY [kg kg{-1}]
+ - UC_URB: URBAN CANOPY WIND [m s{-1}]
+  - TRL_URB: ROOF LAYER TEMPERATURE [K]
+ - TBL_URB: WALL LAYER TEMPERATURE [K]
+ - TGL_URB: ROAD LAYER TEMPERATURE [K]
+ - SH_URB: SENSIBLE HEAT FLUX FROM URBAN SFC [W m{-2}]
+ - LH_URB: LATENT HEAT FLUX FROM URBAN SFC [W m{-2}]
+ - G_URB: GROUND HEAT FLUX INTO URBAN [W m{-2}]
+ - RN_URB: NET RADIATION ON URBAN SFC [W m{-2}]
+ - TS_URB: SKIN TEMPERATURE [K]
+ - FRC_URB2D: URBAN FRACTION [dimensionless]
+ - UTYPE_URB: URBAN TYPE [dimensionless]
+ - SF_AC_URB3D: SENSIBLE HEAT FLUX FROM THE AIR COND. [W m{-2}]
+ - LF_AC_URB3D: LATENT HEAT FLUX FROM THE AIR COND. [W m{-2}]
+ - CM_AC_URB3D: CONSUMPTION OF THE AIR COND. [-] 
+ - SFVENT_URB3D: SENSIBLE HEAT FLUX FROM URBAN VENTILATION [W m{-2}]
+ - LFVENT_URB3D: LATENT HEAT FLUX FROM URBAN VENTILATION [W m{-2}]
+ - SFG_URB3D: SENSIBLE HEAT FLUX FROM URBAN SFC" [W m{-2}]
+ - EP_PV_URB3D: ELEC. PRODUCTION OF ROOFTOP PV PANELS [W m{-2}]
+ - QGR_URB4D:GREEN ROOF LAYER MOISTURE OUTPUT [dimensionless]
+ - TGR_URB4D: GREEN ROOF LAYER TEMPERATURE OUTPUT [dimensionless]
+ - DRAINGR_URB3D: ACCUMULATED GREEN ROOF DRAINAGE [mm]
+ - DG_URB4D: ROOF LAYER DEPTH WATER RETENTION [mm]
+ - LFG_URB3D: LATENT HEAT FLUX FROM URBAN SFC [W m{-2}]
+ 
+iii.- Is available to retrieve the atmospheric 3D state variables (temperature, wind, pressure and humidity) from the vertical layers (by default from 0 to 60, every 5 m) used in BEP+BEM. To do that, user needs to modify the Registry/registry.urbandiags (see instructions below in the INSTALLATION section). The new variables provided in 'wrfurban_d[nn]' are:
+ - THAURB: POTENTIAL TEMPERATURE WITHIN URBAN CANOPY [K]
+ - THA0URB: REFERENCE POTENTIAL TEMPERATURE WITHIN URBAN CANOPY [K]
+ - UAURB: WESTWARD WIND SPEED WITHIN URBAN CANOPY [ms-1]
+ - VAURB: NORTHWARD WIND SPEED WITHIN URBAN CANOPY [ms-1]
+ - RHOURB: AIR DENSITY WITHIN URBAN CANOPY [kgk-1]
+ - PRESSURB: AIR PRESSURE WITHIN URBAN CANOPY [Pa]
+ - QVURB: MIXING RATIO WITHIN URBAN CANOPY [kgm-3]
+
+iv.- individual urban fractions for each LCZ, this is still experimental
+
+v.- New urban diagnostics: Not started yet
+
+= INSTALLATION =
+In order to activate urban modifications user needs to follow these steps:
+ 1.- Make a copy of Registry/registry.urbandiags
+   cp Registry/registry.urbandiags Registry/registry.urbandiags_comp
+ 2.-Modify the file accordingly to needs
+   * For the urban state variables:
+     a) Remove in Registry/registry.urbandiags_comp all the '##urban_state##' strings
+     b) in the configure.wrf introduce the pre-compilation flag -DURBANSTATE (e.g. line below -DNETCDF)
+ 3.- compile as usual
+   compile em_real >& compile.log
+
+
+ 
