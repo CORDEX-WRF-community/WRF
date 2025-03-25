@@ -1,10 +1,13 @@
 # L. Fita, UBA/CIMA/IFAECI, MArch 2025
 This is a new experimental development related to the CORDEX FPS URB RCC initiative focused in the enhancing of WRF capabilities when simulating in urban environments, which are:
- - Mangement of the urban related dimensions from the namelist
- - Inclusion of a new WRF output called 'wrfurban_d[nn]' at auxhist12
- - Getting state variables at the vetical discretization used in BEP and BEM urban modules
- - Allow for the reading of individual urban fractions for each LCZ
- - Retrieval of some diagnostics within the urban canopy
+ i.- Mangement of the urban related dimensions from the namelist
+ ii.- Inclusion of a new WRF output called 'wrfurban_d[nn]' at auxhist12
+ iii.- Getting state variables at the vetical discretization used in BEP and BEM urban modules
+ iv.- Allow for the reading of individual urban fractions for each LCZ
+ v.- Retrieval of some diagnostics within the urban canopy
 
 See more details in the GIT repository
 https://github.com/CORDEX-WRF-community/fps-urb-rcc/tree/main/urbanModule
+
+i.- Extense modifications have been made in order to faciltate the management of urban dimensions from the namelist. Changes in Registry/Registry.EM_COMMON and Registry/registry.dimspec file have been introduced. A new file called Registry/registry.urbandiags has been created. As well as numerous modifications in phys/module_sf_bep.F phys/module_sf_bep_bem.F, phys/module_sf_noahmplsm.F phys/noahmp/drivers/wrf/module_sf_noahmpdrv.F, phys/module_surface_driver.F and dyn_em/module_first_rk_step_part1.F. New parameters in the namelist.input (&physics section) can be used to set-up the different 'urban' dimensions:
+
