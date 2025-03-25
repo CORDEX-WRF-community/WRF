@@ -1,6 +1,6 @@
 # Dimensions
 rconfig   integer    num_urban            namelist,physics      1              11     rh{12}  "num_urban"                    "amount of urban categories used by module BEP"   ""
-rconfig   real       dz_urban             namelist,physics      1              5.     rh{12}  "dz_urban"                     "amount of vertical layers used by the urban module BEP"   ""
+rconfig   real       dz_urban             namelist,physics      1              5.     rh{12}  "dz_urban"                     "distance [m] between vertical layers used by the urban module BEP"   ""
 rconfig   integer    num_urban_nz         namelist,physics      1              18     rh{12}  "num_urban_nz"                 "amount of vertical layers used by the urban module BEP"   ""
 rconfig   integer    num_urban_nbui       namelist,physics      1              15     rh{12}  "num_urban_nbui"               "amount of types of buildings per LCZ used by the urban module BEP"   ""
 rconfig   integer    num_urban_nd         namelist,physics      1              2      rh{12}  "num_urban_nd"                 "amount of directions of streets used by module BEP"   ""
@@ -33,55 +33,55 @@ rconfig   integer    urban_map_gbd        namelist,physics      1              3
 rconfig   integer    urban_map_fbd        namelist,physics      1              5100   rh{12}  "urban_map_fbd"                "dimension used by module BEP as num_urban_nd*(num_urban_nz - 1)*num_urban_nf*num_urban_nbui"   ""
 rconfig   integer    urban_map_zgrd       namelist,physics      1              360    rh{12}  "urban_map_zgrd"               "dimension used by module BEP as num_urban_nd*num_urban_ngr*num_urban_nz"   ""
 
-# Diagnostics for urban studies
-state    real     tasupav        ij     misc        -         -       h{12}     "tasupav"          "Near-surface temperature urban pavements"     "K"
-state    real     tasuroof       ij     misc        -         -       h{12}     "tasuroof"         "Near-surface temperature urban roof"          "K"
-state    real     tasugreen      ij     misc        -         -       h{12}     "tasugreen"        "Near-surface temperature urban green spaces"  "K"
-state    real     tasublue       ij     misc        -         -       h{12}     "tasublue"         "Near-surface temperature urban blue spaces"   "K"
-state    real     antropohfx     ij     misc        -         -       h{12}     "antropohfx"       "Anthropogenic urban heat flux"                "Jkg-2s-1"
-state    real     tsku           ij     misc        -         -       h{12}     "utsk"             "urban skin temperature"                       "K"
-state    real     tskupav        ij     misc        -         -       h{12}     "tskupav"          "Surface temperature urban pavements"          "K"
-state    real     tskuroof       ij     misc        -         -       h{12}     "tskuroof"         "Surface temperature urban roof"               "K"
-state    real     tskugreen      ij     misc        -         -       h{12}     "tskugreen"        "Surface temperature urban green spaces"       "K"
-state    real     tskublue       ij     misc        -         -       h{12}     "tskublue"         "Surface temperature urban blue spaces"        "K"
+# Diagnostics for urban studies (experimental)
+#state    real     tasupav        ij     misc        -         -       h{12}     "tasupav"          "Near-surface temperature urban pavements"     "K"
+#state    real     tasuroof       ij     misc        -         -       h{12}     "tasuroof"         "Near-surface temperature urban roof"          "K"
+#state    real     tasugreen      ij     misc        -         -       h{12}     "tasugreen"        "Near-surface temperature urban green spaces"  "K"
+#state    real     tasublue       ij     misc        -         -       h{12}     "tasublue"         "Near-surface temperature urban blue spaces"   "K"
+#state    real     antropohfx     ij     misc        -         -       h{12}     "antropohfx"       "Anthropogenic urban heat flux"                "Jkg-2s-1"
+#state    real     tsku           ij     misc        -         -       h{12}     "utsk"             "urban skin temperature"                       "K"
+#state    real     tskupav        ij     misc        -         -       h{12}     "tskupav"          "Surface temperature urban pavements"          "K"
+#state    real     tskuroof       ij     misc        -         -       h{12}     "tskuroof"         "Surface temperature urban roof"               "K"
+#state    real     tskugreen      ij     misc        -         -       h{12}     "tskugreen"        "Surface temperature urban green spaces"       "K"
+#state    real     tskublue       ij     misc        -         -       h{12}     "tskublue"         "Surface temperature urban blue spaces"        "K"
 
 # Masks along compressed urban dimensions (1: value, 0: no value)
-state    integer urban_map_zrd_mask    i{umap1}j   misc       1         Z     rh{12}      "urban_map_zrd_mask"       "urban_map_zrd MASK (1: value, 0: no value)"        "1"
-state    integer urban_map_zwd_mask    i{umap2}j   misc       1         Z     rh{12}      "urban_map_zwd_mask"       "urban_map_zwd MASK (1: value, 0: no value)"        "1"
-state    integer urban_map_gd_mask     i{umap3}j   misc       1         Z     rh{12}      "urban_map_gd_mask"        "urban_map_gd MASK (1: value, 0: no value)"         "1"
-state    integer urban_map_zd_mask     i{umap4}j   misc       1         Z     rh{12}      "urban_map_zd_mask"        "urban_map_zd MASK (1: value, 0: no value)"         "1"
-state    integer urban_map_zdf_mask    i{umap5}j   misc       1         Z     rh{12}      "urban_map_zdf_mask"       "urban_map_zdf MASK (1: value, 0: no value)"        "1"
-state    integer urban_map_bd_mask     i{umap6}j   misc       1         Z     rh{12}      "urban_map_bd_mask"        "urban_map_bd MASK (1: value, 0: no value)"         "1"
-state    integer urban_map_wd_mask     i{umap7}j   misc       1         Z     rh{12}      "urban_map_wd_mask"        "urban_map_wd MASK (1: value, 0: no value)"         "1"
-state    integer urban_map_gbd_mask    i{umap8}j   misc       1         Z     rh{12}      "urban_map_gbd_mask"       "urban_map_gbd MASK (1: value, 0: no value)"        "1"
-state    integer urban_map_fbd_mask    i{umap9}j   misc       1         Z     rh{12}      "urban_map_fbd_mask"       "urban_map_fbd MASK (1: value, 0: no value)"        "1"
-state    integer urban_map_zgrd_mask   i{umap10}j  misc       1         Z     rh{12}      "urban_map_zgrd_mask"      "urban_map_zgrd MASK (1: value, 0: no value)"       "1"
+#state    integer urban_map_zrd_mask    i{umap1}j   misc       1         Z     rh{12}      "urban_map_zrd_mask"       "urban_map_zrd MASK (1: value, 0: no value)"        "1"
+#state    integer urban_map_zwd_mask    i{umap2}j   misc       1         Z     rh{12}      "urban_map_zwd_mask"       "urban_map_zwd MASK (1: value, 0: no value)"        "1"
+#state    integer urban_map_gd_mask     i{umap3}j   misc       1         Z     rh{12}      "urban_map_gd_mask"        "urban_map_gd MASK (1: value, 0: no value)"         "1"
+#state    integer urban_map_zd_mask     i{umap4}j   misc       1         Z     rh{12}      "urban_map_zd_mask"        "urban_map_zd MASK (1: value, 0: no value)"         "1"
+#state    integer urban_map_zdf_mask    i{umap5}j   misc       1         Z     rh{12}      "urban_map_zdf_mask"       "urban_map_zdf MASK (1: value, 0: no value)"        "1"
+#state    integer urban_map_bd_mask     i{umap6}j   misc       1         Z     rh{12}      "urban_map_bd_mask"        "urban_map_bd MASK (1: value, 0: no value)"         "1"
+#state    integer urban_map_wd_mask     i{umap7}j   misc       1         Z     rh{12}      "urban_map_wd_mask"        "urban_map_wd MASK (1: value, 0: no value)"         "1"
+#state    integer urban_map_gbd_mask    i{umap8}j   misc       1         Z     rh{12}      "urban_map_gbd_mask"       "urban_map_gbd MASK (1: value, 0: no value)"        "1"
+#state    integer urban_map_fbd_mask    i{umap9}j   misc       1         Z     rh{12}      "urban_map_fbd_mask"       "urban_map_fbd MASK (1: value, 0: no value)"        "1"
+#state    integer urban_map_zgrd_mask   i{umap10}j  misc       1         Z     rh{12}      "urban_map_zgrd_mask"      "urban_map_zgrd MASK (1: value, 0: no value)"       "1"
 
-state    integer urban_map_zrd_Nvals   ij         misc       -         -     rh{12}      "urban_map_zrd_Nvals"       "urban_map_zrdamount of values"        "1"
-state    integer urban_map_zwd_Nvals   ij         misc       -         -     rh{12}      "urban_map_zwd_Nvals"       "urban_map_zwdamount of values"        "1"
-state    integer urban_map_gd_Nvals    ij         misc       -         -     rh{12}      "urban_map_gd_Nvals"        "urban_map_gdamount of values"         "1"
-state    integer urban_map_zd_Nvals    ij         misc       -         -     rh{12}      "urban_map_zd_Nvals"        "urban_map_zdamount of values"         "1"
-state    integer urban_map_zdf_Nvals   ij         misc       -         -     rh{12}      "urban_map_zdf_Nvals"       "urban_map_zdfamount of values"        "1"
-state    integer urban_map_bd_Nvals    ij         misc       -         -     rh{12}      "urban_map_bd_Nvals"        "urban_map_bdamount of values"         "1"
-state    integer urban_map_wd_Nvals    ij         misc       -         -     rh{12}      "urban_map_wd_Nvals"        "urban_map_wdamount of values"         "1"
-state    integer urban_map_gbd_Nvals   ij         misc       -         -     rh{12}      "urban_map_gbd_Nvals"       "urban_map_gbdamount of values"        "1"
-state    integer urban_map_fbd_Nvals   ij         misc       -         -     rh{12}      "urban_map_fbd_Nvals"       "urban_map_fbdamount of values"        "1"
-state    integer urban_map_zgrd_Nvals  ij         misc       -         -     rh{12}      "urban_map_zgrd_Nvals"      "urban_map_zgrdamount of values"       "1"
+#state    integer urban_map_zrd_Nvals   ij         misc       -         -     rh{12}      "urban_map_zrd_Nvals"       "urban_map_zrdamount of values"        "1"
+#state    integer urban_map_zwd_Nvals   ij         misc       -         -     rh{12}      "urban_map_zwd_Nvals"       "urban_map_zwdamount of values"        "1"
+#state    integer urban_map_gd_Nvals    ij         misc       -         -     rh{12}      "urban_map_gd_Nvals"        "urban_map_gdamount of values"         "1"
+#state    integer urban_map_zd_Nvals    ij         misc       -         -     rh{12}      "urban_map_zd_Nvals"        "urban_map_zdamount of values"         "1"
+#state    integer urban_map_zdf_Nvals   ij         misc       -         -     rh{12}      "urban_map_zdf_Nvals"       "urban_map_zdfamount of values"        "1"
+#state    integer urban_map_bd_Nvals    ij         misc       -         -     rh{12}      "urban_map_bd_Nvals"        "urban_map_bdamount of values"         "1"
+#state    integer urban_map_wd_Nvals    ij         misc       -         -     rh{12}      "urban_map_wd_Nvals"        "urban_map_wdamount of values"         "1"
+#state    integer urban_map_gbd_Nvals   ij         misc       -         -     rh{12}      "urban_map_gbd_Nvals"       "urban_map_gbdamount of values"        "1"
+#state    integer urban_map_fbd_Nvals   ij         misc       -         -     rh{12}      "urban_map_fbd_Nvals"       "urban_map_fbdamount of values"        "1"
+#state    integer urban_map_zgrd_Nvals  ij         misc       -         -     rh{12}      "urban_map_zgrd_Nvals"      "urban_map_zgrdamount of values"       "1"
 
 # Weights along compressed urban dimensions
-state    integer urban_map_zrd_wgt    i{umap1}j   misc       1         Z     rh{12}      "urban_map_zrd_wgt"       "urban_map_zrd WEIGHTS"        "1."
-state    integer urban_map_zwd_wgt    i{umap2}j   misc       1         Z     rh{12}      "urban_map_zwd_wgt"       "urban_map_zwd WEIGHTS"        "1."
-state    integer urban_map_gd_wgt     i{umap3}j   misc       1         Z     rh{12}      "urban_map_gd_wgt"        "urban_map_gd WEIGHTS"         "1."
-state    integer urban_map_zd_wgt     i{umap4}j   misc       1         Z     rh{12}      "urban_map_zd_wgt"        "urban_map_zd WEIGHTS"         "1."
-state    integer urban_map_zdf_wgt    i{umap5}j   misc       1         Z     rh{12}      "urban_map_zdf_wgt"       "urban_map_zdf WEIGHTS"        "1."
-state    integer urban_map_bd_wgt     i{umap6}j   misc       1         Z     rh{12}      "urban_map_bd_wgt"        "urban_map_bd WEIGHTS"         "1."
-state    integer urban_map_wd_wgt     i{umap7}j   misc       1         Z     rh{12}      "urban_map_wd_wgt"        "urban_map_wd WEIGHTS"         "1."
-state    integer urban_map_gbd_wgt    i{umap8}j   misc       1         Z     rh{12}      "urban_map_gbd_wgt"       "urban_map_gbd WEIGHTS"        "1."
-state    integer urban_map_fbd_wgt    i{umap9}j   misc       1         Z     rh{12}      "urban_map_fbd_wgt"       "urban_map_fbd WEIGHTS"        "1."
-state    integer urban_map_zgrd_wgt   i{umap10}j  misc       1         Z     rh{12}      "urban_map_zgrd_wgt"      "urban_map_zgrd WEIGHTS"       "1."
+#state    integer urban_map_zrd_wgt    i{umap1}j   misc       1         Z     rh{12}      "urban_map_zrd_wgt"       "urban_map_zrd WEIGHTS"        "1."
+#state    integer urban_map_zwd_wgt    i{umap2}j   misc       1         Z     rh{12}      "urban_map_zwd_wgt"       "urban_map_zwd WEIGHTS"        "1."
+#state    integer urban_map_gd_wgt     i{umap3}j   misc       1         Z     rh{12}      "urban_map_gd_wgt"        "urban_map_gd WEIGHTS"         "1."
+#state    integer urban_map_zd_wgt     i{umap4}j   misc       1         Z     rh{12}      "urban_map_zd_wgt"        "urban_map_zd WEIGHTS"         "1."
+#state    integer urban_map_zdf_wgt    i{umap5}j   misc       1         Z     rh{12}      "urban_map_zdf_wgt"       "urban_map_zdf WEIGHTS"        "1."
+#state    integer urban_map_bd_wgt     i{umap6}j   misc       1         Z     rh{12}      "urban_map_bd_wgt"        "urban_map_bd WEIGHTS"         "1."
+#state    integer urban_map_wd_wgt     i{umap7}j   misc       1         Z     rh{12}      "urban_map_wd_wgt"        "urban_map_wd WEIGHTS"         "1."
+#state    integer urban_map_gbd_wgt    i{umap8}j   misc       1         Z     rh{12}      "urban_map_gbd_wgt"       "urban_map_gbd WEIGHTS"        "1."
+#state    integer urban_map_fbd_wgt    i{umap9}j   misc       1         Z     rh{12}      "urban_map_fbd_wgt"       "urban_map_fbd WEIGHTS"        "1."
+#state    integer urban_map_zgrd_wgt   i{umap10}j  misc       1         Z     rh{12}      "urban_map_zgrd_wgt"      "urban_map_zgrd WEIGHTS"       "1."
 
 # State variales inside urban module
-#  remove ##urban_state## and introduce in configure.wrf -DURBANSTATE=1
+#  remove ##urban_state## and introduce in configure.wrf -DURBANSTATE
 ##urban_state##state    real   THAURB          i{umap_1}j   misc       1         Z     h{12}       "THAURB"               "POTENTIAL TEMPERATURE WITHIN URBAN CANOPY"                "K"
 ##urban_state##state    real   THA0URB         i{umap_1}j   misc       1         Z     h{12}       "THA0URB"              "REFERENCE POTENTIAL TEMPERATURE WITHIN URBAN CANOPY"                "K"
 ##urban_state##state    real   UAURB           i{umap_1}j   misc       1         Z     h{12}       "UAURB"                "WESTWARD WIND SPEED WITHIN URBAN CANOPY"                "ms-1"
@@ -90,8 +90,7 @@ state    integer urban_map_zgrd_wgt   i{umap10}j  misc       1         Z     rh{
 ##urban_state##state    real   PRESSURB        i{umap_1}j   misc       1         Z     h{12}       "PRESSURB"             "AIR PRESSURE WITHIN URBAN CANOPY"                "Pa"
 ##urban_state##state    real   QVURB           i{umap_1}j   misc       1         Z     h{12}       "QVURB"                "MIXING RATIO WITHIN URBAN CANOPY"                "kgm-3"
 
-
-# Diagnostics from urban modules mean outputs with some colapsed dimensions
+# Diagnostics from urban modules mean outputs with some colapsed dimensions (experimental)
 #   Choose between:
 #       urban_nz: amount of urban vertical layers, remove ##urban_nz## and introduce in configure.wrf -DURBANCOLAPSE=1
 #       urban_nd: amount of street directions, remove ##urban_nd## and introduce in configure.wrf -DURBANCOLAPSE=2
@@ -150,6 +149,8 @@ state    integer urban_map_zgrd_wgt   i{umap10}j  misc       1         Z     rh{
 
 
 # All collapsed urban variables
-state    real   TLEV_URB3D_clpd      ij   misc       1         Z     rh{12}      "TLEV_URB3D_clpd" "COLAPSED INDOOR TEMPERATURE"             "K"
-state    real   QLEV_URB3D_clpd      ij   misc       1         Z     rh{12}      "QLEV_URB3D_clpd" "COLAPSED SPECIFIC HUMIDITY"              "dimensionless"
+##urban_nz##state    real   TLEV_URB3D_clpd      ij   misc       1         Z     rh{12}      "TLEV_URB3D_clpd" "COLAPSED INDOOR TEMPERATURE"             "K"
+##urban_nz##state    real   QLEV_URB3D_clpd      ij   misc       1         Z     rh{12}      "QLEV_URB3D_clpd" "COLAPSED SPECIFIC HUMIDITY"              "dimensionless"
+##urban_nd##state    real   TLEV_URB3D_clpd      ij   misc       1         Z     rh{12}      "TLEV_URB3D_clpd" "COLAPSED INDOOR TEMPERATURE"             "K"
+##urban_nd##state    real   QLEV_URB3D_clpd      ij   misc       1         Z     rh{12}      "QLEV_URB3D_clpd" "COLAPSED SPECIFIC HUMIDITY"              "dimensionless"
 
