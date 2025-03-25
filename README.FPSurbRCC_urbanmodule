@@ -1,3 +1,10 @@
 # L. Fita, UBA/CIMA/IFAECI, MArch 2025
-# This is a new experimental development related to the CORDEX FPS URB RCC initiative focused in the enhancing of WRF capabilities when simulating in urban environments
+This is a new experimental development related to the CORDEX FPS URB RCC initiative focused in the enhancing of WRF capabilities when simulating in urban environments, which are:
+ - Mangement of the urban related dimensions from the namelist
+ - Inclusion of a new WRF output called 'wrfurban_d[nn]' at auxhist12
+ - Getting state variables at the vetical discretization used in BEP and BEM urban modules
+ - Allow for the reading of individual urban fractions for each LCZ
+ - Retrieval of some diagnostics within the urban canopy
 
+See more details in the GIT repository
+https://github.com/CORDEX-WRF-community/fps-urb-rcc/tree/main/urbanModule
