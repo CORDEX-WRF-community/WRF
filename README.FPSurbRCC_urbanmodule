@@ -95,13 +95,19 @@ v.- New urban diagnostics: Not started yet
 
 = INSTALLATION =
 In order to activate urban modifications user needs to follow these steps:
- 1.- Make a copy of Registry/registry.urbandiags
+ 1.- Download the code for WRFv4.5.1 FPS URB RCC fork and 'urbanmodule' branch
+   git clone -b urbanmodule git@github.com:CORDEX-WRF-community/WRF.git WRF_FPSurbRcc-urbanmodule
+ 2.- Download the right version of the noahmp land module 'urban-module' branch
+   cd WRF_FPSurbRcc-urbanmodule/phys
+   rmdir noahmp
+   git clone -b urban-mods git@github.com:CORDEX-WRF-community/noahmp.git
+ 3.- Make a copy of Registry/registry.urbandiags
    cp Registry/registry.urbandiags Registry/registry.urbandiags_comp
- 2.-Modify the file accordingly to needs
+ 4.-Modify the file accordingly to needs
    * For the urban state variables:
      a) Remove in Registry/registry.urbandiags_comp all the '##urban_state##' strings
      b) in the configure.wrf introduce the pre-compilation flag -DURBANSTATE (e.g. line below -DNETCDF)
- 3.- compile as usual
+ 5.- compile as usual
    compile em_real >& compile.log
 
 
