@@ -133,7 +133,7 @@ use module_wrf_error
       REAL, INTENT(IN )::   DT      ! Time step
       
    INTEGER, INTENT(in)                                            :: num_urban_nz
-   INTEGER, INTENT(in)                                            :: nurbi, nd, nz_ui, ng_u, nwr_u
+   INTEGER, INTENT(in)                                            :: nurbi, ndi, nz_ui, ng_u, nwr_u
    REAL, INTENT(in)                                               :: dz_u
 #ifdef URBANSTATE
    REAL, DIMENSION(1:num_urban_nz)                                :: ua_u1D, va_u1D, pt_u1D, da_u1D,  &
@@ -546,7 +546,7 @@ use module_wrf_error
 	  sfg_urb3d(ix,id,iy)=sfg1D(id) 
 	 enddo
 	
-	 do id=1,nd
+	 do id=1,ndi
 	 do iz=1,nz_ui
 	  sfr_urb3d(ix,ind_zd(iz,id),iy)=sfr1D(id,iz)
 	 enddo
@@ -864,7 +864,7 @@ use module_wrf_error
 
       call modif_rad(iurb,ndu,nzu,z_u,ws,               &
                     drst,strd,ss,pb,                    &
-                    nurbi, nz_ui, ng_u, nwr_u,           &
+                    nurbi, nz_ui, ng_u, nwr_u,          &
                     tw,tg,albg,albw,emw,emg,            &
                     fww,fwg,fgw,fsw,fsg,                &
                     zr,deltar,ah,                       &
@@ -874,7 +874,7 @@ use module_wrf_error
        
        call upward_rad(ndu,nzu,ws,bs,                   &
                        sigma,pb,ss,                     &
-                       nd, nz_ui, ng_u, nwr_u, dz_u,    &
+                       ndi, nz_ui, ng_u, nwr_u, dz_u,   &
                        tg,emg,albg,rlg,rsg,sfg,         & 
                        tw,emw,albw,rlw,rsw,sfw,         & 
                        tr,emr,albr,rld,rs,sfr,          & 
@@ -907,7 +907,7 @@ use module_wrf_error
 !  
 ! 
  
-      do id=1,ndu         
+      do id=1,ndi
          sfg(id)=-da_u(1)*cp_u*thb_u(id,1)
          do iz=2,nzu
             sfr(id,iz)=-da_u(iz)*cp_u*thb_u(id,iz)
@@ -977,7 +977,7 @@ use module_wrf_error
       integer nzu                  ! Number of vertical urban levels in the current class
       integer nzurb                ! Number of vertical urban levels in the current class
       integer ndu                  ! Number of street direction for the current urban class
-      INTEGER, INTENT(in)                                :: nurbi, nd, nz_ui, ng_u, nwr_u
+      INTEGER, INTENT(in)                                :: nurbi, ndi, nz_ui, ng_u, nwr_u
       real alag_u(nurbi)           ! Ground thermal diffusivity [m^2 s^-1]
       real alar_u(nurbi)           ! Roof thermal diffusivity [m^2 s^-1]
       real alaw_u(nurbi)           ! Wall thermal diffusivity [m^2 s^-1]
@@ -1068,7 +1068,7 @@ use module_wrf_error
           nzurban=nzu
        endif
 
-       do id=1,ndu
+       do id=1,ndi
         z0(id,1)=z0g_u(iurb)
         do iz=2,nzurban+1
            z0(id,iz)=z0r_u(iurb)
@@ -1090,12 +1090,12 @@ use module_wrf_error
         alaw(iw)=alaw_u(iurb)
        enddo
       
-       do id=1,ndu
+       do id=1,ndi
         strd(id)=strd_u(id,iurb)
         drst(id)=drst_u(id,iurb)     
        enddo
     
-       do id=1,ndu
+       do id=1,ndi
           if ((hgt_urb<=0.).OR.(lp_urb<=0.).OR.(lb_urb<=0.)) then
              ws(id)=ws_u(id,iurb)
              bs(id)=bs_u(id,iurb)
@@ -1107,7 +1107,7 @@ use module_wrf_error
                   bs(id)=bs_u(id,iurb) 
           endif
        enddo
-       do id=1,ndu
+       do id=1,ndi
           if ((bs(id)<=1.).OR.(bs(id)>=150.)) then
 !            write(*,*) 'WARNING, WIDTH OF THE BUILDING WRONG',id,bs(id)
 !            write(*,*) 'WIDTH OF THE STREET',id,ws(id)
@@ -1180,7 +1180,7 @@ use module_wrf_error
 ! ===6=8===============================================================72     
 
       subroutine modif_rad(iurb,nd,nz_u,z,ws,drst,strd,ss,pb,    &
-                          nurbi, nz_ui, ng_u, nwr_u,              &
+                          nurbi, ndi, nz_ui, ng_u, nwr_u,        &
                           tw,tg,albg,albw,emw,emg,               &
                           fww,fwg,fgw,fsw,fsg,                   &
                           zr,deltar,ah,                          &    
@@ -1200,25 +1200,25 @@ use module_wrf_error
       integer iurb              ! current urban class
       integer nd                ! Number of street direction for the current urban class
       integer nz_u              ! Number of layer in the urban grid
-      INTEGER, INTENT(in)                                            :: nurbi, nz_ui, ng_u, nwr_u
+      INTEGER, INTENT(in)                                            :: nurbi, ndi, nz_ui, ng_u, nwr_u
       real z(nz_ui)           ! Height of the urban grid levels
-      real ws(nd)              ! Street widths of the current urban class
-      real drst(nd)            ! street directions for the current urban class
-      real strd(nd)            ! Street lengths for the current urban class
+      real ws(ndi)              ! Street widths of the current urban class
+      real drst(ndi)            ! street directions for the current urban class
+      real strd(ndi)            ! Street lengths for the current urban class
       real ss(nz_ui)          ! probability to have a building with height h
       real pb(nz_ui)          ! probability to have a building with an height equal
-      real tw(2*nd,nz_ui,nwr_u) ! Temperature in each layer of the wall [K]
-      real tg(nd,ng_u)         ! Temperature in each layer of the ground [K]
+      real tw(2*ndi,nz_ui,nwr_u) ! Temperature in each layer of the wall [K]
+      real tg(ndi,ng_u)         ! Temperature in each layer of the ground [K]
       real albg                 ! Albedo of the ground for the current urban class
       real albw                 ! Albedo of the wall for the current urban class
       real emg                  ! Emissivity of ground for the current urban class
       real emw                  ! Emissivity of wall for the current urban class
-      real fgw(nz_ui,nd,nurbi)       ! View factors from ground to wall
-      real fsg(nd,nurbi)             ! View factors from sky to ground
-      real fsw(nz_ui,nd,nurbi)       ! View factors from sky to wall
-      real fws(nz_ui,nd,nurbi)       ! View factors from wall to sky
-      real fwg(nz_ui,nd,nurbi)       ! View factors from wall to ground
-      real fww(nz_ui,nz_ui,nd,nurbi) ! View factors from wall to wall
+      real fgw(nz_ui,ndi,nurbi)       ! View factors from ground to wall
+      real fsg(ndi,nurbi)             ! View factors from sky to ground
+      real fsw(nz_ui,ndi,nurbi)       ! View factors from sky to wall
+      real fws(nz_ui,ndi,nurbi)       ! View factors from wall to sky
+      real fwg(nz_ui,ndi,nurbi)       ! View factors from wall to ground
+      real fww(nz_ui,nz_ui,ndi,nurbi) ! View factors from wall to wall
       real ah                   ! Hour angle (it should come from the radiation routine)
       real zr                   ! zenith angle
       real deltar               ! Declination of the sun
@@ -1227,10 +1227,10 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
 ! OUTPUT:
 ! ----------------------------------------------------------------------
-      real rlg(nd)             ! Long wave radiation at the ground
-      real rlw(2*nd,nz_ui)     ! Long wave radiation at the walls
-      real rsg(nd)             ! Short wave radiation at the ground
-      real rsw(2*nd,nz_ui)     ! Short wave radiation at the walls
+      real rlg(ndi)             ! Long wave radiation at the ground
+      real rlw(2*ndi,nz_ui)     ! Long wave radiation at the walls
+      real rsg(ndi)             ! Short wave radiation at the ground
+      real rsw(2*ndi,nz_ui)     ! Short wave radiation at the walls
 
 ! ----------------------------------------------------------------------
 ! LOCAL:
@@ -1241,17 +1241,16 @@ use module_wrf_error
 !  Calculation of the shadow effects
 
       call shadow_mas(nd,nz_u,zr,deltar,ah,drst,ws,ss,pb,z,           &
-                     nz_ui,                                           &
-                     rs,rsw,rsg)
+                     ndi,nz_ui,                                       &                     rs,rsw,rsg)
 
 ! Calculation of the reflection effects          
       do id=1,nd
-         call long_rad(iurb,nz_u,id,emw,emg,                 &
-                      nurbi, nz_ui, nd, ng_u, nwr_u,          &
+         call long_rad(iurb,nz_u,id,emw,emg,                   &
+                      nurbi, nz_ui, ndi, ng_u, nwr_u,          &
                       fwg,fww,fgw,fsw,fsg,tg,tw,rlg,rlw,rl,pb)
          
-         call short_rad(iurb,nz_u,id,albw,                   & 
-                           nurbi, nz_ui, nd, ng_u,            &
+         call short_rad(iurb,nz_u,id,albw,                     & 
+                           nurbi, nz_ui, ndi, ng_u,            &
                            albg,fwg,fww,fgw,rsg,rsw,pb)
   
       enddo
@@ -1264,7 +1263,7 @@ use module_wrf_error
 ! ===6=8===============================================================72     
 
       subroutine surf_temp(nz_u,nd,pr,dt,ss,rs,rl,rsg,rlg,rsw,rlw,     &
-                          nz_ui, ng_u, nwr_u,                          &
+                          ndi, nz_ui, ng_u, nwr_u,                     &
                           tg,alag,csg,emg,albg,ptg,sfg,gfg,            &
                           tr,alar,csr,emr,albr,ptr,sfr,gfr,            &
                           tw,alaw,csw,emw,albw,ptw,sfw,gfw)             
@@ -1281,8 +1280,7 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
       integer nz_u              ! Number of vertical layers defined in the urban grid
       integer nd                ! Number of street direction for the current urban class
-      INTEGER, INTENT(in)                                :: nz_ui, ng_u, nwr_u
-
+      INTEGER, INTENT(in)                                :: ndi, nz_ui, ng_u, nwr_u
       real alag(ng_u)           ! Ground thermal diffusivity for the current urban class [m^2 s^-1] 
       real alar(nwr_u)           ! Roof thermal diffusivity for the current urban class [m^2 s^-1]  
       real alaw(nwr_u)           ! Wall thermal diffusivity for the current urban class [m^2 s^-1]  
@@ -1299,37 +1297,37 @@ use module_wrf_error
       real pr(nz_ui)            ! Air pressure
       real rs                   ! Solar radiation
       real rl                   ! Downward flux of the longwave radiation
-      real rlg(nd)             ! Long wave radiation at the ground
-      real rlw(2*nd,nz_ui)     ! Long wave radiation at the walls
-      real rsg(nd)             ! Short wave radiation at the ground
-      real rsw(2*nd,nz_ui)     ! Short wave radiation at the walls
-      real sfg(nd)             ! Sensible heat flux from ground (road)
-      real sfr(nd,nz_ui)     ! Sensible heat flux from roofs
-      real sfw(2*nd,nz_ui)     ! Sensible heat flux from walls
-      real gfg(nd)             ! Heat flux transferred from the surface of the ground (road) toward the interior
-      real gfr(nd,nz_ui)     ! Heat flux transferred from the surface of the roof toward the interior
-      real gfw(2*nd,nz_ui)     ! Heat flux transfered from the surface of the walls toward the interior
+      real rlg(ndi)             ! Long wave radiation at the ground
+      real rlw(2*ndi,nz_ui)     ! Long wave radiation at the walls
+      real rsg(ndi)             ! Short wave radiation at the ground
+      real rsw(2*ndi,nz_ui)     ! Short wave radiation at the walls
+      real sfg(ndi)             ! Sensible heat flux from ground (road)
+      real sfr(ndi,nz_ui)     ! Sensible heat flux from roofs
+      real sfw(2*ndi,nz_ui)     ! Sensible heat flux from walls
+      real gfg(ndi)             ! Heat flux transferred from the surface of the ground (road) toward the interior
+      real gfr(ndi,nz_ui)     ! Heat flux transferred from the surface of the roof toward the interior
+      real gfw(2*ndi,nz_ui)     ! Heat flux transfered from the surface of the walls toward the interior
       real ss(nz_ui)          ! Probability to have a building with height h
-      real tg(nd,ng_u)         ! Temperature in each layer of the ground [K]
-      real tr(nd,nz_ui,nwr_u) ! Temperature in each layer of the roof [K]
-      real tw(2*nd,nz_ui,nwr_u) ! Temperature in each layer of the wall [K]
+      real tg(ndi,ng_u)         ! Temperature in each layer of the ground [K]
+      real tr(ndi,nz_ui,nwr_u) ! Temperature in each layer of the roof [K]
+      real tw(2*ndi,nz_ui,nwr_u) ! Temperature in each layer of the wall [K]
       
 
 ! ----------------------------------------------------------------------
 ! OUTPUT:
 ! ----------------------------------------------------------------------
-      real ptg(nd)             ! Ground potential temperatures 
-      real ptr(nd,nz_ui)     ! Roof potential temperatures 
-      real ptw(2*nd,nz_ui)     ! Walls potential temperatures 
+      real ptg(ndi)             ! Ground potential temperatures 
+      real ptr(ndi,nz_ui)     ! Roof potential temperatures 
+      real ptw(2*ndi,nz_ui)     ! Walls potential temperatures 
 
 ! ----------------------------------------------------------------------
 ! LOCAL:
 ! ----------------------------------------------------------------------
       integer id,ig,ir,iw,iz
 
-      real rtg(nd)             ! Total radiation at ground(road) surface (solar+incoming long+outgoing long)
-      real rtr(nd,nz_ui)     ! Total radiation at roof surface (solar+incoming long+outgoing long)
-      real rtw(2*nd,nz_ui)     ! Radiation at walls surface (solar+incoming long+outgoing long)
+      real rtg(ndi)             ! Total radiation at ground(road) surface (solar+incoming long+outgoing long)
+      real rtr(ndi,nz_ui)     ! Total radiation at roof surface (solar+incoming long+outgoing long)
+      real rtw(2*ndi,nz_ui)     ! Radiation at walls surface (solar+incoming long+outgoing long)
       real tg_tmp(ng_u)
       real tr_tmp(nwr_u)
       real tw_tmp(nwr_u)
@@ -1365,7 +1363,7 @@ use module_wrf_error
 
         
    
-      do id=1,nd
+      do id=1,ndi
 
 !      Calculation for the ground surfaces
        do ig=1,ng_u
@@ -1440,8 +1438,8 @@ use module_wrf_error
 ! ===6=8===============================================================72     
 ! ===6=8===============================================================72  
 
-      subroutine buildings(nd,nz,z0,ua_u,va_u,pt_u,pt0_u,         &
-                        nz_ui, dz_u,                                 &
+      subroutine buildings(nd,nz,z0,ua_u,va_u,pt_u,pt0_u,            &
+                        ndi, nz_ui, dz_u,                            &
                         ptg,ptr,da_u,ptw,                            &
                         drst,uva_u,vva_u,uvb_u,vvb_u,                &
                         tva_u,tvb_u,evb_u,                           &
@@ -1461,20 +1459,20 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
       integer nd                ! Number of street direction for the current urban class
       integer nz                ! number of vertical space steps
-      INTEGER, INTENT(in)                                :: nz_ui
+      INTEGER, INTENT(in)                                :: ndi, nz_ui
       REAL, INTENT(in)                                   :: dz_u
       real ua_u(nz_ui)          ! Wind speed in the x direction on the urban grid
       real va_u(nz_ui)          ! Wind speed in the y direction on the urban grid
       real da_u(nz_ui)          ! air density on the urban grid
-      real drst(nd)            ! Street directions for the current urban class
+      real drst(ndi)            ! Street directions for the current urban class
       real dz
       real pt_u(nz_ui)          ! Potential temperature on the urban grid
       real pt0_u(nz_ui)         ! reference potential temperature on the urban grid
-      real ptg(nd)             ! Ground potential temperatures 
-      real ptr(nd,nz_ui)     ! Roof potential temperatures 
-      real ptw(2*nd,nz_ui)     ! Walls potential temperatures 
+      real ptg(ndi)             ! Ground potential temperatures 
+      real ptr(ndi,nz_ui)     ! Roof potential temperatures 
+      real ptw(2*ndi,nz_ui)     ! Walls potential temperatures 
       real ss(nz_ui)          ! probability to have a building with height h
-      real z0(nd,nz_ui)      ! Roughness lengths "profiles"
+      real z0(ndi,nz_ui)      ! Roughness lengths "profiles"
       real dt ! time step
 
 
@@ -1486,17 +1484,17 @@ use module_wrf_error
 ! The fluxes can be computed as follow: Fluxes of X = A*X + B
 !  Example: Momentum fluxes on vertical surfaces = uva_u * ua_u + uvb_u
 
-      real uhb_u(nd,nz_ui)   ! U (wind component) Horizontal surfaces, B (explicit) term
-      real uva_u(2*nd,nz_ui)   ! U (wind component)   Vertical surfaces, A (implicit) term
-      real uvb_u(2*nd,nz_ui)   ! U (wind component)   Vertical surfaces, B (explicit) term
-      real vhb_u(nd,nz_ui)   ! V (wind component) Horizontal surfaces, B (explicit) term
-      real vva_u(2*nd,nz_ui)   ! V (wind component)   Vertical surfaces, A (implicit) term
-      real vvb_u(2*nd,nz_ui)   ! V (wind component)   Vertical surfaces, B (explicit) term
-      real thb_u(nd,nz_ui)   ! Temperature        Horizontal surfaces, B (explicit) term
-      real tva_u(2*nd,nz_ui)   ! Temperature          Vertical surfaces, A (implicit) term
-      real tvb_u(2*nd,nz_ui)   ! Temperature          Vertical surfaces, B (explicit) term
-      real ehb_u(nd,nz_ui)   ! Energy (TKE)       Horizontal surfaces, B (explicit) term
-      real evb_u(2*nd,nz_ui)   ! Energy (TKE)         Vertical surfaces, B (explicit) term
+      real uhb_u(ndi,nz_ui)   ! U (wind component) Horizontal surfaces, B (explicit) term
+      real uva_u(2*ndi,nz_ui)   ! U (wind component)   Vertical surfaces, A (implicit) term
+      real uvb_u(2*ndi,nz_ui)   ! U (wind component)   Vertical surfaces, B (explicit) term
+      real vhb_u(ndi,nz_ui)   ! V (wind component) Horizontal surfaces, B (explicit) term
+      real vva_u(2*ndi,nz_ui)   ! V (wind component)   Vertical surfaces, A (implicit) term
+      real vvb_u(2*ndi,nz_ui)   ! V (wind component)   Vertical surfaces, B (explicit) term
+      real thb_u(ndi,nz_ui)   ! Temperature        Horizontal surfaces, B (explicit) term
+      real tva_u(2*ndi,nz_ui)   ! Temperature          Vertical surfaces, A (implicit) term
+      real tvb_u(2*ndi,nz_ui)   ! Temperature          Vertical surfaces, B (explicit) term
+      real ehb_u(ndi,nz_ui)   ! Energy (TKE)       Horizontal surfaces, B (explicit) term
+      real evb_u(2*ndi,nz_ui)   ! Energy (TKE)         Vertical surfaces, B (explicit) term
   
 ! ----------------------------------------------------------------------
 ! LOCAL:
@@ -1559,9 +1557,9 @@ use module_wrf_error
 ! ===6=8===============================================================72
 
         subroutine urban_meso(nd,kms,kme,kts,kte,nz_u,z,dz,z_u,pb,ss,bs,ws,sf,vl,    &
-                             nz_ui,                                     &
-                             uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u, &       
-                             uhb_u,vhb_u,thb_u,ehb_u,                   &      
+                             ndi, nz_ui,                                             &
+                             uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,              &
+                             uhb_u,vhb_u,thb_u,ehb_u,                                &
                              a_u,a_v,a_t,a_e,b_u,b_v,b_t,b_e)           
 
 ! ----------------------------------------------------------------------
@@ -1583,23 +1581,23 @@ use module_wrf_error
 ! Data relative to the "uban grid"
       integer nz_u              ! Number of layer in the urban grid
       integer nd                ! Number of street direction for the current urban class
-      INTEGER, INTENT(in)                                :: nz_ui
-      real bs(nd)              ! Building widths of the current urban class
-      real ws(nd)              ! Street widths of the current urban class
+      INTEGER, INTENT(in)                                :: ndi,nz_ui
+      real bs(ndi)              ! Building widths of the current urban class
+      real ws(ndi)              ! Street widths of the current urban class
       real z_u(nz_ui)         ! Height of the urban grid levels
       real pb(nz_ui)          ! Probability to have a building with an height equal
       real ss(nz_ui)          ! Probability to have a building with height h
-      real uhb_u(nd,nz_ui)   ! U (x-wind component) Horizontal surfaces, B (explicit) term
-      real uva_u(2*nd,nz_ui)   ! U (x-wind component) Vertical surfaces, A (implicit) term
-      real uvb_u(2*nd,nz_ui)   ! U (x-wind component) Vertical surfaces, B (explicit) term
-      real vhb_u(nd,nz_ui)   ! V (y-wind component) Horizontal surfaces, B (explicit) term
-      real vva_u(2*nd,nz_ui)   ! V (y-wind component) Vertical surfaces, A (implicit) term
-      real vvb_u(2*nd,nz_ui)   ! V (y-wind component) Vertical surfaces, B (explicit) term
-      real thb_u(nd,nz_ui)   ! Temperature        Horizontal surfaces, B (explicit) term
-      real tva_u(2*nd,nz_ui)   ! Temperature          Vertical surfaces, A (implicit) term
-      real tvb_u(2*nd,nz_ui)   ! Temperature          Vertical surfaces, B (explicit) term
-      real ehb_u(nd,nz_ui)   ! Energy (TKE)       Horizontal surfaces, B (explicit) term
-      real evb_u(2*nd,nz_ui)   ! Energy (TKE)         Vertical surfaces, B (explicit) term
+      real uhb_u(ndi,nz_ui)   ! U (x-wind component) Horizontal surfaces, B (explicit) term
+      real uva_u(2*ndi,nz_ui)   ! U (x-wind component) Vertical surfaces, A (implicit) term
+      real uvb_u(2*ndi,nz_ui)   ! U (x-wind component) Vertical surfaces, B (explicit) term
+      real vhb_u(ndi,nz_ui)   ! V (y-wind component) Horizontal surfaces, B (explicit) term
+      real vva_u(2*ndi,nz_ui)   ! V (y-wind component) Vertical surfaces, A (implicit) term
+      real vvb_u(2*ndi,nz_ui)   ! V (y-wind component) Vertical surfaces, B (explicit) term
+      real thb_u(ndi,nz_ui)   ! Temperature        Horizontal surfaces, B (explicit) term
+      real tva_u(2*ndi,nz_ui)   ! Temperature          Vertical surfaces, A (implicit) term
+      real tvb_u(2*ndi,nz_ui)   ! Temperature          Vertical surfaces, B (explicit) term
+      real ehb_u(ndi,nz_ui)   ! Energy (TKE)       Horizontal surfaces, B (explicit) term
+      real evb_u(2*ndi,nz_ui)   ! Energy (TKE)         Vertical surfaces, B (explicit) term
 
 ! ----------------------------------------------------------------------
 ! OUTPUT:
@@ -1652,7 +1650,7 @@ use module_wrf_error
       enddo
       sf(kte+1)=0. 
       
-      do id=1,nd      
+      do id=1,ndi
          do iz=kts+1,kte+1
             sr=0.
             do iz_u=2,nz_ui
@@ -1660,28 +1658,28 @@ use module_wrf_error
                   sr=pb(iz_u)
                endif
             enddo
-            sf(iz)=sf(iz)+((ws(id)+(1.-sr)*bs(id))/(ws(id)+bs(id)))/nd
+            sf(iz)=sf(iz)+((ws(id)+(1.-sr)*bs(id))/(ws(id)+bs(id)))/ndi
          enddo
       enddo
 
 ! volume      
       do iz=kts,kte
-         do id=1,nd
+         do id=1,ndi
             vtot=0.
             do iz_u=1,nz_ui
                dzz=max(min(z_u(iz_u+1),z(iz+1))-max(z_u(iz_u),z(iz)),0.)
                vtot=vtot+pb(iz_u+1)*dzz
             enddo
             vtot=vtot/(z(iz+1)-z(iz))
-            vl(iz)=vl(iz)+(1.-vtot*bs(id)/(ws(id)+bs(id)))/nd
+            vl(iz)=vl(iz)+(1.-vtot*bs(id)/(ws(id)+bs(id)))/ndi
          enddo
       enddo
       
 ! horizontal surface impact  
 
-      do id=1,nd
+      do id=1,ndi
       
-         fact=1./vl(kts)/dz(kts)*ws(id)/(ws(id)+bs(id))/nd
+         fact=1./vl(kts)/dz(kts)*ws(id)/(ws(id)+bs(id))/ndi
          b_t(kts)=b_t(kts)+thb_u(id,1)*fact
          b_u(kts)=b_u(kts)+uhb_u(id,1)*fact
          b_v(kts)=b_v(kts)+vhb_u(id,1)*fact 
@@ -1701,7 +1699,7 @@ use module_wrf_error
                endif
             enddo
       
-            fact=bs(id)/(ws(id)+bs(id))/vl(iz)/dz(iz)/nd
+            fact=bs(id)/(ws(id)+bs(id))/vl(iz)/dz(iz)/ndi
             b_t(iz)=b_t(iz)+st*fact
             b_u(iz)=b_u(iz)+su*fact
             b_v(iz)=b_v(iz)+sv*fact
@@ -1713,7 +1711,7 @@ use module_wrf_error
            
       do iz=kts,kte 
          uet(iz)=0.
-         do id=1,nd              
+         do id=1,ndi      
             vtb=0.
             vta=0.
             vua=0.
@@ -1741,7 +1739,7 @@ use module_wrf_error
                     (evb_u(2*id-1,iz_u)+evb_u(2*id,iz_u))*fact
             enddo
            
-            fact=1./vl(iz)/dz(iz)/nd
+            fact=1./vl(iz)/dz(iz)/ndi
             b_t(iz)=b_t(iz)+vtb*fact
             a_t(iz)=a_t(iz)+vta*fact
             a_u(iz)=a_u(iz)+vua*fact
@@ -1762,7 +1760,7 @@ use module_wrf_error
 ! ===6=8===============================================================72 
 
       subroutine interp_length(nd,kms,kme,kts,kte,nz_u,z_u,z,ss,ws,bs,              &
-                             nz_ui,                                                 &
+                             ndi, nz_ui,                                                 &
                              dlg,dl_u)
 
 ! ----------------------------------------------------------------------     
@@ -1780,11 +1778,11 @@ use module_wrf_error
       real z(kms:kme)              ! Altitude above the ground of the cell interface
       integer nd                ! Number of street direction for the current urban class
       integer nz_u              ! Number of levels in the "urban grid"
-      INTEGER, INTENT(in)                                :: nz_ui
+      INTEGER, INTENT(in)                                :: ndi, nz_ui
       real z_u(nz_ui)         ! Height of the urban grid levels
-      real bs(nd)              ! Building widths of the current urban class
+      real bs(ndi)              ! Building widths of the current urban class
       real ss(nz_ui)          ! Probability to have a building with height h
-      real ws(nd)              ! Street widths of the current urban class
+      real ws(ndi)              ! Street widths of the current urban class
 
 
 ! ----------------------------------------------------------------------     
@@ -1808,11 +1806,11 @@ use module_wrf_error
         do iz=kts,kte
          ulu=0.
          ssl=0.
-         do id=1,nd        
+         do id=1,ndi
           do iz_u=2,nz_ui
            if(z_u(iz_u).gt.z(iz))then
-            ulu=ulu+ss(iz_u)/z_u(iz_u)/nd
-            ssl=ssl+ss(iz_u)/nd
+            ulu=ulu+ss(iz_u)/z_u(iz_u)/ndi
+            ssl=ssl+ss(iz_u)/ndi
            endif
           enddo
          enddo
@@ -1827,7 +1825,7 @@ use module_wrf_error
 
         do iz=kts,kte
          dlg(iz)=0.
-          do id=1,nd
+          do id=1,ndi
            sftot=ws(id)  
            dlgtmp=ws(id)/((z(iz)+z(iz+1))/2.)
            do iz_u=1,nz_ui
@@ -1837,7 +1835,7 @@ use module_wrf_error
              sftot=sftot+ss(iz_u)*bs(id)
             endif
            enddo
-           dlg(iz)=dlg(iz)+dlgtmp/sftot/nd
+           dlg(iz)=dlg(iz)+dlgtmp/sftot/ndi
          enddo
          dlg(iz)=1./dlg(iz)
         enddo
@@ -1849,7 +1847,7 @@ use module_wrf_error
 ! ===6=8===============================================================72   
 
       subroutine shadow_mas(nd,nz_u,zr,deltar,ah,drst,ws,ss,pb,z,         &
-                           nz_ui,                                         &
+                           ndi, nz_ui,                                         &
                            rs,rsw,rsg)
         
 ! ----------------------------------------------------------------------
@@ -1864,22 +1862,22 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
       integer nd                ! Number of street direction for the current urban class
       integer nz_u              ! number of vertical layers defined in the urban grid
-      INTEGER, INTENT(in)                                :: nz_ui
+      INTEGER, INTENT(in)                                :: ndi, nz_ui
       real ah                   ! Hour angle (it should come from the radiation routine)
       real deltar               ! Declination of the sun
-      real drst(nd)            ! street directions for the current urban class
+      real drst(ndi)            ! street directions for the current urban class
       real rs                   ! solar radiation
       real ss(nz_ui)          ! probability to have a building with height h
       real pb(nz_ui)          ! Probability that a building has an height greater or equal to h
-      real ws(nd)              ! Street width of the current urban class
+      real ws(ndi)              ! Street width of the current urban class
       real z(nz_ui)           ! Height of the urban grid levels
       real zr                   ! zenith angle
 
 ! ----------------------------------------------------------------------
 ! OUTPUT:
 ! ----------------------------------------------------------------------
-      real rsg(nd)             ! Short wave radiation at the ground
-      real rsw(2*nd,nz_ui)     ! Short wave radiation at the walls
+      real rsg(ndi)             ! Short wave radiation at the ground
+      real rsw(2*ndi,nz_ui)     ! Short wave radiation at the walls
 
 ! ----------------------------------------------------------------------
 ! LOCAL:
@@ -1892,7 +1890,7 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
 
       if(rs.eq.0.or.sin(zr).eq.1)then
-         do id=1,nd
+         do id=1,ndi
             rsg(id)=0.
             do iz=1,nz_ui
                rsw(2*id-1,iz)=0.
@@ -1919,7 +1917,7 @@ use module_wrf_error
 
          phix=zr
            
-         do id=1,nd
+         do id=1,ndi
         
             rsg(id)=0.
            
@@ -2028,7 +2026,7 @@ use module_wrf_error
 ! ===6=8===============================================================72     
 
       subroutine long_rad(iurb,nz_u,id,emw,emg,                   &
-                         nurbi, nz_ui, nd, ng_u, nwr_u,           &
+                         nurbi, nz_ui, ndi, ng_u, nwr_u,           &
                          fwg,fww,fgw,fsw,fsg,tg,tw,rlg,rlw,rl,pb)
 
 ! ----------------------------------------------------------------------
@@ -2049,26 +2047,26 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
       real emg                        ! Emissivity of ground for the current urban class
       real emw                        ! Emissivity of wall for the current urban class
-      INTEGER, INTENT(in)                                :: nurbi, nz_ui, nd, ng_u, nwr_u
-      real fgw(nz_ui,nd,nurbi)       ! View factors from ground to wall
-      real fsg(nd,nurbi)             ! View factors from sky to ground
-      real fsw(nz_ui,nd,nurbi)       ! View factors from sky to wall
-      real fwg(nz_ui,nd,nurbi)       ! View factors from wall to ground
-      real fww(nz_ui,nz_ui,nd,nurbi) ! View factors from wall to wall
+      INTEGER, INTENT(in)                                :: nurbi, nz_ui, ndi, ng_u, nwr_u
+      real fgw(nz_ui,ndi,nurbi)       ! View factors from ground to wall
+      real fsg(ndi,nurbi)             ! View factors from sky to ground
+      real fsw(nz_ui,ndi,nurbi)       ! View factors from sky to wall
+      real fwg(nz_ui,ndi,nurbi)       ! View factors from wall to ground
+      real fww(nz_ui,nz_ui,ndi,nurbi) ! View factors from wall to wall
       integer id                      ! Current street direction
       integer iurb                    ! Current urban class
       integer nz_u                    ! Number of layer in the urban grid
       real pb(nz_ui)                ! Probability to have a building with an height equal
       real rl                         ! Downward flux of the longwave radiation
-      real tg(nd,ng_u)               ! Temperature in each layer of the ground [K]
-      real tw(2*nd,nz_ui,nwr_u)       ! Temperature in each layer of the wall [K]
+      real tg(ndi,ng_u)               ! Temperature in each layer of the ground [K]
+      real tw(2*ndi,nz_ui,nwr_u)       ! Temperature in each layer of the wall [K]
       
 
 ! ----------------------------------------------------------------------
 ! OUTPUT:
 ! ----------------------------------------------------------------------
-      real rlg(nd)                   ! Long wave radiation at the ground
-      real rlw(2*nd,nz_ui)           ! Long wave radiation at the walls
+      real rlg(ndi)                   ! Long wave radiation at the ground
+      real rlw(2*ndi,nz_ui)           ! Long wave radiation at the walls
 
 ! ----------------------------------------------------------------------
 ! LOCAL:
@@ -2176,7 +2174,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 
        subroutine short_rad(iurb,nz_u,id,albw,                         & 
-                           nurbi, nz_ui, nd, ng_u,                     &
+                           nurbi, nz_ui, ndi, ng_u,                    &
                            albg,fwg,fww,fgw,rsg,rsw,pb)
 
 ! ----------------------------------------------------------------------
@@ -2197,10 +2195,10 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
       real albg                 ! Albedo of the ground for the current urban class
       real albw                 ! Albedo of the wall for the current urban class
-      INTEGER, INTENT(in)                                :: nurbi, nz_ui, nd, ng_u
-      real fgw(nz_ui,nd,nurbi)       ! View factors from ground to wall
-      real fwg(nz_ui,nd,nurbi)       ! View factors from wall to ground
-      real fww(nz_ui,nz_ui,nd,nurbi) ! View factors from wall to wall
+      INTEGER, INTENT(in)                                :: nurbi, nz_ui, ndi, ng_u
+      real fgw(nz_ui,ndi,nurbi)       ! View factors from ground to wall
+      real fwg(nz_ui,ndi,nurbi)       ! View factors from wall to ground
+      real fww(nz_ui,nz_ui,ndi,nurbi) ! View factors from wall to wall
       integer id                ! current street direction 
       integer iurb              ! current urban class
       integer nz_u              ! Number of layer in the urban grid
@@ -2209,8 +2207,8 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
 ! OUTPUT:
 ! ----------------------------------------------------------------------
-      real rsg(nd)             ! Short wave radiation at the ground
-      real rsw(2*nd,nz_ui)     ! Short wave radiation at the walls
+      real rsg(ndi)             ! Short wave radiation at the ground
+      real rsw(2*ndi,nz_ui)     ! Short wave radiation at the walls
 
 ! ----------------------------------------------------------------------
 ! LOCAL:
@@ -2744,11 +2742,11 @@ use module_wrf_error
 ! ===6=8===============================================================72
 
       subroutine icBEP (nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u,            &                               
-                      nurbi, nz_ui, dz_u)
+                      nurbi, ndi, nz_ui, dz_u)
 
       implicit none       
         
-      INTEGER, INTENT(in)                                :: nurbi, nz_ui
+      INTEGER, INTENT(in)                                :: nurbi, ndi, nz_ui
       REAL, INTENT(in)                                   :: dz_u
 
 !    Street parameters
@@ -2850,7 +2848,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 
       subroutine view_factors(iurb,nz_u,id,dxy,z,ws,fww,fwg,fgw,fsg,fsw,fws,   &
-                      nurbi, nz_ui, nd)
+                      nurbi, nz_ui, ndi)
      
       implicit none 
 
@@ -2861,7 +2859,7 @@ use module_wrf_error
       integer iurb            ! Number of the urban class
       integer nz_u            ! Number of levels in the urban grid
       integer id              ! Street direction number
-      INTEGER, INTENT(in)                                :: nurbi, nz_ui, nd
+      INTEGER, INTENT(in)                                :: nurbi, nz_ui, ndi
       real ws                 ! Street width
       real z(nz_ui)         ! Height of the urban grid levels
       real dxy                ! Street lenght
@@ -2874,12 +2872,12 @@ use module_wrf_error
 !   and the short wave radation. They are the part of radiation from a surface
 !   or from the sky to another surface.
 
-      real fww(nz_ui,nz_ui,nd,nurbi)            !  from wall to wall
-      real fwg(nz_ui,nd,nurbi)                  !  from wall to ground
-      real fgw(nz_ui,nd,nurbi)                  !  from ground to wall
-      real fsw(nz_ui,nd,nurbi)                  !  from sky to wall
-      real fws(nz_ui,nd,nurbi)                  !  from wall to sky
-      real fsg(nd,nurbi)                        !  from sky to ground
+      real fww(nz_ui,nz_ui,ndi,nurbi)            !  from wall to wall
+      real fwg(nz_ui,ndi,nurbi)                  !  from wall to ground
+      real fgw(nz_ui,ndi,nurbi)                  !  from ground to wall
+      real fsw(nz_ui,ndi,nurbi)                  !  from sky to wall
+      real fws(nz_ui,ndi,nurbi)                  !  from wall to sky
+      real fsg(ndi,nurbi)                        !  from sky to ground
 
 
 ! -----------------------------------------------------------------------
@@ -3069,7 +3067,7 @@ use module_wrf_error
   ! ===6=8===============================================================72  
      
       SUBROUTINE init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,        &
-                nurbi, nz_ui, nd,                                         &
+                nurbi, nz_ui, ndi,                                        &
                 twini_u,trini_u,tgini_u,albg_u,albw_u,albr_u,emg_u,emw_u, &
                 emr_u,z0g_u,z0r_u,nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b)
 
@@ -3078,7 +3076,7 @@ use module_wrf_error
       implicit none
       
       integer iurb            ! urban class number
-      INTEGER, INTENT(in)                                :: nurbi, nz_ui, nd
+      INTEGER, INTENT(in)                                :: nurbi, nz_ui, ndi
 
 !    Building parameters      
       real alag_u(nurbi)      ! Ground thermal diffusivity [m^2 s^-1]
@@ -3106,10 +3104,10 @@ use module_wrf_error
 !    Street parameters
       integer nd_u(nurbi)     ! Number of street direction for each urban class
 
-      real strd_u(nd,nurbi)  ! Street length (fix to greater value to the horizontal length of the cells)
-      real drst_u(nd,nurbi)  ! Street direction [degree]
-      real ws_u(nd,nurbi)    ! Street width [m]
-      real bs_u(nd,nurbi)    ! Building width [m]
+      real strd_u(ndi,nurbi)  ! Street length (fix to greater value to the horizontal length of the cells)
+      real drst_u(ndi,nurbi)  ! Street direction [degree]
+      real ws_u(ndi,nurbi)    ! Street width [m]
+      real bs_u(ndi,nurbi)    ! Building width [m]
       real h_b(nz_ui,nurbi)   ! Bulding's heights [m]
       real d_b(nz_ui,nurbi)   ! The probability that a building has an height h_b
 
@@ -3149,7 +3147,7 @@ use module_wrf_error
        z0g_u=Z0G_TBL
        nd_u=NUMDIR_TBL
        do iu=1,icate
-              if(nd.lt.nd_u(iu))then
+              if(ndi.lt.nd_u(iu))then
                 write(*,*)'num_urban_nd too small in module_sf_bep, please increase to at least ',    &
                   nd_u(iu)
                 write(*,*)'remember also that urban_map_zrd should be equal or greater than ' //      &
@@ -3176,7 +3174,7 @@ use module_wrf_error
          enddo
        enddo
 
-       do i=1,nd
+       do i=1,ndi
         do iu=1,nurbi
          strd_u(i,iu)=100000.
         enddo
@@ -3269,7 +3267,7 @@ use module_wrf_error
 !====6=8===============================================================72 
 
       subroutine upward_rad(ndu,nzu,ws,bs,sigma,pb,ss,                     &
-                       nd, nz_ui, ng_u, nwr_u, dz_u,                       &
+                       ndi, nz_ui, ng_u, nwr_u, dz_u,                      &
                        tg,emg_u,albg_u,rlg,rsg,sfg,                        & 
                        tw,emw_u,albw_u,rlw,rsw,sfw,                        & 
                        tr,emr_u,albr_u,rld,rs, sfr,                        & 
@@ -3283,23 +3281,23 @@ use module_wrf_error
 !
 !INPUT VARIABLES
 !
-      INTEGER, INTENT(in)                                            :: nd, nz_ui, ng_u, nwr_u
+      INTEGER, INTENT(in)                                            :: ndi, nz_ui, ng_u, nwr_u
       REAL, INTENT(in)                                               :: dz_u
 
-      real rsw(2*nd,nz_ui)        ! Short wave radiation at the wall for a given canyon direction [W/m2]
-      real rlw(2*nd,nz_ui)         ! Long wave radiation at the walls for a given canyon direction [W/m2]
-      real rsg(nd)                   ! Short wave radiation at the canyon for a given canyon direction [W/m2]
-      real rlg(nd)                   ! Long wave radiation at the ground for a given canyon direction [W/m2]
+      real rsw(2*ndi,nz_ui)        ! Short wave radiation at the wall for a given canyon direction [W/m2]
+      real rlw(2*ndi,nz_ui)         ! Long wave radiation at the walls for a given canyon direction [W/m2]
+      real rsg(ndi)                   ! Short wave radiation at the canyon for a given canyon direction [W/m2]
+      real rlg(ndi)                   ! Long wave radiation at the ground for a given canyon direction [W/m2]
       real rs                        ! Short wave radiation at the horizontal surface from the sun [W/m2]  
-      real sfw(2*nd,nz_ui)      ! Sensible heat flux from walls [W/m2]
-      real sfg(nd)              ! Sensible heat flux from ground (road) [W/m2]
-      real sfr(nd,nz_ui)      ! Sensible heat flux from roofs [W/m2]                      
+      real sfw(2*ndi,nz_ui)      ! Sensible heat flux from walls [W/m2]
+      real sfg(ndi)              ! Sensible heat flux from ground (road) [W/m2]
+      real sfr(ndi,nz_ui)      ! Sensible heat flux from roofs [W/m2]                      
       real rld                        ! Long wave radiation from the sky [W/m2]
       real albg_u                    ! albedo of the ground/street
       real albw_u                    ! albedo of the walls
       real albr_u                    ! albedo of the roof 
-      real ws(nd)                        ! width of the street
-      real bs(nd)
+      real ws(ndi)                        ! width of the street
+      real bs(ndi)
                         ! building size
       real pb(nz_ui)                ! Probability to have a building with an height equal or higher   
       integer nzu
@@ -3308,9 +3306,9 @@ use module_wrf_error
       real emg_u                       ! emissivity of the street
       real emw_u                       ! emissivity of the wall
       real emr_u                       ! emissivity of the roof
-      real tw(2*nd,nz_ui,nwr_u)  ! Temperature in each layer of the wall [K]
-      real tr(nd,nz_ui,nwr_u)  ! Temperature in each layer of the roof [K]
-      real tg(nd,ng_u)          ! Temperature in each layer of the ground [K]
+      real tw(2*ndi,nz_ui,nwr_u)  ! Temperature in each layer of the wall [K]
+      real tr(ndi,nz_ui,nwr_u)  ! Temperature in each layer of the roof [K]
+      real tg(ndi,ng_u)          ! Temperature in each layer of the ground [K]
       integer id ! street direction
       integer ndu ! number of street directions
 !OUTPUT/INPUT
@@ -3326,7 +3324,7 @@ use module_wrf_error
 
          iwrong=1
       do iz=1,nzu+1
-      do id=1,ndu
+      do id=1,ndi
       do iw=1,nwr_u
         if(tr(id,iz,iw).lt.100.)then
               write(*,*)'in upward_rad ',iz,id,iw,tr(id,iz,iw) 
@@ -3343,7 +3341,7 @@ use module_wrf_error
       enddo
       enddo
       enddo
-      do id=1,ndu
+      do id=1,ndi
       do iw=1,ng_u
           if(tg(id,iw).lt.100.) then
             write(*,*)'in upward_rad ',id,iw,tg(id,iw) 
@@ -3360,29 +3358,29 @@ use module_wrf_error
       emiss=0.
       rl_emit=0.
       grdflx_urb=0.
-      do id=1,ndu          
-       rl_emit=rl_emit-( emg_u*sigma*(tg(id,ng_u)**4.)+(1-emg_u)*rlg(id))*ws(id)/(ws(id)+bs(id))/ndu
-       rl_inc=rl_inc+rlg(id)*ws(id)/(ws(id)+bs(id))/ndu       
-       rs_abs=rs_abs+(1.-albg_u)*rsg(id)*ws(id)/(ws(id)+bs(id))/ndu
+      do id=1,ndi          
+       rl_emit=rl_emit-( emg_u*sigma*(tg(id,ng_u)**4.)+(1-emg_u)*rlg(id))*ws(id)/(ws(id)+bs(id))/ndi
+       rl_inc=rl_inc+rlg(id)*ws(id)/(ws(id)+bs(id))/ndi
+       rs_abs=rs_abs+(1.-albg_u)*rsg(id)*ws(id)/(ws(id)+bs(id))/ndi
          gfl=(1.-albg_u)*rsg(id)+emg_u*rlg(id)-emg_u*sigma*(tg(id,ng_u)**4.)+sfg(id)
-         grdflx_urb=grdflx_urb-gfl*ws(id)/(ws(id)+bs(id))/ndu  
+         grdflx_urb=grdflx_urb-gfl*ws(id)/(ws(id)+bs(id))/ndi
  
           do iz=2,nzu
-            rl_emit=rl_emit-(emr_u*sigma*(tr(id,iz,nwr_u)**4.)+(1-emr_u)*rld)*ss(iz)*bs(id)/(ws(id)+bs(id))/ndu
-            rl_inc=rl_inc+rld*ss(iz)*bs(id)/(ws(id)+bs(id))/ndu            
-            rs_abs=rs_abs+(1.-albr_u)*rs*ss(iz)*bs(id)/(ws(id)+bs(id))/ndu
+            rl_emit=rl_emit-(emr_u*sigma*(tr(id,iz,nwr_u)**4.)+(1-emr_u)*rld)*ss(iz)*bs(id)/(ws(id)+bs(id))/ndi
+            rl_inc=rl_inc+rld*ss(iz)*bs(id)/(ws(id)+bs(id))/ndi
+            rs_abs=rs_abs+(1.-albr_u)*rs*ss(iz)*bs(id)/(ws(id)+bs(id))/ndi
             gfl=(1.-albr_u)*rs+emr_u*rld-emr_u*sigma*(tr(id,iz,nwr_u)**4.)+sfr(id,iz)
-            grdflx_urb=grdflx_urb-gfl*ss(iz)*bs(id)/(ws(id)+bs(id))/ndu
+            grdflx_urb=grdflx_urb-gfl*ss(iz)*bs(id)/(ws(id)+bs(id))/ndi
          enddo
            
          do iz=1,nzu            
             rl_emit=rl_emit-(emw_u*sigma*( tw(2*id-1,iz,nwr_u)**4.+tw(2*id,iz,nwr_u)**4. )+          &
-               (1-emw_u)*( rlw(2*id-1,iz)+rlw(2*id,iz) ) )*dz_u*pb(iz+1)/(ws(id)+bs(id))/ndu
-            rl_inc=rl_inc+(( rlw(2*id-1,iz)+rlw(2*id,iz) ) )*dz_u*pb(iz+1)/(ws(id)+bs(id))/ndu
-            rs_abs=rs_abs+((1.-albw_u)*( rsw(2*id-1,iz)+rsw(2*id,iz) ) )*dz_u*pb(iz+1)/(ws(id)+bs(id))/ndu 
+               (1-emw_u)*( rlw(2*id-1,iz)+rlw(2*id,iz) ) )*dz_u*pb(iz+1)/(ws(id)+bs(id))/ndi
+            rl_inc=rl_inc+(( rlw(2*id-1,iz)+rlw(2*id,iz) ) )*dz_u*pb(iz+1)/(ws(id)+bs(id))/ndi
+            rs_abs=rs_abs+((1.-albw_u)*( rsw(2*id-1,iz)+rsw(2*id,iz) ) )*dz_u*pb(iz+1)/(ws(id)+bs(id))/ndi
             gfl=(1.-albw_u)*(rsw(2*id-1,iz)+rsw(2*id,iz)) +emw_u*( rlw(2*id-1,iz)+rlw(2*id,iz) )   &
              -emw_u*sigma*( tw(2*id-1,iz,nwr_u)**4.+tw(2*id,iz,nwr_u)**4. )+(sfw(2*id-1,iz)+sfw(2*id,iz))            
-            grdflx_urb=grdflx_urb-gfl*dz_u*pb(iz+1)/(ws(id)+bs(id))/ndu
+            grdflx_urb=grdflx_urb-gfl*dz_u*pb(iz+1)/(ws(id)+bs(id))/ndi
          enddo
           
       enddo
@@ -3398,7 +3396,7 @@ use module_wrf_error
 !====6=8===============================================================72 
 
       subroutine icBEP_XY(iurb,fww_u,fwg_u,fgw_u,fsw_u,             &
-                          nurbi, nd, nz_ui,                          &
+                          nurbi, ndi, nz_ui,                          &
                           fws_u,fsg_u,ndu,strd,ws,nzu,z_u)                               
 
       implicit none       
@@ -3407,10 +3405,10 @@ use module_wrf_error
       integer ndu     ! Number of street direction for each urban class
       integer iurb
 
-      INTEGER, INTENT(in)                                            :: nurbi, nd, nz_ui
+      INTEGER, INTENT(in)                                            :: nurbi, ndi, nz_ui
 
-      real strd(nd)        ! Street length (fix to greater value to the horizontal length of the cells)
-      real ws(nd)          ! Street width [m]
+      real strd(ndi)        ! Street length (fix to greater value to the horizontal length of the cells)
+      real ws(ndi)          ! Street width [m]
 
 !    Grid parameters
       integer nzu          ! Number of layer in the urban grid
@@ -3423,12 +3421,12 @@ use module_wrf_error
 !   and the short wave radation. They are the part of radiation from a surface
 !   or from the sky to another surface.
 
-      real fww_u(nz_ui,nz_ui,nd,nurbi)         !  from wall to wall
-      real fwg_u(nz_ui,nd,nurbi)               !  from wall to ground
-      real fgw_u(nz_ui,nd,nurbi)               !  from ground to wall
-      real fsw_u(nz_ui,nd,nurbi)               !  from sky to wall
-      real fws_u(nz_ui,nd,nurbi)               !  from sky to wall
-      real fsg_u(nd,nurbi)                     !  from sky to ground
+      real fww_u(nz_ui,nz_ui,ndi,nurbi)         !  from wall to wall
+      real fwg_u(nz_ui,ndi,nurbi)               !  from wall to ground
+      real fgw_u(nz_ui,ndi,nurbi)               !  from ground to wall
+      real fsw_u(nz_ui,ndi,nurbi)               !  from sky to wall
+      real fws_u(nz_ui,ndi,nurbi)               !  from sky to wall
+      real fsg_u(ndi,nurbi)                     !  from sky to ground
 
 ! -----------------------------------------------------------------------
 !     Local
@@ -3449,11 +3447,11 @@ use module_wrf_error
       fws_u=0.
       fsg_u=0.
       
-      do id=1,ndu
+      do id=1,ndi
 
             call view_factors(iurb,nzu,id,strd(id),z_u,ws(id),     &
                               fww_u,fwg_u,fgw_u,fsg_u,fsw_u,fws_u, &
-                              nurbi, nz_ui, nd)
+                              nurbi, nz_ui, ndi)
       
       enddo               
 
@@ -3465,7 +3463,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 
       subroutine icBEPHI_XY(hb_u,hi_urb1D,ss_u,pb_u,nzu,z_u,                                          &
-                      nd, nz_ui, dz_u)
+                      ndi, nz_ui, dz_u)
 
       implicit none   
 !-----------------------------------------------------------------------
@@ -3473,7 +3471,7 @@ use module_wrf_error
 !-----------------------------------------------------------------------
 !    Street parameters
 !
-      INTEGER, INTENT(in)                                :: nd, nz_ui
+      INTEGER, INTENT(in)                                :: ndi, nz_ui
       REAL, INTENT(in)                                   :: dz_u
 
       real hi_urb1D(nz_ui)    ! The probability that a building has an height h_b
