@@ -394,7 +394,7 @@ use module_wrf_error
 !      Initialisation of the urban parameters and calculation of the view factors
              
          call icBEP (nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u,                    &
-                      nurbi, nz_ui, dz_u)
+                      nurbi, ndi, nz_ui, dz_u)
 
          first=.false.
 
@@ -520,7 +520,7 @@ use module_wrf_error
 #ifdef URBANSTATE
                    ua_u1D, va_u1D, pt_u1D, da_u1D, pt0_u1D, pr_u1D, &
 #endif
-                   nurbi, nd, nz_ui, ng_u, nwr_u, dz_u,              &
+                   nurbi, ndi, nz_ui, ng_u, nwr_u, dz_u,            &
                    dlg1D,dl_u1D,sf1D,vl1D,rl_up(ix,iy),             &
                    rs_abs(ix,iy),emiss(ix,iy),grdflx_urb(ix,iy))                            
 !        write(*,*) 'salgo de BEP1D'
@@ -864,7 +864,7 @@ use module_wrf_error
 
       call modif_rad(iurb,ndu,nzu,z_u,ws,               &
                     drst,strd,ss,pb,                    &
-                    nurbi, nz_ui, ng_u, nwr_u,          &
+                    nurbi, ndi, nz_ui, ng_u, nwr_u,     &
                     tw,tg,albg,albw,emw,emg,            &
                     fww,fwg,fgw,fsw,fsg,                &
                     zr,deltar,ah,                       &
@@ -885,7 +885,7 @@ use module_wrf_error
 
       call surf_temp(nzu,ndu,pr_u,dt,ss,                & 
                     rs,rld,rsg,rlg,rsw,rlw,             &
-                    nz_ui, ng_u, nwr_u,                 &
+                    ndi, nz_ui, ng_u, nwr_u,            &
                     tg,alag,csg,emg,albg,ptg,sfg,gfg,   &
                     tr,alar,csr,emr,albr,ptr,sfr,gfr,   &
                     tw,alaw,csw,emw,albw,ptw,sfw,gfw)  
@@ -895,7 +895,7 @@ use module_wrf_error
        
       call buildings(ndu,nzu,z0,ua_u,va_u,                       & 
                      pt_u,pt0_u,                                 &
-                     nz_ui, dz_u,                                &
+                     ndi, nz_ui, dz_u,                           &
                      ptg,ptr,da_u,ptw,drst,                      &                      
                      uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,  & 
                      uhb_u,vhb_u,thb_u,ehb_u,ss,dt)                        
@@ -934,7 +934,7 @@ use module_wrf_error
 
       call urban_meso(ndu,kms,kme,kts,kte,nzu,z,dz,z_u,pb,ss,bs,ws,sf, & 
                      vl,                                               &
-                     nz_ui,                                            &
+                     ndi, nz_ui,                                       &
                      uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,        &
                      uhb_u,vhb_u,thb_u,ehb_u,                          &
                      a_u,a_v,a_t,a_e,b_u,b_v,b_t,b_e)                    
@@ -945,8 +945,8 @@ use module_wrf_error
 
 ! Calculation of the length scale taking into account the buildings effects
 
-      call interp_length(ndu,kms,kme,kts,kte,nzu,z_u,z,ss,ws,bs,      &
-        nz_ui,                                                        &
+      call interp_length(ndu,kms,kme,kts,kte,nzu,z_u,z,ss,ws,bs,       &
+        ndi, nz_ui,                                                    &
         dlg,dl_u)
 
       return
@@ -1241,7 +1241,8 @@ use module_wrf_error
 !  Calculation of the shadow effects
 
       call shadow_mas(nd,nz_u,zr,deltar,ah,drst,ws,ss,pb,z,           &
-                     ndi,nz_ui,                                       &                     rs,rsw,rsg)
+                     ndi, nz_ui,                                      &
+                     rs,rsw,rsg)
 
 ! Calculation of the reflection effects          
       do id=1,nd
