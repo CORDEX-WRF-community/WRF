@@ -822,17 +822,17 @@ use module_wrf_error
 ! The fluxes can be computed as follow: Fluxes of X = A*X + B
 !  Example: Momentum fluxes on vertical surfaces = uva_u * ua_u + uvb_u
 
-      real uhb_u(nd,nz_ui)   ! U (wind component) Horizontal surfaces, B (explicit) term
-      real uva_u(2*nd,nz_ui)   ! U (wind component)   Vertical surfaces, A (implicit) term
-      real uvb_u(2*nd,nz_ui)   ! U (wind component)   Vertical surfaces, B (explicit) term
-      real vhb_u(nd,nz_ui)   ! V (wind component) Horizontal surfaces, B (explicit) term
-      real vva_u(2*nd,nz_ui)   ! V (wind component)   Vertical surfaces, A (implicit) term
-      real vvb_u(2*nd,nz_ui)   ! V (wind component)   Vertical surfaces, B (explicit) term
-      real thb_u(nd,nz_ui)   ! Temperature        Horizontal surfaces, B (explicit) term
-      real tva_u(2*nd,nz_ui)   ! Temperature          Vertical surfaces, A (implicit) term
-      real tvb_u(2*nd,nz_ui)   ! Temperature          Vertical surfaces, B (explicit) term
-      real ehb_u(nd,nz_ui)   ! Energy (TKE)       Horizontal surfaces, B (explicit) term
-      real evb_u(2*nd,nz_ui)   ! Energy (TKE)         Vertical surfaces, B (explicit) term
+      real uhb_u(ndi,nz_ui)   ! U (wind component) Horizontal surfaces, B (explicit) term
+      real uva_u(2*ndi,nz_ui)   ! U (wind component)   Vertical surfaces, A (implicit) term
+      real uvb_u(2*ndi,nz_ui)   ! U (wind component)   Vertical surfaces, B (explicit) term
+      real vhb_u(ndi,nz_ui)   ! V (wind component) Horizontal surfaces, B (explicit) term
+      real vva_u(2*ndi,nz_ui)   ! V (wind component)   Vertical surfaces, A (implicit) term
+      real vvb_u(2*ndi,nz_ui)   ! V (wind component)   Vertical surfaces, B (explicit) term
+      real thb_u(ndi,nz_ui)   ! Temperature        Horizontal surfaces, B (explicit) term
+      real tva_u(2*ndi,nz_ui)   ! Temperature          Vertical surfaces, A (implicit) term
+      real tvb_u(2*ndi,nz_ui)   ! Temperature          Vertical surfaces, B (explicit) term
+      real ehb_u(ndi,nz_ui)   ! Energy (TKE)       Horizontal surfaces, B (explicit) term
+      real evb_u(2*ndi,nz_ui)   ! Energy (TKE)         Vertical surfaces, B (explicit) term
       
 !
       real rs_abs ! solar radiation absorbed by urban surfaces 
@@ -956,7 +956,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 
        subroutine param(iurb,nzu,nzurb,nzurban,ndu,                   &
-                       nurbi, nd, nz_ui, ng_u, nwr_u,                 &
+                       nurbi, ndi, nz_ui, ng_u, nwr_u,                &
                        csg_u,csg,alag_u,alag,csr_u,csr,               &
                        alar_u,alar,csw_u,csw,alaw_u,alaw,             &
                        ws_u,ws,bs_u,bs,z0g_u,z0r_u,z0,                &  
@@ -981,13 +981,13 @@ use module_wrf_error
       real alag_u(nurbi)           ! Ground thermal diffusivity [m^2 s^-1]
       real alar_u(nurbi)           ! Roof thermal diffusivity [m^2 s^-1]
       real alaw_u(nurbi)           ! Wall thermal diffusivity [m^2 s^-1]
-      real bs_u(nd,nurbi)         ! Building width
+      real bs_u(ndi,nurbi)         ! Building width
       real csg_u(nurbi)            ! Specific heat of the ground material [J m^3 K^-1]
       real csr_u(nurbi)            ! Specific heat of the roof material [J m^3 K^-1]
       real csw_u(nurbi)            ! Specific heat of the wall material [J m^3 K^-1]
-      real drst_u(nd,nurbi)       ! Street direction
-      real strd_u(nd,nurbi)       ! Street length 
-      real ws_u(nd,nurbi)         ! Street width
+      real drst_u(ndi,nurbi)       ! Street direction
+      real strd_u(ndi,nurbi)       ! Street length 
+      real ws_u(ndi,nurbi)         ! Street width
       real z0g_u(nurbi)            ! The ground's roughness length
       real z0r_u(nurbi)            ! The roof's roughness length
       real ss_u(nz_ui,nurbi)     ! The probability that a building has an height equal to "z"
@@ -1008,11 +1008,11 @@ use module_wrf_error
       real csg(ng_u)            ! Specific heat of the ground material at each ground levels
       real csr(nwr_u)            ! Specific heat of the roof material at each roof levels
       real csw(nwr_u)            ! Specific heat of the wall material at each wall levels
-      real bs(nd)              ! Building width for the current urban class
-      real drst(nd)            ! street directions for the current urban class
-      real strd(nd)            ! Street lengths for the current urban class
-      real ws(nd)              ! Street widths of the current urban class
-      real z0(nd,nz_ui)      ! Roughness lengths "profiles"
+      real bs(ndi)              ! Building width for the current urban class
+      real drst(ndi)            ! street directions for the current urban class
+      real strd(ndi)            ! Street lengths for the current urban class
+      real ws(ndi)              ! Street widths of the current urban class
+      real z0(ndi,nz_ui)      ! Roughness lengths "profiles"
       real ss(nz_ui)          ! Probability to have a building with height h
       real pb(nz_ui)          ! Probability to have a building with an height equal
       integer nzurban
@@ -1207,7 +1207,7 @@ use module_wrf_error
       real strd(nd)            ! Street lengths for the current urban class
       real ss(nz_ui)          ! probability to have a building with height h
       real pb(nz_ui)          ! probability to have a building with an height equal
-      real tw(2*nd,nz_u,nwr_u) ! Temperature in each layer of the wall [K]
+      real tw(2*nd,nz_ui,nwr_u) ! Temperature in each layer of the wall [K]
       real tg(nd,ng_u)         ! Temperature in each layer of the ground [K]
       real albg                 ! Albedo of the ground for the current urban class
       real albw                 ! Albedo of the wall for the current urban class
@@ -1382,7 +1382,7 @@ use module_wrf_error
 
 !      Calculation for the roofs surfaces
          
-       do iz=2,nz_u
+       do iz=2,nz_ui
             
         if(ss(iz).gt.0.)then
          do ir=1,nwr_u        
@@ -1402,7 +1402,7 @@ use module_wrf_error
 
 !      Calculation for the walls surfaces
          
-       do iz=1,nz_u
+       do iz=1,nz_ui
             
         do iw=1,nwr_u        
          tw_tmp(iw)=tw(2*id-1,iz,iw)
@@ -1655,7 +1655,7 @@ use module_wrf_error
       do id=1,nd      
          do iz=kts+1,kte+1
             sr=0.
-            do iz_u=2,nz_u
+            do iz_u=2,nz_ui
                if(z(iz).lt.z_u(iz_u).and.z(iz).ge.z_u(iz_u-1))then
                   sr=pb(iz_u)
                endif
@@ -1668,7 +1668,7 @@ use module_wrf_error
       do iz=kts,kte
          do id=1,nd
             vtot=0.
-            do iz_u=1,nz_u
+            do iz_u=1,nz_ui
                dzz=max(min(z_u(iz_u+1),z(iz+1))-max(z_u(iz_u),z(iz)),0.)
                vtot=vtot+pb(iz_u+1)*dzz
             enddo
@@ -1692,7 +1692,7 @@ use module_wrf_error
             su=0.
             sv=0.
             se=0.
-            do iz_u=2,nz_u
+            do iz_u=2,nz_ui
                if(z(iz).le.z_u(iz_u).and.z(iz+1).gt.z_u(iz_u))then
                   st=st+ss(iz_u)*thb_u(id,iz_u)
                   su=su+ss(iz_u)*uhb_u(id,iz_u)
@@ -1722,7 +1722,7 @@ use module_wrf_error
             vvb=0.
             veb=0.
 	    vte=0.
-            do iz_u=1,nz_u
+            do iz_u=1,nz_ui
                dzz=max(min(z_u(iz_u+1),z(iz+1))-max(z_u(iz_u),z(iz)),0.)
                fact=dzz/(ws(id)+bs(id))
                vtb=vtb+pb(iz_u+1)*                                  &        
@@ -1809,7 +1809,7 @@ use module_wrf_error
          ulu=0.
          ssl=0.
          do id=1,nd        
-          do iz_u=2,nz_u
+          do iz_u=2,nz_ui
            if(z_u(iz_u).gt.z(iz))then
             ulu=ulu+ss(iz_u)/z_u(iz_u)/nd
             ssl=ssl+ss(iz_u)/nd
@@ -1830,7 +1830,7 @@ use module_wrf_error
           do id=1,nd
            sftot=ws(id)  
            dlgtmp=ws(id)/((z(iz)+z(iz+1))/2.)
-           do iz_u=1,nz_u
+           do iz_u=1,nz_ui
             if((z(iz)+z(iz+1))/2..gt.z_u(iz_u))then
              dlgtmp=dlgtmp+ss(iz_u)*bs(id)/                           &                
                     ((z(iz)+z(iz+1))/2.-z_u(iz_u))
@@ -1894,7 +1894,7 @@ use module_wrf_error
       if(rs.eq.0.or.sin(zr).eq.1)then
          do id=1,nd
             rsg(id)=0.
-            do iz=1,nz_u
+            do iz=1,nz_ui
                rsw(2*id-1,iz)=0.
                rsw(2*id,iz)=0.
             enddo
@@ -1926,11 +1926,11 @@ use module_wrf_error
             aae=bbb-drst(id)
             aaw=bbb-drst(id)+pi
                     
-            do iz=1,nz_u
+            do iz=1,nz_ui
                rsw(2*id-1,iz)=0.
                rsw(2*id,iz)=0.          
             if(pb(iz+1).gt.0.)then           
-               do jz=1,nz_u                    
+               do jz=1,nz_ui                    
                 if(abs(sin(aae)).gt.1.e-10)then
                   call shade_wall(z(iz),z(iz+1),z(jz+1),phix,aae,   &    
                       ws(id),rd)                  
@@ -1948,13 +1948,13 @@ use module_wrf_error
         if(abs(sin(aae)).gt.1.e-10)then
             wsd=abs(ws(id)/sin(aae))
               
-            do jz=1,nz_u           
+            do jz=1,nz_ui           
                rd=max(0.,wsd-z(jz+1)*tan(phix))
                rsg(id)=rsg(id)+rs*rd*ss(jz+1)/wsd          
             enddo
             rtot=0.
            
-            do iz=1,nz_u
+            do iz=1,nz_ui
                rtot=rtot+(rsw(2*id,iz)+rsw(2*id-1,iz))*            &
                          (z(iz+1)-z(iz))
             enddo
@@ -2084,23 +2084,23 @@ use module_wrf_error
 
 ! west wall
        
-      do i=1,nz_u
+      do i=1,nz_ui
         
-        do j=1,nz_u
+        do j=1,nz_ui
          aaa(i,j)=0.
         enddo
         
         aaa(i,i)=1.        
        
-        do j=nz_u+1,2*nz_u
-         aaa(i,j)=-(1.-emw)*fww(j-nz_u,i,id,iurb)*pb(j-nz_u+1)
+        do j=nz_ui+1,2*nz_ui
+         aaa(i,j)=-(1.-emw)*fww(j-nz_ui,i,id,iurb)*pb(j-nz_ui+1)
         enddo
         
-!!      aaa(i,2*nz_u+1)=-(1.-emg)*fgw(i,id,iurb)*pb(i+1)
-        aaa(i,2*nz_u+1)=-(1.-emg)*fgw(i,id,iurb)
+!!      aaa(i,2*nz_ui+1)=-(1.-emg)*fgw(i,id,iurb)*pb(i+1)
+        aaa(i,2*nz_ui+1)=-(1.-emg)*fgw(i,id,iurb)
         
         bbb(i)=fsw(i,id,iurb)*rl+emg*fgw(i,id,iurb)*sigma*tg(id,ng_u)**4
-        do j=1,nz_u
+        do j=1,nz_ui
          bbb(i)=bbb(i)+pb(j+1)*emw*sigma*fww(j,i,id,iurb)*       &
                tw(2*id,j,nwr_u)**4+                              &
                fww(j,i,id,iurb)*rl*(1.-pb(j+1))
@@ -2110,64 +2110,64 @@ use module_wrf_error
        
 ! east wall
 
-       do i=1+nz_u,2*nz_u
+       do i=1+nz_ui,2*nz_ui
         
-        do j=1,nz_u
-         aaa(i,j)=-(1.-emw)*fww(j,i-nz_u,id,iurb)*pb(j+1)
+        do j=1,nz_ui
+         aaa(i,j)=-(1.-emw)*fww(j,i-nz_ui,id,iurb)*pb(j+1)
         enddo
         
-        do j=1+nz_u,2*nz_u
+        do j=1+nz_ui,2*nz_ui
          aaa(i,j)=0.
         enddo
         
         aaa(i,i)=1.
         
-!!      aaa(i,2*nz_u+1)=-(1.-emg)*fgw(i-nz_u,id,iurb)*pb(i-nz_u+1)
-        aaa(i,2*nz_u+1)=-(1.-emg)*fgw(i-nz_u,id,iurb)
+!!      aaa(i,2*nz_ui+1)=-(1.-emg)*fgw(i-nz_ui,id,iurb)*pb(i-nz_ui+1)
+        aaa(i,2*nz_ui+1)=-(1.-emg)*fgw(i-nz_ui,id,iurb)
         
-        bbb(i)=fsw(i-nz_u,id,iurb)*rl+                           &     
-              emg*fgw(i-nz_u,id,iurb)*sigma*tg(id,ng_u)**4
+        bbb(i)=fsw(i-nz_ui,id,iurb)*rl+                           &     
+              emg*fgw(i-nz_ui,id,iurb)*sigma*tg(id,ng_u)**4
 
-        do j=1,nz_u
-         bbb(i)=bbb(i)+pb(j+1)*emw*sigma*fww(j,i-nz_u,id,iurb)*  &   
+        do j=1,nz_ui
+         bbb(i)=bbb(i)+pb(j+1)*emw*sigma*fww(j,i-nz_ui,id,iurb)*  &   
                 tw(2*id-1,j,nwr_u)**4+                           &   
-                fww(j,i-nz_u,id,iurb)*rl*(1.-pb(j+1))
+                fww(j,i-nz_ui,id,iurb)*rl*(1.-pb(j+1))
         enddo
        
        enddo
 
 ! ground
-       do j=1,nz_u
-        aaa(2*nz_u+1,j)=-(1.-emw)*fwg(j,id,iurb)*pb(j+1)
+       do j=1,nz_ui
+        aaa(2*nz_ui+1,j)=-(1.-emw)*fwg(j,id,iurb)*pb(j+1)
        enddo
        
-       do j=nz_u+1,2*nz_u
-        aaa(2*nz_u+1,j)=-(1.-emw)*fwg(j-nz_u,id,iurb)*pb(j-nz_u+1)
+       do j=nz_ui+1,2*nz_ui
+        aaa(2*nz_ui+1,j)=-(1.-emw)*fwg(j-nz_ui,id,iurb)*pb(j-nz_ui+1)
        enddo
        
-       aaa(2*nz_u+1,2*nz_u+1)=1.
+       aaa(2*nz_ui+1,2*nz_ui+1)=1.
        
-       bbb(2*nz_u+1)=fsg(id,iurb)*rl
+       bbb(2*nz_ui+1)=fsg(id,iurb)*rl
        
-       do i=1,nz_u
-        bbb(2*nz_u+1)=bbb(2*nz_u+1)+emw*sigma*fwg(i,id,iurb)*pb(i+1)*    &
+       do i=1,nz_ui
+        bbb(2*nz_u+1)=bbb(2*nz_ui+1)+emw*sigma*fwg(i,id,iurb)*pb(i+1)*    &
                       (tw(2*id-1,i,nwr_u)**4+tw(2*id,i,nwr_u)**4)+       &
                       2.*fwg(i,id,iurb)*(1.-pb(i+1))*rl                  
        enddo
    
 
      
-       call gaussj(aaa,2*nz_u+1,bbb,2*nz_ui+1)
+       call gaussj(aaa,2*nz_ui+1,bbb,2*nz_ui+1)
 
-       do i=1,nz_u
+       do i=1,nz_ui
         rlw(2*id-1,i)=bbb(i)
        enddo
        
-       do i=nz_u+1,2*nz_u
-        rlw(2*id,i-nz_u)=bbb(i)
+       do i=nz_ui+1,2*nz_ui
+        rlw(2*id,i-nz_ui)=bbb(i)
        enddo
        
-       rlg(id)=bbb(2*nz_u+1)
+       rlg(id)=bbb(2*nz_ui+1)
   
        return
        end subroutine long_rad
@@ -2226,62 +2226,62 @@ use module_wrf_error
       
 ! west wall
        
-      do i=1,nz_u
-         do j=1,nz_u
+      do i=1,nz_ui
+         do j=1,nz_ui
             aaa(i,j)=0.
          enddo
          
          aaa(i,i)=1.        
          
-         do j=nz_u+1,2*nz_u
-            aaa(i,j)=-albw*fww(j-nz_u,i,id,iurb)*pb(j-nz_u+1)
+         do j=nz_ui+1,2*nz_ui
+            aaa(i,j)=-albw*fww(j-nz_ui,i,id,iurb)*pb(j-nz_ui+1)
          enddo
          
-         aaa(i,2*nz_u+1)=-albg*fgw(i,id,iurb)
+         aaa(i,2*nz_ui+1)=-albg*fgw(i,id,iurb)
          bbb(i)=rsw(2*id-1,i)
          
       enddo
        
 ! east wall
 
-      do i=1+nz_u,2*nz_u
-         do j=1,nz_u
-            aaa(i,j)=-albw*fww(j,i-nz_u,id,iurb)*pb(j+1)
+      do i=1+nz_ui,2*nz_ui
+         do j=1,nz_ui
+            aaa(i,j)=-albw*fww(j,i-nz_ui,id,iurb)*pb(j+1)
          enddo
          
-         do j=1+nz_u,2*nz_u
+         do j=1+nz_ui,2*nz_ui
             aaa(i,j)=0.
          enddo
          
         aaa(i,i)=1.
-        aaa(i,2*nz_u+1)=-albg*fgw(i-nz_u,id,iurb)
-        bbb(i)=rsw(2*id,i-nz_u)
+        aaa(i,2*nz_ui+1)=-albg*fgw(i-nz_ui,id,iurb)
+        bbb(i)=rsw(2*id,i-nz_ui)
         
       enddo
 
 ! ground
-      do j=1,nz_u
-         aaa(2*nz_u+1,j)=-albw*fwg(j,id,iurb)*pb(j+1)
+      do j=1,nz_ui
+         aaa(2*nz_ui+1,j)=-albw*fwg(j,id,iurb)*pb(j+1)
       enddo
        
-      do j=nz_u+1,2*nz_u
-         aaa(2*nz_u+1,j)=-albw*fwg(j-nz_u,id,iurb)*pb(j-nz_u+1)
+      do j=nz_ui+1,2*nz_ui
+         aaa(2*nz_ui+1,j)=-albw*fwg(j-nz_ui,id,iurb)*pb(j-nz_ui+1)
       enddo
        
-      aaa(2*nz_u+1,2*nz_u+1)=1.
-      bbb(2*nz_u+1)=rsg(id)
+      aaa(2*nz_ui+1,2*nz_ui+1)=1.
+      bbb(2*nz_ui+1)=rsg(id)
        
-      call gaussj(aaa,2*nz_u+1,bbb,2*nz_ui+1)
+      call gaussj(aaa,2*nz_ui+1,bbb,2*nz_ui+1)
 
-      do i=1,nz_u
+      do i=1,nz_ui
          rsw(2*id-1,i)=bbb(i)
       enddo
        
-      do i=nz_u+1,2*nz_u
-         rsw(2*id,i-nz_u)=bbb(i) 
+      do i=nz_ui+1,2*nz_ui
+         rsw(2*id,i-nz_ui)=bbb(i) 
       enddo
        
-      rsg(id)=bbb(2*nz_u+1)
+      rsg(id)=bbb(2*nz_ui+1)
        
       return
       end subroutine short_rad
@@ -2899,11 +2899,11 @@ use module_wrf_error
         
       hut=z(nz_u+1)
         
-      do jz=1,nz_u      
+      do jz=1,nz_ui      
       
 ! radiation from wall to wall
        
-         do iz=1,nz_u
+         do iz=1,nz_ui
      
             call fprls (fprl,dxy,abs(z(jz+1)-z(iz  )),ws)
             f123=fprl
@@ -2964,7 +2964,7 @@ use module_wrf_error
       enddo
 
 ! radiation from wall to sky      
-      do iz=1,nz_u
+      do iz=1,nz_ui
        call fnrms(fnrm,ws,dxy,hut-z(iz))
        f12=fnrm
        call fnrms(fnrm,ws,dxy,hut-z(iz+1))
@@ -2980,7 +2980,7 @@ use module_wrf_error
 !!!!!!!!!!!!!
 
 
-       do iz=1,nz_u
+       do iz=1,nz_ui
 
 ! radiation from wall to ground
       
