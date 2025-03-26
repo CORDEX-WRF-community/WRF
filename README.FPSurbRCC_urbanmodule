@@ -101,6 +101,8 @@ In order to activate urban modifications user needs to follow these steps:
    cd WRF_FPSurbRcc-urbanmodule/phys
    rmdir noahmp
    git clone -b urban-mods git@github.com:CORDEX-WRF-community/noahmp.git
+   cd nohamp
+   git checkout urban-mods
  3.- Make a copy of Registry/registry.urbandiags
    cp Registry/registry.urbandiags Registry/registry.urbandiags_comp
  4.-Modify the file accordingly to needs
