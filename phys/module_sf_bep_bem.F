@@ -1691,7 +1691,7 @@ use module_wrf_error
    
      call modif_rad(iurb,ndu,nzu,z_u,ws,                &
                     drst,strd,ss,pb,                    &
-                    nurbi, nz_ui, ng_u, nwr_u,          &
+                    nurbi, ndi,nz_ui, ng_u, nwr_u,      &
                     tw_av,tg_av,twlev_av,albg,albw,     &
                     emw,emg,pwin_u(iurb),albwin,        &
                     emwind,fww,fwg,fgw,fsw,fsg,         &
@@ -2246,7 +2246,7 @@ use module_wrf_error
                   ws_urb(id,iurb)=ws_u(id,iurb)
           endif
        enddo
-       do id=1,ndu
+       do id=1,ndi
           if ((bs(id)<=1.).OR.(bs(id)>=150.)) then
              bs(id)=bs_u(id,iurb)
              ws(id)=ws_u(id,iurb)
