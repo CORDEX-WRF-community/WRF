@@ -1675,7 +1675,7 @@ use module_wrf_error
                            ndi, nz_ui, nwr_u, nbi,       &
                            sfw_av,sfwind_av,sfw,sfwin)
                            
-     do id=1,ndu
+     do id=1,ndi
        tg_av(id)=tg(id,ng_u)
      do iz=1,nz_ui
 
@@ -1712,7 +1712,7 @@ use module_wrf_error
                        albwin,twlev_av,pwin_u(iurb),sfwind_av,rld,rs,sfr,sfrv,lfr,lfrv, & 
                        rs_abs,rl_up,emiss,grdflx_urb,gr_frac_roof,tpvlev,pv_frac_roof)          
    
-    do id=1,ndu
+    do id=1,ndi
     if(dg(id).le.dgmax) then
       dg(id)=dg(id)+(rainbl+(lfg(id)*dt)/latent)
      endif
@@ -1740,14 +1740,14 @@ use module_wrf_error
 
      call surf_temp(ndu,pr_u,dt,                         & 
                     rld,rsg,rlg,                         &
-                    nz_ui, ng_u, nwr_u,                  &
+                    ndi, nz_ui, ng_u, nwr_u,             &
                     tg,alag,csg,emg,albg,ptg,sfg,lfg,gfg)
      if(gr_flag.eq.1)then
      if(gr_frac_roof.gt.0.)then
      hfgr=0.
      call roof_temp_veg(ndu,pr_u,dt,                     &
                     rld,rs,                              &
-                    nz_ui, nwr_u, ngr_u,                 &
+                    ndi,nz_ui, nwr_u, ngr_u,             &
                     trv,ptrv,sfrv,lfrv,gfr,qr,rainbl,    &
                     drain,hfgr,tr,alar(5),dzr(5),csr(5), &
                     nzu,irri_now,gr_type,pv_frac_roof,   &
@@ -1985,10 +1985,10 @@ use module_wrf_error
 !NEW CDRAG!
      do iz=1,nz_ui
        alp=0.
-       do id=1,ndu
+       do id=1,ndi
         alp=alp+bs(id)/(ws(id)+bs(id))*pb(iz)
        enddo
-       alp=alp/ndu
+       alp=alp/ndi
        if(alp.lt.0.29)then
         cdrag(iz)=3.32*alp**0.47
        else
@@ -2002,7 +2002,7 @@ use module_wrf_error
 
       call buildings(iurb,ndu,nzu,z0,cdrag,ua_u,va_u,                                                 &
                      pt_u,pt0_u,                                                                      &
-                     nz_ui, nurbi, nbi, ngr_u,                                                        &
+                     ndi, nz_ui, nurbi, nbi, ngr_u,                                                   &
                      ptg,ptr,ptrv,da_u,qv_u,pr_u,tmp_u,ptw,ptwin,pwin_u(iurb),drst,                   &
                      uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,qvb_u,qhb_u,                           &
                      uhb_u,vhb_u,thb_u,ehb_u,ss,dt,sfw,sfg,sfr,sfrpv,sfrv,lfrv,                       &
@@ -2021,7 +2021,7 @@ use module_wrf_error
 
       call urban_meso(ndu,kms,kme,kts,kte,nzu,z,dz,z_u,pb,ss,bs,ws,sf, & 
                      vl,                                               &
-                     nz_ui,                                            &
+                     ndi, nz_ui,                                       &
                      uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,        &
                      uhb_u,vhb_u,thb_u,ehb_u,qhb_u,qvb_u,              &
                      a_u,a_v,a_t,a_e,b_u,b_v,b_t,b_e,b_q,tvb_ac,b_ac)                    
@@ -2029,8 +2029,8 @@ use module_wrf_error
 
 ! Calculation of the length scale taking into account the buildings effects
 
-      call interp_length(ndu,kms,kme,kts,kte,nzu,z_u,z,ss,ws,bs,      &
-        nz_ui,                                                        &
+      call interp_length(ndu,kms,kme,kts,kte,nzu,z_u,z,ss,ws,bs,       &
+        ndi, nz_ui,                                                    &
         dlg,dl_u)
       
       return
@@ -2216,19 +2216,19 @@ use module_wrf_error
         alag(ig)=alag_u(iurb)
        enddo
        
-       do id=1,ndu
+       do id=1,ndi
           z0(id,1)=z0g_u(iurb)
         do iz=2,nzurban+1
            z0(id,iz)=z0r_u(iurb)
         enddo
        enddo
       
-       do id=1,ndu
+       do id=1,ndi
           strd(id)=strd_u(id,iurb)
           drst(id)=drst_u(id,iurb)     
        enddo
 
-       do id=1,ndu
+       do id=1,ndi
           if ((hgt_urb<=0.).OR.(lp_urb<=0.).OR.(lb_urb<=0.)) then
               ws(id)=ws_u(id,iurb)
               bs(id)=bs_u(id,iurb)
