@@ -379,13 +379,15 @@ use module_wrf_error
 
       if (first) then                           ! True only on first call
          
-         call init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,&
-                twini_u,trini_u,tgini_u,albg_u,albw_u,albr_u,emg_u,emw_u,&
+         call init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,            &
+                nurbm, nz_um, ndm,                                         &
+                twini_u,trini_u,tgini_u,albg_u,albw_u,albr_u,emg_u,emw_u,  &
                 emr_u,z0g_u,z0r_u,nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b)
 
 !      Initialisation of the urban parameters and calculation of the view factors
              
-         call icBEP(nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u)                                  
+         call icBEP(nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u,                       &
+                nz_um, nurbm, dz_u)
           
          first=.false.
 
@@ -401,11 +403,12 @@ use module_wrf_error
               hi_urb1D(iz_u)=hi_urb(ix,iz_u,iy)
            enddo
 
-           call icBEPHI_XY(hb_u,hi_urb1D,ss_urb,pb_urb,    &
+           call icBEPHI_XY(nz_um, hb_u,hi_urb1D,ss_urb,pb_urb,       &
                            nz_urb(iurb),z_u)
            
-           call param(iurb,nz_u(iurb),nz_urb(iurb),nzurban(iurb),    &
-                      nd_u(iurb),csg_u,csg,alag_u,alag,csr_u,csr,    &
+           call param(iurb,nz_u(iurb),nz_urb(iurb),nzurban(iurb),nd_u(iurb), &
+                      nurbm, ndm, nz_um, ng_u, nwr_u,                        &
+                      csg_u,csg,alag_u,alag,csr_u,csr,               &
                       alar_u,alar,csw_u,csw,alaw_u,alaw,             &
                       ws_u,ws,bs_u,bs,z0g_u,z0r_u,z0,                &
                       strd_u,strd,drst_u,drst,ss_u,ss_urb,ss,pb_u,   &
@@ -415,8 +418,9 @@ use module_wrf_error
 !We compute the view factors in the icBEP_XY routine
 !           
          
-           call icBEP_XY(iurb,fww_u,fwg_u,fgw_u,fsw_u,fws_u,fsg_u,   &
-                         nd_u(iurb),strd,ws,nzurban(iurb),z_u)   
+           call icBEP_XY(iurb,fww_u,fwg_u,fgw_u,fsw_u,                 &
+                      ndm, nz_um, nurbm,                               &
+                      fws_u,fsg_u,nd_u(iurb),strd,ws,nzurban(iurb),z_u)   
 
        do iz= kts,kte
           ua1D(iz)=u_phy(ix,iz,iy)
@@ -855,6 +859,7 @@ use module_wrf_error
 
       call modif_rad(iurb,ndu,nzu,z_u,ws,               &
                     drst,strd,ss,pb,                    &
+                    nurbm, ndm, nz_um, ng_u, nwr_u,     &
                     tw,tg,albg,albw,emw,emg,            &
                     fww,fwg,fgw,fsw,fsg,                &
                     zr,deltar,ah,                       &
@@ -864,6 +869,7 @@ use module_wrf_error
        
        call upward_rad(ndu,nzu,ws,bs,                   &
                        sigma,pb,ss,                     &
+                       ndm, nz_um, ng_u, nwr_u, dz_u,   &
                        tg,emg,albg,rlg,rsg,sfg,         & 
                        tw,emw,albw,rlw,rsw,sfw,         & 
                        tr,emr,albr,rld,rs,sfr,          & 
@@ -874,6 +880,7 @@ use module_wrf_error
 
       call surf_temp(nzu,ndu,pr_u,dt,ss,                & 
                     rs,rld,rsg,rlg,rsw,rlw,             &
+                    ndm, nz_um, ng_u, nwr_u,            &
                     tg,alag,csg,emg,albg,ptg,sfg,gfg,   &
                     tr,alar,csr,emr,albr,ptr,sfr,gfr,   &
                     tw,alaw,csw,emw,albw,ptw,sfw,gfw)  
@@ -882,7 +889,9 @@ use module_wrf_error
 ! Compute the implicit and explicit components of the sources or sinks on the "urban grid"
        
       call buildings(ndu,nzu,z0,ua_u,va_u,                       & 
-                     pt_u,pt0_u,ptg,ptr,da_u,ptw,drst,           &                      
+                     pt_u,pt0_u,                                 &
+                     ndm, nz_um, dz_u,                           &
+                     ptg,ptr,da_u,ptw,drst,                      &                      
                      uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,  & 
                      uhb_u,vhb_u,thb_u,ehb_u,ss,dt)                        
  
@@ -919,7 +928,9 @@ use module_wrf_error
 ! Interpolation on the "mesoscale grid"
 
       call urban_meso(ndu,kms,kme,kts,kte,nzu,z,dz,z_u,pb,ss,bs,ws,sf, & 
-                     vl,uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,     &
+                     vl,                                               &
+                     ndm, nz_um,                                       &
+                     uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,        &
                      uhb_u,vhb_u,thb_u,ehb_u,                          &
                      a_u,a_v,a_t,a_e,b_u,b_v,b_t,b_e)                    
        
@@ -1225,14 +1236,18 @@ use module_wrf_error
 !  Calculation of the shadow effects
 
       call shadow_mas(nd,nz_u,zr,deltar,ah,drst,ws,ss,pb,z,           &
+                     ndm, nz_um,                                      &
                      rs,rsw,rsg)
 
 ! Calculation of the reflection effects          
       do id=1,nd
          call long_rad(iurb,nz_u,id,emw,emg,                 &
-                      fwg,fww,fgw,fsw,fsg,tg,tw,rlg,rlw,rl,pb)
+                     nz_um, ndm, nurbm, ng_u, nwr_u,         &
+                     fwg,fww,fgw,fsw,fsg,tg,tw,rlg,rlw,rl,pb)
          
-         call short_rad(iurb,nz_u,id,albw,albg,fwg,fww,fgw,rsg,rsw,pb)
+         call short_rad(iurb,nz_u,id,albw,                   &
+                     nz_um, ndm, nurbm, ng_u,                &
+                     albg,fwg,fww,fgw,rsg,rsw,pb)
   
       enddo
       
@@ -2463,7 +2478,6 @@ use module_wrf_error
       
       call invert(nz,a,c,temp)
 
-           
       pt=temp(nz)*(press/1.e+5)**(-rcp_u)
 
       rt=(1.-alb)*rs+em*rl-em*sigma*(tsig**4)
@@ -3009,13 +3023,10 @@ use module_wrf_error
       SUBROUTINE fprls (fprl,a,b,c)
 
       implicit none
-
-     
             
       real a,b,c
       real x,y
       real fprl
-
 
       x=a/c
       y=b/c
@@ -3453,12 +3464,16 @@ use module_wrf_error
       
       do id=1,ndu
 
-            call view_factors(iurb,nzu,id,strd(id),z_u,ws(id),  &    
-                              fww_u,fwg_u,fgw_u,fsg_u,fsw_u,fws_u) 
+            call view_factors(iurb,nzu,id,strd(id),z_u,ws(id),     &    
+                              fww_u,fwg_u,fgw_u,fsg_u,fsw_u,fws_u, &
+                              nz_um,ndm,nurbm)  
       
       enddo               
+
       return       
+
       end subroutine icBEP_XY
+
 ! ===6=8===============================================================72
 ! ===6=8===============================================================72
 
