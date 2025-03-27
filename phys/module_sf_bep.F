@@ -15,15 +15,6 @@ use module_wrf_error
 ! for CASE (BEPSCHEME) select sf_urban_physics
 !
  USE module_driver_constants, ONLY: nurbanmax, nstrdirmax, nz_urbanmax
-! Getting model namelist values
- USE module_configure, ONLY : grid_config_rec_type, model_config_rec
-
-     INTEGER                                             :: nurbmax = model_config_rec%num_urban
-     INTEGER                                             :: ndm = model_config_rec%num_urban_nd
-     INTEGER                                             :: nz_um = model_config_rec%num_urban_nz
-     INTEGER                                             :: ng_u = model_config_rec%num_urban_ng
-     INTEGER                                             :: nwr_u = model_config_rec%num_urban_nwr
-     REAL                                                :: dz_u = model_config_rec%dz_urban
 
 ! The change of ng_u, nwr_u should be done in agreement with the block data
 !  in the routine "surf_temp" 
@@ -65,6 +56,14 @@ use module_wrf_error
                       ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D,        &
                       pr_u3D,                                         &
 #endif
+! These dimensions are no longer depending no activation of DURBANSTATE, it would complicate
+!   too much the lecture of the code. By now own, all the uses of the following dimensions
+!   have been changed from the use of their maximum value (defined in frame/module_driver_constants.F)
+!   to the actual value passed from the namelist.input
+!     nurbmax --> nurbi
+!     ndm --> nd
+!     nz_um --> nz_ui
+                      nurbmax, ndm, nz_um, ng_u, nwr_u, dz_u,         &
                       lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,           &
                       a_u,a_v,a_t,a_e,b_u,b_v,                        &
                       b_t,b_e,b_q,dlg,dl_u,sf,vl,                     &
@@ -134,6 +133,7 @@ use module_wrf_error
       REAL, INTENT(IN )::   DT      ! Time step
       
    INTEGER, INTENT(in)                                            :: num_urban_nz
+   INTEGER, INTENT(in)                                            :: nurbmax, ndm, nz_um, ng_u, nwr_u
    REAL, INTENT(in)                                               :: dz_u
 #ifdef URBANSTATE
    REAL, DIMENSION(1:num_urban_nz)                                :: ua_u1D, va_u1D, pt_u1D, da_u1D,  &

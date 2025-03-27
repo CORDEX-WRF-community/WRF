@@ -16,22 +16,6 @@ use module_wrf_error
 ! for CASE (BEPSCHEME) select sf_urban_physics
 !
  USE module_driver_constants, ONLY: nurbanmax, nstrdirmax, nz_urbanmax, nbuilding_max
-! Getting model namelist values
- USE module_configure, ONLY : grid_config_rec_type, model_config_rec
-
-     INTEGER                                             :: nurbmax = model_config_rec%num_urban
-     INTEGER                                             :: ndm = model_config_rec%num_urban_nd
-     INTEGER                                             :: nz_um = model_config_rec%num_urban_nz
-     INTEGER                                             :: ng_u = model_config_rec%num_urban_ng
-     INTEGER                                             :: ngr_u = model_config_rec%num_urban_ngr
-     INTEGER                                             :: nwr_u = model_config_rec%num_urban_nwr
-     INTEGER                                             :: nf_u = model_config_rec%num_urban_nf
-     INTEGER                                             :: ngb_u = model_config_rec%num_urban_ngb
-     REAL                                                :: dz_u = model_config_rec%dz_urban
-     INTEGER                                             :: nbui_max = model_config_rec%num_urban_nbui
-     REAL                                                :: h_water = model_config_rec%h_water
-     INTEGER                                             :: p_num = model_config_rec%p_num
-     INTEGER                                             :: q_num = model_config_rec%q_num
 
 ! The change of ng_u, nwr_u should be done in agreement with the block data
 !  in the routine "surf_temp" 
@@ -87,6 +71,12 @@ use module_wrf_error
                       ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,             &
                       qv_u3D,                                                      &
 #endif
+! These dimensions are no longer depending no activation of DURBANSTATE, it would complicate
+!   too much the lecture of the code. By now own, all the uses of the following dimensions
+!   have been changed from the use of their maximum value (defined in frame/module_driver_constants.F)
+!   to the actual value passed from the namelist.input
+                      nurbmax, ndm, nz_um, ng_u, ngr_u,                            &
+                      nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num, dz_u, h_water,   &
                       lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,                        &
                       a_u,a_v,a_t,a_e,b_u,b_v,                                     &
                       b_t,b_e,b_q,dlg,dl_u,sf,vl,                                  &
@@ -190,6 +180,10 @@ use module_wrf_error
    real z(ims:ime,kms:kme,jms:jme)            ! Vertical coordinates
    REAL, INTENT(IN )::   DT      ! Time step
 
+   INTEGER, INTENT(in)                                            :: num_urban_nz
+   INTEGER, INTENT(in)                                            :: nurbmax, ndm, nz_um, ng_u, ngr_u,   &
+     nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num
+   REAL, INTENT(in)                                               :: dz_u, h_water
 #ifdef URBANSTATE
    REAL, DIMENSION(1:num_urban_nz)                                :: ua_u1D, va_u1D, pt_u1D, da_u1D,  &
      pt0_u1D, pr_u1D, qv_u1D
