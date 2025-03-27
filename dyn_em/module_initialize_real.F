@@ -193,6 +193,11 @@ integer::oops1,oops2
 
       REAL :: press_above, press_below
 
+      !  Urban checks
+      LOGICAL                                            :: first_urbanij
+      ! I know, it can be better done 
+      REAL, DIMENSION(100)                               :: urban_zs
+
       !  Dimension information stored in grid data structure.
 
       CALL cpu_time(t_start)
@@ -3134,12 +3139,19 @@ integer::oops1,oops2
       ENDIF
 
       IF ( ( config_flags%sf_urban_physics == 2 ) .OR. ( config_flags%sf_urban_physics == 3 ) ) THEN
+         first_urbanij = .TRUE.
          DO j = jts , MIN(jde-1,jte)
             DO i = its , MIN(ide-1,ite)
                IF ( skip_middle_points_t ( ids , ide , jds , jde , i , j , em_width , hold_ups ) ) CYCLE
-               DO k = 1, 15
-                  grid%HI_URB2D(i,k,j)  = grid%URB_PARAM(i,k+117,j)
-               END DO
+               IF (config_flags%num_urban_hi /= 15) THEN
+                 IF (first_urbanij) THEN
+                   PRINT *,"  In dyn_em/module_initialize_real using averages of NUDAPT's HI_URB2D"
+                 END IF
+               ELSE
+                 DO k = 1, config_flags%num_urban_hi
+                   grid%HI_URB2D(i,k,j)  = grid%URB_PARAM(i,k+117,j)
+                 END DO
+               END IF
             END DO
          END DO
       ENDIF
