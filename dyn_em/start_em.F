@@ -1089,7 +1089,7 @@ endif
                       ids, ide, jds, jde, kds, kde,           &
                       ims, ime, jms, jme, kms, kme,           &
                       grid%i_start(ij), grid%i_end(ij), grid%j_start(ij), grid%j_end(ij), kts, kte, &
-                      config_flags%num_urban_nd,                            & !multi-layer urban
+                      config_flags%num_urban_ndm,                           & !multi-layer urban
                       config_flags%urban_map_zrd,                           & !multi-layer urban
                       config_flags%urban_map_zwd,                           & !multi-layer urban
                       config_flags%urban_map_gd,                            & !multi-layer urban

@@ -113,7 +113,7 @@
 !         INTEGER FUNCTION bep_bem_ngr_u()
 !         END FUNCTION bep_bem_ngr_u
 
-!      END INTERFACE
+      END INTERFACE
 
 !-----------------------------------------------------------------------
 ! Set up the WRF Hydro namelist option to allow dynamic allocation of

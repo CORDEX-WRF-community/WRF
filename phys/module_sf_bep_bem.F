@@ -445,14 +445,14 @@ use module_wrf_error
       data first/.true./
       save first,time_bep
        
-      save alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,                       &
-           albg_u,albw_u,albr_u,emg_u,emw_u,emr_u,                       &
-           z0g_u,z0r_u, nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b,ss_u,pb_u,  &
-           nz_u,z_u,albwin_u,emwind_u,cop_u,pwin_u,beta_u,sw_cond_u,     &
-           bldac_frc_u,cooled_frc_u,                                     &
-           time_on_u,time_off_u,targtemp_u,gaptemp_u,targhum_u,gaphum_u, &
-           perflo_u,gr_frac_roof_u,                    &
-           pv_frac_roof_u,hsesf_u,hsequip,irho,gr_flag_u,gr_type_u
+!      save alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,                       &
+!           albg_u,albw_u,albr_u,emg_u,emw_u,emr_u,                       &
+!           z0g_u,z0r_u, nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b,ss_u,pb_u,  &
+!           nz_u,z_u,albwin_u,emwind_u,cop_u,pwin_u,beta_u,sw_cond_u,     &
+!           bldac_frc_u,cooled_frc_u,                                     &
+!           time_on_u,time_off_u,targtemp_u,gaptemp_u,targhum_u,gaphum_u, &
+!           perflo_u,gr_frac_roof_u,                    &
+!           pv_frac_roof_u,hsesf_u,hsequip,irho,gr_flag_u,gr_type_u
 
 !------------------------------------------------------------------------
 !    Calculation of the momentum, heat and turbulent kinetic fluxes
@@ -1525,13 +1525,13 @@ do ix=its,ite
          dz(iz)=z(iz+1)-z(iz)
       end do
 ! Interpolation on the "urban grid"
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,ua,ua_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,va,va_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,pt,pt_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,pt0,pt0_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,pr,pr_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,da,da_u)
-      call interpol(kms,kme,kts,kte,nzu,z,z_u,qv,qv_u)
+      call interpol(kms,kme,kts,kte,nz_um,nzu,z,z_u,ua,ua_u)
+      call interpol(kms,kme,kts,kte,nz_um,nzu,z,z_u,va,va_u)
+      call interpol(kms,kme,kts,kte,nz_um,nzu,z,z_u,pt,pt_u)
+      call interpol(kms,kme,kts,kte,nz_um,nzu,z,z_u,pt0,pt0_u)
+      call interpol(kms,kme,kts,kte,nz_um,nzu,z,z_u,pr,pr_u)
+      call interpol(kms,kme,kts,kte,nz_um,nzu,z,z_u,da,da_u)
+      call interpol(kms,kme,kts,kte,nz_um,nzu,z,z_u,qv,qv_u)
 ! Compute the modification of the radiation due to the buildings
 
       call averaging_temp(tw,twlev,ss,pb,tw_av,twlev_av, &
@@ -2325,7 +2325,7 @@ do ix=its,ite
 !  Calculation of the shadow effects
 
       call shadow_mas(nd,nz_u,zr,deltar,ah,drst,ws,ss,pb,z,           &
-                     nz_um,                                           &
+                     nz_um, ndm,                                      &
                      swddir,rsw,rsg,xlat)
       rsd=rsw
 
@@ -2669,7 +2669,7 @@ do ix=its,ite
       integer nd                ! Number of street direction for the current urban class
       integer ix,iy
       integer nz                ! number of vertical space steps
-      INTEGER, INTENT(in)                                :: ndm, nz_um, nurbm, nbuimax, ngr_u
+      INTEGER, INTENT(in)                                :: ndm, nz_um, nurbm, nbui_max, ngr_u
       real ua_u(nz_um)          ! Wind speed in the x direction on the urban grid
       real va_u(nz_um)          ! Wind speed in the y direction on the urban grid
       real da_u(nz_um)          ! air density on the urban grid
@@ -3262,7 +3262,7 @@ do ix=its,ite
 ! ===6=8===============================================================72   
 
       subroutine shadow_mas(nd,nz_u,zr,deltar,ah,drst,ws,ss,pb,z,    &
-                           nz_um,                                    &
+                           nz_um, ndm,                               &
                            swddir,rsw,rsg,xlat)
         
 ! ----------------------------------------------------------------------
@@ -3277,7 +3277,7 @@ do ix=its,ite
 ! ----------------------------------------------------------------------
       integer nd                ! Number of street direction for the current urban class
       integer nz_u              ! number of vertical layers defined in the urban grid
-      INTEGER, INTENT(in)                                :: nz_um
+      INTEGER, INTENT(in)                                :: nz_um, ndm
       real ah                   ! Hour angle (it should come from the radiation routine)
       real deltar               ! Declination of the sun
       real drst(ndm)            ! street directions for the current urban class
@@ -4570,7 +4570,7 @@ do ix=its,ite
       ELSE
         PRINT *,'ERROR -- error -- ERROR -- error'
         PRINT *,"   In phys/module_sf_bep_bem.F, subroutine 'flux_flat_roof' wrong amount of ground layers"
-        PRINT *,'    by now only works with 10 ground layers, you passed:', ng_u
+        PRINT *,'    by now only works with 10 ground layers, you passed:', ngr_u
         FATAL_ERROR('modify code or namelist parameter num_urban_ngr')
       END IF
 
@@ -5553,7 +5553,7 @@ do ix=its,ite
       integer ndu     ! Number of street direction for each urban class
       integer iurb
 
-      INTEGER, INTENT(in)                                            :: nurbi, ndi, nz_ui
+      INTEGER, INTENT(in)                                            :: nurbm, ndm, nz_um
 
       real strd(ndm)        ! Street length (fix to greater value to the horizontal length of the cells)
       real ws(ndm)          ! Street width [m]
@@ -5737,68 +5737,68 @@ END MODULE module_sf_bep_bem
 ! ===6=8===============================================================72
 ! ===6=8===============================================================72
 
-      FUNCTION bep_bem_nurbm () RESULT (bep_bem_val_nurbm)
-         USE module_sf_bep_bem
-         IMPLICIT NONE
-         INTEGER :: bep_bem_val_nurbm
-         bep_bem_val_nurbm = nurbm
-      END FUNCTION bep_bem_nurbm
+!     FUNCTION bep_bem_nurbm () RESULT (bep_bem_val_nurbm)
+!        USE module_sf_bep_bem
+!        IMPLICIT NONE
+!        INTEGER :: bep_bem_val_nurbm
+!        bep_bem_val_nurbm = nurbm
+!     END FUNCTION bep_bem_nurbm
 
-      FUNCTION bep_bem_ndm () RESULT (bep_bem_val_ndm)
-         USE module_sf_bep_bem
-         IMPLICIT NONE
-         INTEGER :: bep_bem_val_ndm
-         bep_bem_val_ndm = ndm
-      END FUNCTION bep_bem_ndm
+!     FUNCTION bep_bem_ndm () RESULT (bep_bem_val_ndm)
+!        USE module_sf_bep_bem
+!        IMPLICIT NONE
+!        INTEGER :: bep_bem_val_ndm
+!        bep_bem_val_ndm = ndm
+!     END FUNCTION bep_bem_ndm
 
-      FUNCTION bep_bem_nz_um () RESULT (bep_bem_val_nz_um)
-         USE module_sf_bep_bem
-         IMPLICIT NONE
-         INTEGER :: bep_bem_val_nz_um
-         bep_bem_val_nz_um = nz_um
-      END FUNCTION bep_bem_nz_um
+!     FUNCTION bep_bem_nz_um () RESULT (bep_bem_val_nz_um)
+!        USE module_sf_bep_bem
+!        IMPLICIT NONE
+!        INTEGER :: bep_bem_val_nz_um
+!        bep_bem_val_nz_um = nz_um
+!     END FUNCTION bep_bem_nz_um
 
-      FUNCTION bep_bem_ng_u () RESULT (bep_bem_val_ng_u)
-         USE module_sf_bep_bem
-         IMPLICIT NONE
-         INTEGER :: bep_bem_val_ng_u
-         bep_bem_val_ng_u = ng_u
-      END FUNCTION bep_bem_ng_u
+!     FUNCTION bep_bem_ng_u () RESULT (bep_bem_val_ng_u)
+!        USE module_sf_bep_bem
+!        IMPLICIT NONE
+!        INTEGER :: bep_bem_val_ng_u
+!        bep_bem_val_ng_u = ng_u
+!     END FUNCTION bep_bem_ng_u
 
-      FUNCTION bep_bem_nwr_u () RESULT (bep_bem_val_nwr_u)
-         USE module_sf_bep_bem
-         IMPLICIT NONE
-         INTEGER :: bep_bem_val_nwr_u
-         bep_bem_val_nwr_u = nwr_u
-      END FUNCTION bep_bem_nwr_u
+!     FUNCTION bep_bem_nwr_u () RESULT (bep_bem_val_nwr_u)
+!        USE module_sf_bep_bem
+!        IMPLICIT NONE
+!        INTEGER :: bep_bem_val_nwr_u
+!        bep_bem_val_nwr_u = nwr_u
+!     END FUNCTION bep_bem_nwr_u
 
-      FUNCTION bep_bem_nf_u () RESULT (bep_bem_val_nf_u)
-         USE module_sf_bep_bem
-         IMPLICIT NONE
-         INTEGER :: bep_bem_val_nf_u
-         bep_bem_val_nf_u = nf_u
-      END FUNCTION bep_bem_nf_u
+!     FUNCTION bep_bem_nf_u () RESULT (bep_bem_val_nf_u)
+!        USE module_sf_bep_bem
+!        IMPLICIT NONE
+!        INTEGER :: bep_bem_val_nf_u
+!        bep_bem_val_nf_u = nf_u
+!     END FUNCTION bep_bem_nf_u
 
 
-      FUNCTION bep_bem_ngb_u () RESULT (bep_bem_val_ngb_u)
-         USE module_sf_bep_bem
-         IMPLICIT NONE
-         INTEGER :: bep_bem_val_ngb_u
-         bep_bem_val_ngb_u = ngb_u
-      END FUNCTION bep_bem_ngb_u
+!     FUNCTION bep_bem_ngb_u () RESULT (bep_bem_val_ngb_u)
+!        USE module_sf_bep_bem
+!        IMPLICIT NONE
+!        INTEGER :: bep_bem_val_ngb_u
+!        bep_bem_val_ngb_u = ngb_u
+!     END FUNCTION bep_bem_ngb_u
 
-      FUNCTION bep_bem_nbui_max () RESULT (bep_bem_val_nbui_max)
-         USE module_sf_bep_bem
-         IMPLICIT NONE
-         INTEGER :: bep_bem_val_nbui_max
-         bep_bem_val_nbui_max = nbui_max
-      END FUNCTION bep_bem_nbui_max
+!     FUNCTION bep_bem_nbui_max () RESULT (bep_bem_val_nbui_max)
+!        USE module_sf_bep_bem
+!        IMPLICIT NONE
+!        INTEGER :: bep_bem_val_nbui_max
+!        bep_bem_val_nbui_max = nbui_max
+!     END FUNCTION bep_bem_nbui_max
 
  
-   FUNCTION bep_bem_ngr_u () RESULT (bep_bem_val_ngr_u)
-         USE module_sf_bep_bem
-         IMPLICIT NONE
-         INTEGER :: bep_bem_val_ngr_u
-         bep_bem_val_ngr_u = ngr_u
-      END FUNCTION bep_bem_ngr_u
+!  FUNCTION bep_bem_ngr_u () RESULT (bep_bem_val_ngr_u)
+!        USE module_sf_bep_bem
+!        IMPLICIT NONE
+!        INTEGER :: bep_bem_val_ngr_u
+!        bep_bem_val_ngr_u = ngr_u
+!     END FUNCTION bep_bem_ngr_u
 

@@ -284,8 +284,8 @@ CONTAINS
      &          ,ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D     &
      &          ,qv_u3D                                              &
 #endif
-     &          ,nurbi, nd, nz_ui, ng_u, ngr_u                       &
-     &          ,nwr_u, nf_u, ngb_u, nbi, p_num, q_num               &
+     &          ,nurbmax, ndm, nz_um, ng_u, ngr_u                    &
+     &          ,nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num          &
      &          ,dz_u, h_water                                       &
 
      &          ,ep_pv_urb3d,t_pv_urb3d                              & !multi-layer urban GRZ
@@ -1022,8 +1022,8 @@ CONTAINS
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::dl_u_bep  !Length scale
 
    INTEGER, INTENT(in)                                   :: num_urban_nz
-   INTEGER, INTENT(in)                                   :: nurbi, nd, nz_ui, ng_u, ngr_u, nwr_u,     &
-     nf_u, ngb_u, nbi, p_num, q_num
+   INTEGER, INTENT(in)                                   :: nurbmax, ndm, nz_um, ng_u, ngr_u, nwr_u,  &
+     nf_u, ngb_u, nbui_max, p_num, q_num
    REAL, INTENT(in)                                      :: dz_u, h_water
 #ifdef URBANSTATE
 ! Data interpolated from the "mesoscale grid" to the "urban grid" (num_urban_nz)
@@ -2774,8 +2774,8 @@ CONTAINS
                 ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,&
                 qv_u3D,                                         &
 #endif
-                nurbi, nd, nz_ui, ng_u, ngr_u,                  &
-                nwr_u, nf_u, ngb_u, nbi, p_num, q_num,          &
+                nurbmax, ndm, nz_um, ng_u, ngr_u,               &
+                nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num,     &
                 dz_u, h_water,                                  &
                 ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
                 trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !GRZ
@@ -2914,8 +2914,8 @@ CONTAINS
                 ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,&
                 qv_u3D,                                         &
 #endif
-                nurbi, nd, nz_ui, ng_u, ngr_u,                  &
-                nwr_u, nf_u, ngb_u, nbi, p_num, q_num,          &
+                nurbmax, ndm, nz_um, ng_u, ngr_u,               &
+                nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num,     &
                 dz_u, h_water,                                  &
                 ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
                 trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !GRZ
@@ -3260,8 +3260,8 @@ CONTAINS
                              ua_u3D,         va_u3D,         pt_u3D,     da_u3D,   pt0_u3D, &
                              pr_u3D,         qv_u3D,                                        &
 #endif
-                             nurbi, nd, nz_ui, ng_u, ngr_u,                                 &
-                             nwr_u, nf_u, ngb_u, nbi, p_num, q_num,                         &
+                             nurbmax, ndm, nz_um, ng_u, ngr_u,                              &
+                             nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num,                    &
                                dz_u, h_water,                                               &
                           trv_urb4d,       qr_urb4d,      qgr_urb3d,  tgr_urb3d,            & !GRZ
                         drain_urb4d,  draingr_urb3d,     sfrv_urb3d, lfrv_urb3d,            & !GRZ
