@@ -3215,12 +3215,12 @@
       IF ( any(model_config_rec%sf_urban_physics > 0 ) ) THEN
 
         ! urban_map_zrd
-        prodv = model_config_rec%num_urban_nd *                  &
+        prodv = model_config_rec%num_urban_ndm *                 &
           model_config_rec%num_urban_nwr *                       &
           model_config_rec%num_urban_nz
         IF (model_config_rec%urban_map_zrd /= prodv) THEN
           labS='urban_map_zrd'
-          prodS='num_urban_nd * num_urban_nwr * num_urban_nz'
+          prodS='num_urban_ndm * num_urban_nwr * num_urban_nz'
           WRITE(ISa,'(A8)')model_config_rec%urban_map_zrd
           WRITE(ISb,'(A8)')prodv 
           msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
@@ -3229,13 +3229,13 @@
         END IF
 
         ! urban_map_zwd
-        prodv = model_config_rec%num_urban_nd *                  &
+        prodv = model_config_rec%num_urban_ndm *                 &
           model_config_rec%num_urban_nwr *                       &
           model_config_rec%num_urban_nz  *                       &
           model_config_rec%num_urban_nbui
         IF (model_config_rec%urban_map_zwd /= prodv) THEN
           labS = 'urban_map_zwd'
-          prodS = 'num_urban_nd * num_urban_nwr * num_urban_nz * num_urban_nbui'
+          prodS = 'num_urban_ndm * num_urban_nwr * num_urban_nz * num_urban_nbui'
           WRITE(ISa,'(A8)')model_config_rec%urban_map_zwd
           WRITE(ISb,'(A8)')prodv 
           msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
@@ -3244,11 +3244,11 @@
         END IF
 
         ! urban_map_gd
-        prodv  = model_config_rec%num_urban_nd *                 &
+        prodv  = model_config_rec%num_urban_ndm *                &
           model_config_rec%num_urban_ng
         IF (model_config_rec%urban_map_gd /= prodv) THEN
           labS = 'urban_map_gd'
-          prodS = 'num_urban_nd * num_urban_ng'
+          prodS = 'num_urban_ndm * num_urban_ng'
           WRITE(ISa,'(A8)')model_config_rec%urban_map_gd
           WRITE(ISb,'(A8)')prodv 
           msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
@@ -3256,12 +3256,12 @@
           CALL wrf_error_fatal (msg)
         END IF
         ! urban_map_zd
-        prodv  = model_config_rec%num_urban_nd *                 &
+        prodv  = model_config_rec%num_urban_ndm *                &
           model_config_rec%num_urban_nz *                        &
           model_config_rec%num_urban_nbui
         IF (model_config_rec%urban_map_zd /= prodv) THEN
           labS = 'urban_map_zd'
-          prodS = 'num_urban_nd * num_urban_nz * num_urban_nbui'
+          prodS = 'num_urban_ndm * num_urban_nz * num_urban_nbui'
           WRITE(ISa,'(A8)')model_config_rec%urban_map_zd
           WRITE(ISb,'(A8)')prodv 
           msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
@@ -3269,11 +3269,11 @@
           CALL wrf_error_fatal (msg)
         END IF
         ! urban_map_zdf
-        prodv = model_config_rec%num_urban_nd *                  &
+        prodv = model_config_rec%num_urban_ndm *                 &
           model_config_rec%num_urban_nz 
         IF (model_config_rec%urban_map_zdf /= prodv) THEN
           labS = 'urban_map_zdf'
-          prodS = 'num_urban_nd * num_urban_nz'
+          prodS = 'num_urban_ndm * num_urban_nz'
           WRITE(ISa,'(A8)')model_config_rec%urban_map_zdf
           WRITE(ISb,'(A8)')prodv 
           msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
@@ -3295,12 +3295,12 @@
         END IF
 
         ! urban_map_wd
-        prodv  = model_config_rec%num_urban_nd *                 &
+        prodv  = model_config_rec%num_urban_ndm *                &
           model_config_rec%num_urban_nz *                        &
           model_config_rec%num_urban_nbui
         IF (model_config_rec%urban_map_wd /= prodv) THEN
           labS = 'urban_map_wd'
-          prodS = 'num_urban_nd * num_urban_nz * num_urban_nbui'
+          prodS = 'num_urban_ndm * num_urban_nz * num_urban_nbui'
           WRITE(ISa,'(A8)')model_config_rec%urban_map_wd
           WRITE(ISb,'(A8)')prodv 
           msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
@@ -3309,12 +3309,12 @@
         END IF
 
         ! urban_map_gbd
-        prodv = model_config_rec%num_urban_nd *                  &
+        prodv = model_config_rec%num_urban_ndm *                 &
           model_config_rec%num_urban_ngb *                       &
           model_config_rec%num_urban_nbui
         IF (model_config_rec%urban_map_gbd /= prodv) THEN
           labS = 'urban_map_gbd'
-          prodS = 'num_urban_nd * num_urban_ngb * num_urban_nbui'
+          prodS = 'num_urban_ndm * num_urban_ngb * num_urban_nbui'
           WRITE(ISa,'(A8)')model_config_rec%urban_map_gbd
           WRITE(ISb,'(A8)')prodv 
           msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
@@ -3323,13 +3323,13 @@
         END IF
 
         ! urban_map_fbd
-        prodv = model_config_rec%num_urban_nd *                  &
+        prodv = model_config_rec%num_urban_ndm *                 &
           (model_config_rec%num_urban_nz - 1) *                  &
           model_config_rec%num_urban_nf *                        &
           model_config_rec%num_urban_nbui
         IF (model_config_rec%urban_map_fbd /= prodv) THEN
           labS = 'urban_map_fbd'
-          prodS = 'num_urban_nd * (num_urban_nz - 1) * num_urban_nf * num_urban_nbui'
+          prodS = 'num_urban_ndm * (num_urban_nz - 1) * num_urban_nf * num_urban_nbui'
           WRITE(ISa,'(A8)')model_config_rec%urban_map_fbd
           WRITE(ISb,'(A8)')prodv 
           msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
@@ -3338,12 +3338,12 @@
         END IF
 
         ! urban_map_zgrd
-        prodv = model_config_rec%num_urban_nd *                  &
+        prodv = model_config_rec%num_urban_ndm *                 &
           model_config_rec%num_urban_ngr *                       &
           model_config_rec%num_urban_nz
         IF (model_config_rec%urban_map_zgrd /= prodv) THEN
           labS = 'urban_map_zgrd'
-          prodS = 'num_urban_nd * num_urban_ngr * num_urban_nz'
+          prodS = 'num_urban_ndm * num_urban_ngr * num_urban_nz'
           WRITE(ISa,'(A8)')model_config_rec%urban_map_zgrd
           WRITE(ISb,'(A8)')prodv 
           msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
