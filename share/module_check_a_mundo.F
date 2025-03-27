@@ -69,10 +69,10 @@
       !  directory, we need to break possible circular build dependencies.
 
 ! This might not be required anymore...
-!      INTERFACE
+      INTERFACE
 
-!         INTEGER FUNCTION bep_nurbm()
-!         END FUNCTION bep_nurbm
+         INTEGER FUNCTION bep_nurbm()
+         END FUNCTION bep_nurbm
 
 !         INTEGER FUNCTION bep_ndm()
 !         END FUNCTION bep_ndm
@@ -86,8 +86,8 @@
 !         INTEGER FUNCTION bep_nwr_u()
 !         END FUNCTION bep_nwr_u
 
-!         INTEGER FUNCTION bep_bem_nurbm()
-!         END FUNCTION bep_bem_nurbm
+         INTEGER FUNCTION bep_bem_nurbm()
+         END FUNCTION bep_bem_nurbm
 
 !         INTEGER FUNCTION bep_bem_ndm()
 !         END FUNCTION bep_bem_ndm
