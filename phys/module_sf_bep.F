@@ -60,9 +60,6 @@ use module_wrf_error
 !   too much the lecture of the code. By now own, all the uses of the following dimensions
 !   have been changed from the use of their maximum value (defined in frame/module_driver_constants.F)
 !   to the actual value passed from the namelist.input
-!     nurbmax --> nurbi
-!     ndm --> nd
-!     nz_um --> nz_ui
                       nurbmax, ndm, nz_um, ng_u, nwr_u, dz_u,         &
                       lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,           &
                       a_u,a_v,a_t,a_e,b_u,b_v,                        &
@@ -524,7 +521,7 @@ use module_wrf_error
 	 enddo
 
 #ifdef URBANSTATE
-         DO iz=1,nz_ui   !vertical levels
+         DO iz=1,nz_um   !vertical levels
            ua_u3d(ix,iz,iy)=ua_u1D(iz) 
            va_u3d(ix,iz,iy)=va_u1D(iz) 
            pt_u3d(ix,iz,iy)=pt_u1D(iz) 
