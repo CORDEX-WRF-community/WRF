@@ -9183,6 +9183,7 @@ end do
     REAL                                                 :: delta_desm1, delta_desp1
     REAL                                                 :: deltatop_levorig, deltabot_levorig
     CHARACTER(len=50)                                    :: fname
+    REAL, PARAMETER                                      :: zeroRK=0.0
 
 !!!!!!! Variables
 ! dorig: Original amount of vertical levels
