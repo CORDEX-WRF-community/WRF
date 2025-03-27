@@ -72,6 +72,7 @@ CONTAINS
       USE module_radiation_driver, ONLY: cal_cldfra3
       USE module_dm, ONLY : wrf_dm_max_real
       use module_madwrf, only : Init_madwrf_clouds, Init_madwrf_tracers
+      USE module_driver_constants, ONLY: nz_urbanmax
 
       IMPLICIT NONE
 
@@ -193,10 +194,12 @@ integer::oops1,oops2
 
       REAL :: press_above, press_below
 
-      !  Urban checks
+      !  Urban checks, when urban dimensions are changed from default values
       LOGICAL                                            :: first_urbanij
-      ! I know, it can be better done 
-      REAL, DIMENSION(100)                               :: urban_zs
+      REAL, DIMENSION(15)                                :: NUDAPT_zs, NUDAPT_hiurb2D
+      REAL, DIMENSION(16)                                :: NUDAPT_zs_bt
+      REAL, DIMENSION(nz_urbanmax)                       :: urban_zs, urban_hiurb2D
+      REAL, DIMENSION(nz_urbanmax+1)                     :: urban_zs_bt
 
       !  Dimension information stored in grid data structure.
 
@@ -3146,7 +3149,30 @@ integer::oops1,oops2
                IF (config_flags%num_urban_hi /= 15) THEN
                  IF (first_urbanij) THEN
                    PRINT *,"  In dyn_em/module_initialize_real using averages of NUDAPT's HI_URB2D"
+                   ! L. Fita, UBA/CIMA/IFAECI, March 2025
+                   ! FROM: https://ral.ucar.edu/sites/default/files/public/product-tool/NUDAPT_44_Documentation.pdf
+                   ! NUDAPT data is stored up to 75m in 5 m bins values in URB_PARAM(118:132)
+                   ! When using less vertical urban levels in the urban module, we will average these 
+                   !   values to the new bins
+
+                   ! NUDAPT heights
+                   NUDAPT_zs_bt(1) = 0.
+                   DO k=1, 15
+                     NUDAPT_zs(k) = 5.*(k-1) / 2.
+                     NUDAPT_zs_bt(k+1) = 5.*k                     
+                   END DO
+                   ! New heighgts
+                   urban_zs_bt(1) = 0.
+                   DO k=1, config_flags%num_urban_hi)
+                     urban_zs(k) = config_flags%dz_urban*(k-1) / 2.
+                     urban_zs_bt(k) = config_flags%dz_urban*k
+                   END DO
                  END IF
+                 NUDAPT_hiurb2D = grid%URB_PARAM(i,118:132,j)
+                 ! Interpolating by weighted averages to the new vertical distriubtion
+                 CALL massconserv_vinterp1D(15, NUDAPT_zs, 16, NUDAP_zs_bt, NUDAPT_hiurb2D,           &
+                   config_flags%num_urban_hi, urban_zs, config_flags%num_urban_hi+1, urban_zs_bt,     &
+                   grid%HI_URB2D(i,k,j))
                ELSE
                  DO k = 1, config_flags%num_urban_hi
                    grid%HI_URB2D(i,k,j)  = grid%URB_PARAM(i,k+117,j)
@@ -9131,6 +9157,152 @@ end do
    END SUBROUTINE init_module_initialize
 
 !---------------------------------------------------------------------
+
+! FROM: CORDEX-WRF v2 module subroutine to mass conservative between vertical layers
+!   https://wiki.cima.fcen.uba.ar/mediawiki/index.php/CDXWRF
+!   phys/module_diagvar_cordex.F
+ 
+  SUBROUTINE massconserv_vinterp1D(dorig, levorig, dorig1, btlevorig, valsorig, ddes, levdes,         &
+    ddes1, btlevdes, valsdes)
+  ! Subrotine to mass-conservative vertically interpolate a variable 1D
+  
+    IMPLICIT NONE
+    
+    INTEGER, INTENT(in)                                  :: dorig, ddes, dorig1, ddes1
+    REAL, DIMENSION(dorig), INTENT(in)                   :: levorig, valsorig
+    REAL, DIMENSION(dorig1), INTENT(in)                  :: btlevorig
+    REAL, DIMENSION(ddes), INTENT(in)                    :: levdes
+    REAL, DIMENSION(ddes1), INTENT(in)                   :: btlevdes
+    REAL, DIMENSION(ddes), INTENT(out)                   :: valsdes
+    
+    ! Local
+    INTEGER                                              :: ko, kd
+    REAL                                                 :: deskm1, deskp1
+    REAL                                                 :: orikm1, orikp1
+    REAL                                                 :: Dlevorig, delta_levorig, Dlevdes
+    REAL                                                 :: delta_desm1, delta_desp1
+    REAL                                                 :: deltatop_levorig, deltabot_levorig
+    CHARACTER(len=50)                                    :: fname
+
+!!!!!!! Variables
+! dorig: Original amount of vertical levels
+! levorig: original values of the levels (centerd into the level) [m]
+! valsorig: original values of the field at the original levels (as density or similar [kgm-3])
+! dorig1: original amount of vertical levels + 1
+! btlevorig: bottom, tops of the original cells [m]
+!     btlev(k) < lev(k) < btlev(k+1)
+! ddes: desired amount of vertical levels
+! levdes: desired levels [m]
+! ddes1: desired amount of vertical levels + 1
+! btlevdes: bottom, tops of the desired cells [m]
+! valsdest: mass-conservative interpolated values (as density or similar [kgm-3])
+    
+    fname = 'massconserv_vinterp1D'
+    
+    valsdes = zeroRK
+    
+    ! Let's be efficient
+   
+    ! Assuming surface -> top vertical layers and Xsfc < Xtop (as the case with height...)
+   
+    ! Here comes the proper integration, where the values of the original cells within the range
+    !   of the desired cell, are added according to the percentage of the height of the original 
+    !   cell that lays within the range of the desired cell
+    !   
+    !   valsdes(kd) = SUM_Nlev(delta_levorig(ko)*valsorig(ko)) + 
+    !     deltatop_levorig(itopkin)*valsorig(itopkin) + deltabot_levorig(ibotkin)*valsorig(ibotkin)
+    !
+    !   valdes(kd) = valdes(kd) / Dlevdes
+    !
+    !     where:
+    !        Dlevdes = deskp1 - deskm1
+    !        Dlevorig = orikp1 - orikm1
+    ! 
+    !        delta_levorig(ko) = Dlevorig - delta_desm1 - delta_desp1
+    !
+    !        delta_desm1 = 
+    !          deskm1 - orikm1;        deskm1 > orikm1
+    !          0;                      deskm1 < orikm1   
+    !        delta_desp1 = 
+    !          orikp1 - deskp1;        deskp1 < orikp1
+    !          0;                      deskp1 > orikp1
+    !
+    !        deltatop_levorig(itopkin) = orikp1 - deskm1
+    !        deltabot_levorig(ibotkin) = deskp1 - orikm1
+    !
+    !     being:
+    !       orikm1: value at the base of the original cell
+    !       orikp1: value at the top of the original cell
+    !       deskm1: value at the base of the desired cell
+    !       deskp1: value at the top of the desired cell
+    !       Nlev: amount of original levels within the height of the kd-desired cell
+    !         Nlev = orilev(ko) <= deskm1 .and. orilev(ko) > deskp1
+   
+    DO kd=1, ddes
+
+      ! Cell's bottom          
+      deskm1 = btlevdes(kd)
+      ! Cell0s top
+      deskp1 = btlevdes(kd+1)
+      
+      Dlevdes = deskp1 - deskm1
+  
+      ! Looking for the original cells within the range of the desired cell
+      DO ko=1, dorig
+        ! original cell's top
+        orikp1 = btlevorig(ko+1)
+
+        ! original cell's bottom          
+        orikm1 = btlevorig(ko)
+
+        IF (levorig(ko) >= deskm1 .AND. levorig(ko) < deskp1) THEN
+          ! Center of the columns
+          
+          Dlevorig = orikp1 - orikm1
+          IF (deskm1 > orikm1) THEN
+            delta_desm1 = deskm1 - orikm1
+          ELSE
+            delta_desm1 = zeroRK
+          END IF
+          IF (deskp1 < orikp1) THEN
+            delta_desp1 = orikp1 - deskp1
+          ELSE
+            delta_desp1 = zeroRK
+          END IF
+        
+          delta_levorig = Dlevorig - delta_desm1 - delta_desp1
+        
+          valsdes(kd) = valsdes(kd) + delta_levorig*valsorig(ko)
+
+        ELSE IF (orikp1 > deskm1 .AND. levorig(ko) < deskm1) THEN
+          ! We might have only top of the original columns wihtin the range
+       
+          deltatop_levorig = orikp1 - deskm1
+        
+          valsdes(kd) = valsdes(kd) + deltatop_levorig*valsorig(ko)      
+
+        ELSE IF (orikm1 < deskp1 .AND. levorig(ko) > deskp1) THEN
+          ! We might have only base of the original columns wihtin the range
+
+          deltabot_levorig = deskp1 - orikm1
+          
+          valsdes(kd) = valsdes(kd) + deltabot_levorig*valsorig(ko)      
+        
+        ELSE IF (orikm1 > deskp1) THEN
+          EXIT
+          
+        END IF
+
+      END DO
+      
+      valsdes(kd) = valsdes(kd)/Dlevdes
+      
+    END DO
+  
+    RETURN
+    
+  END SUBROUTINE massconserv_vinterp1D
+
 
 END MODULE module_initialize_real
 #endif
