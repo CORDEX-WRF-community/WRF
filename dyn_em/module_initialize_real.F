@@ -3163,16 +3163,16 @@ integer::oops1,oops2
                    END DO
                    ! New heighgts
                    urban_zs_bt(1) = 0.
-                   DO k=1, config_flags%num_urban_hi)
+                   DO k=1, config_flags%num_urban_hi
                      urban_zs(k) = config_flags%dz_urban*(k-1) / 2.
                      urban_zs_bt(k) = config_flags%dz_urban*k
                    END DO
                  END IF
                  NUDAPT_hiurb2D = grid%URB_PARAM(i,118:132,j)
                  ! Interpolating by weighted averages to the new vertical distriubtion
-                 CALL massconserv_vinterp1D(15, NUDAPT_zs, 16, NUDAP_zs_bt, NUDAPT_hiurb2D,           &
+                 CALL massconserv_vinterp1D(15, NUDAPT_zs, 16, NUDAPT_zs_bt, NUDAPT_hiurb2D,          &
                    config_flags%num_urban_hi, urban_zs, config_flags%num_urban_hi+1, urban_zs_bt,     &
-                   grid%HI_URB2D(i,k,j))
+                   grid%HI_URB2D(i,1:config_flags%num_urban_hi,j))
                ELSE
                  DO k = 1, config_flags%num_urban_hi
                    grid%HI_URB2D(i,k,j)  = grid%URB_PARAM(i,k+117,j)
