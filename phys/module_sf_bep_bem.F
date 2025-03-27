@@ -672,7 +672,8 @@ use module_wrf_error
 
       if (first) then                           ! True only on first call
 
-         call init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,&
+         call init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,                   &
+                nurbm, nz_um, ndm, p_num, q_num,                                  &
                 twini_u,trini_u,tgini_u,albg_u,albw_u,albr_u,albwin_u,emg_u,emw_u,&
                 emr_u,emwind_u,z0g_u,z0r_u,nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b,  &
                 cop_u,pwin_u,beta_u,sw_cond_u,time_on_u,time_off_u,targtemp_u,    &
@@ -682,7 +683,8 @@ use module_wrf_error
                 hsesf_u,hsequip,irho,gr_flag_u,gr_type_u)
  
 !Initialisation of the urban parameters and calculation of the view factor
-        call icBEP(nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u)
+        call icBEP(nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u,                               &
+                      nurbm, ndm, nz_um, dz_u)
    
       first=.false.
 
@@ -700,24 +702,26 @@ do ix=its,ite
            
          enddo
 
-         call icBEPHI_XY(iurb,hb_u,hi_urb1D,ss_urb,pb_urb,    &
-                         nz_urb(iurb),z_u)
+         call icBEPHI_XY(iurb,hb_u,hi_urb1D,ss_urb,pb_urb,                 &
+                         nz_urb(iurb),z_u, ndm, nz_um, nurbm, dz_u)
 
-         call param(iurb,nz_u(iurb),nz_urb(iurb),nzurban(iurb),      &
-                    nd_u(iurb),csg_u,csg,alag_u,alag,csr_u,csr,      &
-                    alar_u,alar,csw_u,csw,alaw_u,alaw,               &
-                    ws_u,ws_urb,ws,bs_u,bs_urb,bs,z0g_u,z0r_u,z0,    &
-                    strd_u,strd,drst_u,drst,ss_u,ss_urb,ss,pb_u,     &
-                    pb_urb,pb,dzw,dzr,dzf,csf,alaf,dzgb,csgb,alagb,  &
-                    lp_urb2d(ix,iy),lb_urb2d(ix,iy),                 &
+         call param(iurb,nz_u(iurb),nz_urb(iurb),nzurban(iurb),nd_u(iurb), &
+                    nurbm, ndm, nz_um, ng_u, nwr_u, ngb_u, nf_u,           &
+                    csg_u,csg,alag_u,alag,csr_u,csr,                       &
+                    alar_u,alar,csw_u,csw,alaw_u,alaw,                     &
+                    ws_u,ws_urb,ws,bs_u,bs_urb,bs,z0g_u,z0r_u,z0,          &
+                    strd_u,strd,drst_u,drst,ss_u,ss_urb,ss,pb_u,           &
+                    pb_urb,pb,dzw,dzr,dzf,csf,alaf,dzgb,csgb,alagb,        &
+                    lp_urb2d(ix,iy),lb_urb2d(ix,iy),                       &
                     hgt_urb2d(ix,iy),FRC_URB2D(ix,iy))
          
 !
 !We compute the view factors in the icBEP_XY routine
 !  
 
-         call icBEP_XY(iurb,fww_u,fwg_u,fgw_u,fsw_u,fws_u,fsg_u,   &
-                         nd_u(iurb),strd,ws,nzurban(iurb),z_u)   
+         call icBEP_XY(iurb,fww_u,fwg_u,fgw_u,fsw_u,                   &
+                         nurbm, ndm, nz_um,                            &
+                         fws_u,fsg_u,nd_u(iurb),strd,ws,nzurban(iurb),z_u)   
 
          ibui=0
          nlev=0
@@ -1531,6 +1535,7 @@ do ix=its,ite
 ! Compute the modification of the radiation due to the buildings
 
       call averaging_temp(tw,twlev,ss,pb,tw_av,twlev_av, &
+                           ndm, nz_um, nwr_u, nbui_max,  &
                            sfw_av,sfwind_av,sfw,sfwin)
                            
      do id=1,ndu
@@ -1542,29 +1547,23 @@ do ix=its,ite
 
      enddo
      enddo
-     
-     
-
-
-   
-     call modif_rad(iurb,ndu,nzu,z_u,ws,           &
-                    drst,strd,ss,pb,                &
-                    tw_av,tg_av,twlev_av,albg,albw,    &
-                    emw,emg,pwin_u(iurb),albwin,    &
-                    emwind,fww,fwg,fgw,fsw,fsg,     &
-                    zr,deltar,ah,xlat,swddir,swddif,      &  !_gl  
+        
+     call modif_rad(iurb,ndu,nzu,z_u,ws,                &
+                    drst,strd,ss,pb,                    &
+                    nurbm, ndm, nz_um, ng_u, nwr_u,     &
+                    tw_av,tg_av,twlev_av,albg,albw,     &
+                    emw,emg,pwin_u(iurb),albwin,        &
+                    emwind,fww,fwg,fgw,fsw,fsg,         &
+                    zr,deltar,ah,xlat,swddir,swddif,    &  !_gl  
                     rs,rld,rsw,rsd,rsg,rlw,rlg)  
-
-
- 
 
 ! calculation of the urban albedo and the upward long wave radiation
 
-
-       call upward_rad(ndu,nzu,ws,bs,sigma,pb,ss,                 &
-                       tg_av,emg,albg,rlg,rsg,sfg,lfg,                   & 
-                       tw_av,emw,albw,rlw,rsw,sfw_av,             & 
-                       tr_av,emr,albr,emwind,                        &
+       call upward_rad(ndu,nzu,ws,bs,sigma,pb,ss,                                       &
+                       ndm, nz_um, ng_u, nwr_u, dz_u,                                   &
+                       tg_av,emg,albg,rlg,rsg,sfg,lfg,                                  &
+                       tw_av,emw,albw,rlw,rsw,sfw_av,                                   &
+                       tr_av,emr,albr,emwind,                                           &
                        albwin,twlev_av,pwin_u(iurb),sfwind_av,rld,rs,sfr,sfrv,lfr,lfrv, & 
                        rs_abs,rl_up,emiss,grdflx_urb,gr_frac_roof,tpvlev,pv_frac_roof)          
    
@@ -1591,18 +1590,20 @@ do ix=its,ite
    enddo
   enddo !id 
  
-  
-
-
-     call surf_temp(ndu,pr_u,dt,                   & 
-                    rld,rsg,rlg,                    &
+     call surf_temp(ndu,pr_u,dt,                         & 
+                    rld,rsg,rlg,                         &
+                    ndm, nz_um, ng_u, nwr_u,             &
                     tg,alag,csg,emg,albg,ptg,sfg,lfg,gfg)
      if(gr_flag.eq.1)then
      if(gr_frac_roof.gt.0.)then
      hfgr=0.
-     call roof_temp_veg(ndu,pr_u,dt,                   &
-                    rld,rs,                    &
-                    trv,ptrv,sfrv,lfrv,gfr,qr,rainbl,drain,hfgr,tr,alar(5),dzr(5),csr(5),nzu,irri_now,gr_type,pv_frac_roof,tpvlev)
+     call roof_temp_veg(ndu,pr_u,dt,                     &
+                    rld,rs,                              &
+                    ndm, nz_um, nwr_u, ngr_u,            &
+                    trv,ptrv,sfrv,lfrv,gfr,qr,rainbl,    &
+                    drain,hfgr,tr,alar(5),dzr(5),csr(5), &
+                    nzu,irri_now,gr_type,pv_frac_roof,   &
+                    tpvlev)
     
      endif
      endif
@@ -1851,16 +1852,15 @@ do ix=its,ite
         
 ! Compute the implicit and explicit components of the sources or sinks on the "urban grid"
 
-      call buildings(iurb,ndu,nzu,z0,cdrag,ua_u,va_u,                               & 
-                     pt_u,pt0_u,ptg,ptr,ptrv,da_u,qv_u,pr_u,tmp_u,ptw,ptwin,pwin_u(iurb),drst,     &                      
-                     uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,qvb_u,qhb_u,   & 
-                     uhb_u,vhb_u,thb_u,ehb_u,ss,dt,sfw,sfg,sfr,sfrpv,sfrv,lfrv,   &
-                     dgr,dg,lfr,lfg,                                                                    &
-                     sfwin,pb,bs_u,dz_u,sflev,lflev,sfvlev,lfvlev,tvb_ac,ix,iy,rsg,rs,qr,gr_frac_roof,  &
+      call buildings(iurb,ndu,nzu,z0,cdrag,ua_u,va_u,                                                 &
+                     pt_u,pt0_u,                                                                      &
+                     ndm, nz_um, nurbm, nbui_max, ngr_u,                                              &
+                     ptg,ptr,ptrv,da_u,qv_u,pr_u,tmp_u,ptw,ptwin,pwin_u(iurb),drst,                   &
+                     uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,qvb_u,qhb_u,                           &
+                     uhb_u,vhb_u,thb_u,ehb_u,ss,dt,sfw,sfg,sfr,sfrpv,sfrv,lfrv,                       &
+                     dgr,dg,lfr,lfg,                                                                  &
+                     sfwin,pb,bs_u,dz_u,sflev,lflev,sfvlev,lfvlev,tvb_ac,ix,iy,rsg,rs,qr,gr_frac_roof,&
                      pv_frac_roof,gr_flag,gr_type)  
-      
-
-
 
 ! Calculation of the sensible heat fluxes for the ground, the wall and roof
 ! Sensible Heat Flux = density * Cp_U * ( A* potential temperature + B )
@@ -1869,14 +1869,18 @@ do ix=its,ite
 ! Interpolation on the "mesoscale grid"
 
       call urban_meso(ndu,kms,kme,kts,kte,nzu,z,dz,z_u,pb,ss,bs,ws,sf, & 
-                     vl,uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,     &
+                     vl,                                               &
+                     ndm, nz_um,                                       &
+                     uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,        &
                      uhb_u,vhb_u,thb_u,ehb_u,qhb_u,qvb_u,              &
                      a_u,a_v,a_t,a_e,b_u,b_v,b_t,b_e,b_q,tvb_ac,b_ac)                    
        
 
 ! Calculation of the length scale taking into account the buildings effects
 
-      call interp_length(ndu,kms,kme,kts,kte,nzu,z_u,z,ss,ws,bs,dlg,dl_u)
+      call interp_length(ndu,kms,kme,kts,kte,nzu,z_u,z,ss,ws,bs,       &
+        ndm, nz_um,                                                    &
+        dlg,dl_u)
       
       return
       end subroutine BEP1D
@@ -2165,7 +2169,7 @@ do ix=its,ite
 ! ===6=8===============================================================72       
 ! ===6=8===============================================================72    
 
-      subroutine  averaging_temp(tw,twlev,ss,pb,tw_av,twlev_av,       &
+      subroutine averaging_temp(tw,twlev,ss,pb,tw_av,twlev_av,        &
                                  ndm, nz_um, nwr_u, nbui_max,         &
                                  sfw_av,sfwind_av,sfw,sfwin) 
 
@@ -2320,18 +2324,22 @@ do ix=its,ite
 
 !  Calculation of the shadow effects
 
-      call shadow_mas(nd,nz_u,zr,deltar,ah,drst,ws,ss,pb,z,        &
+      call shadow_mas(nd,nz_u,zr,deltar,ah,drst,ws,ss,pb,z,           &
+                     nz_um,                                           &
                      swddir,rsw,rsg,xlat)
       rsd=rsw
 
 ! Calculation of the reflection effects          
       do id=1,nd
-         call long_rad(iurb,nz_u,id,emw,emg,emwin,pwin,twlev,      &
+         call long_rad(iurb,nz_u,id,emw,emg,                          &
+                      nurbm, nz_um, ndm, ng_u, nwr_u,                 &
+                      emwin,pwin,twlev,                               &
                       fwg,fww,fgw,fsw,fsg,tg_av,tw,rlg,rlw,rl,pb)
 
          alb_av=pwin*albwin+(1.-pwin)*albw
          
         call short_rad_dd(iurb,nz_u,id,alb_av,                        &
+                           nurbm, nz_um, ndm, ng_u,                   &
                            albg,swddif,fwg,fww,fgw,fsw,fsg,rsg,rsw,pb)
  
 
@@ -2809,67 +2817,70 @@ do ix=its,ite
 !        Calculation at the ground surfaces
       do id=1,nd
       
-          call flux_flat(dz,z0(id,1),ua_u(1),va_u(1),pt_u(1),pt0_u(1),  &
-                       ptg(id),qv_u(1),uhb(id,1),                            & 
-                       vhb(id,1),sfg(id),lfg(id),ehb(id,1),da_u(1),pr_u(1))        
-          if(dg(id).gt.0)then
+         call flux_flat(dz,z0(id,1),ua_u(1),va_u(1),pt_u(1),pt0_u(1),       &
+                      ptg(id),qv_u(1),uhb(id,1),                            & 
+                      vhb(id,1),sfg(id),lfg(id),ehb(id,1),da_u(1),pr_u(1))        
+         if(dg(id).gt.0)then
            wfg=dg(id)/dgmax
            lfg(id)=-da_u(1)*latent*(-(wfg*lfg(id))/(da_u(1)*latent))
-          else
+         else
            qhb_u(id,1)=0.
            lfg(id)=0.
-          endif   
+         endif   
          thb_u(id,1)=-(sfg(id))/(da_u(1)*cp_u)
          vhb_u(id,1)=vhb(id,1)
          uhb_u(id,1)=uhb(id,1)
          ehb_u(id,1)=ehb(id,1)
          qhb_u(id,1)=-lfg(id)/(da_u(1)*latent)
          do iz=2,nz
-            if(ss(iz).gt.0)then
+           if (ss(iz).gt.0) then
             
-               call flux_flat(dz,z0(id,iz),ua_u(iz),&
-                       va_u(iz),pt_u(iz),pt0_u(iz), &
+               call flux_flat(dz,z0(id,iz),ua_u(iz),         &
+                       va_u(iz),pt_u(iz),pt0_u(iz),          &
                        ptr(id,iz),qv_u(iz),uhb(id,iz),       &
-                       vhb(id,iz),sfr(id,iz),lfr(id,iz),ehb(id,iz),da_u(iz),pr_u(iz))
-         if(dgr(id,iz).gt.0)then
-          wfr=dgr(id,iz)/drmax
-          lfr(id,iz)=-da_u(iz)*latent*(-(wfr*lfr(id,iz))/(da_u(iz)*latent))
-         else
-          lfr(id,iz)=0.
-         endif
-         if(gr_flag.eq.1.and.gr_frac_roof.gt.0.)then  
-         do il=1,ngr_u
-           qr_tmp(il)=qr(id,iz,il)
+                       vhb(id,iz),sfr(id,iz),lfr(id,iz),     &
+                       ehb(id,iz),da_u(iz),pr_u(iz))
+             if (dgr(id,iz).gt.0) then
+               wfr=dgr(id,iz)/drmax
+               lfr(id,iz)=-da_u(iz)*latent*(-(wfr*lfr(id,iz))/(da_u(iz)*latent))
+             else
+               lfr(id,iz)=0.
+             endif
+             if (gr_flag.eq.1.and.gr_frac_roof.gt.0.) then
+               do il=1,ngr_u
+                 qr_tmp(il)=qr(id,iz,il)
+               enddo
+               call flux_flat_roof(dz,z0v,ua_u(iz),va_u(iz),pt_u(iz),pt0_u(iz),&
+                   ptrv(id,iz), ngr_u,                                         &
+                   uhbv(id,iz),                                                &
+                   vhbv(id,iz),sfrv(id,iz),lfrv(id,iz),ehbv(id,iz),da_u(iz),   &
+                   qv_u(iz),pr_u(iz),rs,qr_tmp,resg,rsveg,f1,f2,f3,f4,         &
+                   gr_type,pv_frac_roof)
+
+               sfr(id,iz)=sfr(id,iz)+pv_frac_roof*sfrpv(id,iz) 
+               thb_u(id,iz)=-((1.-gr_frac_roof)*sfr(id,iz)+gr_frac_roof*sfrv(id,iz))/(da_u(iz)*cp_u)
+               vhb_u(id,iz)=(1.-gr_frac_roof)*vhb(id,iz)+gr_frac_roof*vhbv(id,iz)
+               uhb_u(id,iz)=(1.-gr_frac_roof)*uhb(id,iz)+gr_frac_roof*uhbv(id,iz)
+               ehb_u(id,iz)=(1.-gr_frac_roof)*ehb(id,iz)+gr_frac_roof*ehbv(id,iz)
+               qhb_u(id,iz)=-(gr_frac_roof*lfrv(id,iz)+(1.-gr_frac_roof)*lfr(id,iz))/(da_u(iz)*latent)
+               sfr(id,iz)=sfr(id,iz)-pv_frac_roof*sfrpv(id,iz)
+             else
+               sfr(id,iz)=sfr(id,iz)+pv_frac_roof*sfrpv(id,iz)
+               thb_u(id,iz)=-sfr(id,iz)/(da_u(iz)*cp_u)
+               vhb_u(id,iz)=vhb(id,iz)
+               uhb_u(id,iz)=uhb(id,iz)
+               ehb_u(id,iz)=ehb(id,iz)
+               qhb_u(id,iz)=-lfr(id,iz)/(da_u(iz)*latent)
+               sfr(id,iz)=sfr(id,iz)-pv_frac_roof*sfrpv(id,iz)
+             endif
+           else
+             uhb_u(id,iz) = 0.0
+             vhb_u(id,iz) = 0.0
+             thb_u(id,iz) = 0.0
+             ehb_u(id,iz) = 0.0
+             qhb_u(id,iz) = 0.0
+           endif
          enddo
-               call flux_flat_roof(dz,z0v,ua_u(iz),va_u(iz),pt_u(iz),pt0_u(iz),  &
-                       ptrv(id,iz),uhbv(id,iz),                            &
-                       vhbv(id,iz),sfrv(id,iz),lfrv(id,iz),ehbv(id,iz),da_u(iz),qv_u(iz),pr_u(iz),rs,qr_tmp,resg,rsveg,f1,f2,f3,f4,gr_type,pv_frac_roof)
-         sfr(id,iz)=sfr(id,iz)+pv_frac_roof*sfrpv(id,iz) 
-         thb_u(id,iz)=-((1.-gr_frac_roof)*sfr(id,iz)+gr_frac_roof*sfrv(id,iz))/(da_u(iz)*cp_u)
-         vhb_u(id,iz)=(1.-gr_frac_roof)*vhb(id,iz)+gr_frac_roof*vhbv(id,iz)
-         uhb_u(id,iz)=(1.-gr_frac_roof)*uhb(id,iz)+gr_frac_roof*uhbv(id,iz)
-         ehb_u(id,iz)=(1.-gr_frac_roof)*ehb(id,iz)+gr_frac_roof*ehbv(id,iz)
-         qhb_u(id,iz)=-(gr_frac_roof*lfrv(id,iz)+(1.-gr_frac_roof)*lfr(id,iz))/(da_u(iz)*latent)
-         sfr(id,iz)=sfr(id,iz)-pv_frac_roof*sfrpv(id,iz)
-         else
-         sfr(id,iz)=sfr(id,iz)+pv_frac_roof*sfrpv(id,iz)
-         thb_u(id,iz)=-sfr(id,iz)/(da_u(iz)*cp_u)
-         vhb_u(id,iz)=vhb(id,iz)
-         uhb_u(id,iz)=uhb(id,iz)
-         ehb_u(id,iz)=ehb(id,iz)
-         qhb_u(id,iz)=-lfr(id,iz)/(da_u(iz)*latent)
-         sfr(id,iz)=sfr(id,iz)-pv_frac_roof*sfrpv(id,iz)
-         endif
-            else
-               uhb_u(id,iz) = 0.0
-               vhb_u(id,iz) = 0.0
-               thb_u(id,iz) = 0.0
-               ehb_u(id,iz) = 0.0
-               qhb_u(id,iz) = 0.0
-            endif
-         enddo
-         
-         
 
 !        Calculation at the wall surfaces        
  
@@ -5279,7 +5290,7 @@ do ix=its,ite
 
        do iu=1,nurb  
           emwind_u(iu)=0.9                       
-          call albwindow(albwin_u(iu))  
+          call albwindow(albwin_u(iu), p_num, q_num)  
        enddo
        
        return
@@ -5586,8 +5597,9 @@ do ix=its,ite
       
       do id=1,ndu
 
-            call view_factors(iurb,nzu,id,strd(id),z_u,ws(id),  &    
-                              fww_u,fwg_u,fgw_u,fsg_u,fsw_u,fws_u) 
+            call view_factors(iurb,nzu,id,strd(id),z_u,ws(id),     &    
+                              fww_u,fwg_u,fgw_u,fsg_u,fsw_u,fws_u, &
+                              nurbm, nz_um, ndm) 
       
       enddo               
 
