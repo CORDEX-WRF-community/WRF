@@ -3167,6 +3167,7 @@ integer::oops1,oops2
                      urban_zs(k) = config_flags%dz_urban*(k-1) / 2.
                      urban_zs_bt(k) = config_flags%dz_urban*k
                    END DO
+                   first_urbanij = .FALSE.
                  END IF
                  NUDAPT_hiurb2D = grid%URB_PARAM(i,118:132,j)
                  ! Interpolating by weighted averages to the new vertical distriubtion
