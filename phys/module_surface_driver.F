@@ -289,6 +289,15 @@ CONTAINS
      &          ,dz_u, h_water                                       &
      &          ,emins, albins, thickwin, cswin, temp_rat, hum_rat   & 
      &          ,effpv                                               &
+     &          ,alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,        &
+     &          ,albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,        &
+     &          ,gr_flag_u, gr_type_u, gr_frac_roof_u,               &
+     &          ,pv_frac_roof_u, albwin_u, emwind_u, z0g_u, z0r_u,   &
+     &          ,nd_u, strd_u, drst_u, ws_u, bs_u, h_b, d_b, ss_u,   &
+     &          ,pb_u, nz_u, z_u, cop_u, pwin_u, beta_u, sw_cond_u,  &
+     &          ,bldac_frc_u, cooled_frc_u, time_on_u, time_off_u,   &
+     &          ,targtemp_u, gaptemp_u, targhum_u, gaphum_u,         &
+     &          ,perflo_u, hsesf_u, hsequip, irho,                   &
      &          ,ep_pv_urb3d,t_pv_urb3d                              & !multi-layer urban GRZ
      &          ,trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d              & !multi-layer urban GRZ
      &          ,drain_urb4d,draingr_urb3d                           & !multi-layer urban GRZ
@@ -1028,6 +1037,21 @@ CONTAINS
    REAL, INTENT(in)                                      :: dz_u, h_water
    REAL, INTENT(in)                                      :: emins, albins, thickwin, cswin, temp_rat, &
      hum_rat, effpv
+   REAL, DIMENSION(nurbmax), INTENT(inout)               :: alag_u, alaw_u, alar_u, csg_u, csw_u,csr_u
+   REAL, DIMENSION(nurbmax), INTENT(inout)               :: albg_u, albw_u, albr_u, emg_u, emw_u,     &
+     emr_u, gr_frac_roof_u, pv_frac_roof_u, albwin_u, emwind_u
+   INTEGER, INTENT(inout)                                :: gr_flag_u, gr_type_u
+   REAL, DIMENSION(nurbmax), INTENT(inout)               :: z0g_u, z0r_u
+   INTEGER, DIMENSION(nurbmax), INTENT(inout)            :: nd_u
+   REAL, DIMENSION(ndm,nurbmax), INTENT(inout)           :: strd_u, drst_u, ws_u, bs_u
+   REAL, DIMENSION(ndm,nurbmax), INTENT(inout)           :: h_b, d_b, ss_u, pb_u
+   INTEGER, DIMENSION(nurbmax), INTENT(inout)            :: nz_u
+   REAL, DIMENSION(nz_um), INTENT(inout)                 :: z_u
+   REAL, DIMENSION(nurbmax), INTENT(inout)               :: cop_u, bldac_frc_u, cooled_frc_u, pwin_u, &
+     beta_u, time_on_u, time_off_u, targtemp_u, gaptemp_u, targhum_u, gaphum_u, perflo_u, hsesf_u
+   INTEGER, DIMENSION(nurbmax), INTENT(inout)            ::  sw_cond_u
+   REAL, DIMENSION(24), INTENT(inout)                    :: hsequip, irho
+
 #ifdef URBANSTATE
 ! Data interpolated from the "mesoscale grid" to the "urban grid" (num_urban_nz)
 ! ua_u3D: Wind speed in the x direction [ms-1]
@@ -2782,6 +2806,17 @@ CONTAINS
                 dz_u, h_water,                                  &
                 emins, albins, thickwin, cswin, temp_rat,       & 
                 hum_rat, effpv,                                 &
+                alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,    &
+                albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,    &
+                gr_flag_u, gr_type_u, gr_frac_roof_u,           &
+                pv_frac_roof_u,                                 &
+                albwin_u, emwind_u, z0g_u, z0r_u,               &
+                nd_u, strd_u, drst_u, ws_u, bs_u, h_b, d_b,     &
+                ss_u, pb_u, nz_u, z_u, cop_u,                   &
+                pwin_u, beta_u, sw_cond_u, bldac_frc_u,         &
+                cooled_frc_u, time_on_u, time_off_u,            &
+                targtemp_u, gaptemp_u, targhum_u, gaphum_u,     &
+                perflo_u, hsesf_u, hsequip, irho,               &
                 ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
                 trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !GRZ
                 drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !GRZ
@@ -2924,6 +2959,16 @@ CONTAINS
                 dz_u, h_water,                                  &
                 emins, albins, thickwin, cswin, temp_rat,       &
                 hum_rat, effpv,                                 &
+                alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,    &
+                albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,    &
+                gr_flag_u, gr_type_u, gr_frac_roof_u,           &
+                pv_frac_roof_u, albwin_u, emwind_u, z0g_u,      &
+                z0r_u, nd_u, strd_u, drst_u, ws_u, bs_u, h_b,   &
+                d_b, ss_u, pb_u, nz_u, z_u, cop_u,              &
+                pwin_u, beta_u, sw_cond_u, bldac_frc_u,         &
+                cooled_frc_u, time_on_u, time_off_u, targtemp_u,&
+                gaptemp_u, targhum_u, gaphum_u, perflo_u,       &
+                hsesf_u, hsequip, irho,                         &
                 ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
                 trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !GRZ
                 drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !GRZ
@@ -3271,6 +3316,15 @@ CONTAINS
                              nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num,                    &
                                dz_u, h_water,                                               &
                                emins, albins, thickwin, cswin, temp_rat, hum_rat, effpv,    &
+                               alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,                 &
+                               albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,                 &
+                               gr_flag_u, gr_type_u, gr_frac_roof_u, pv_frac_roof_u,        &
+                               albwin_u, emwind_u, z0g_u, z0r_u,                            &
+                               nd_u, strd_u, drst_u, ws_u, bs_u, h_b, d_b, ss_u, pb_u,      &
+                               nz_u, z_u, cop_u, pwin_u, beta_u, sw_cond_u,                 &
+                               bldac_frc_u, cooled_frc_u, time_on_u, time_off_u,            &
+                               targtemp_u, gaptemp_u, targhum_u, gaphum_u, perflo_u,        &
+                               hsesf_u, hsequip, irho,                                      &              
                           trv_urb4d,       qr_urb4d,      qgr_urb3d,  tgr_urb3d,            & !GRZ
                         drain_urb4d,  draingr_urb3d,     sfrv_urb3d, lfrv_urb3d,            & !GRZ
                           dgr_urb3d,       dg_urb3d,      lfr_urb3d,  lfg_urb3d,            & !GRZ

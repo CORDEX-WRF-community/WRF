@@ -78,6 +78,15 @@ use module_wrf_error
                       nurbmax, ndm, nz_um, ng_u, ngr_u,                            &
                       nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num, dz_u, h_water,   &
                       emins, albins, thickwin, cswin, temp_rat, hum_rat, effpv,    &
+                      alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,                 &
+                      albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,                 &
+                      gr_flag_u, gr_type_u, gr_frac_roof_u, pv_frac_roof_u,        &
+                      albwin_u, emwind_u, z0g_u, z0r_u,                            &
+                      nd_u, strd_u, drst_u, ws_u, bs_u, h_b, d_b, ss_u, pb_u,      &
+                      nz_u, z_u, cop_u, pwin_u, beta_u, sw_cond_u,                 &
+                      bldac_frc_u, cooled_frc_u, time_on_u, time_off_u,            &
+                      targtemp_u, gaptemp_u, targhum_u, gaphum_u, perflo_u,        &
+                      hsesf_u, hsequip, irho,                                      &
                       lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,                        &
                       a_u,a_v,a_t,a_e,b_u,b_v,                                     &
                       b_t,b_e,b_q,dlg,dl_u,sf,vl,                                  &
@@ -233,12 +242,7 @@ use module_wrf_error
       integer nzurban(nurbmax)
 
 !    Building parameters      
-      real alag_u(nurbmax)                    ! Ground thermal diffusivity [m^2 s^-1]
-      real alaw_u(nurbmax)                    ! Wall thermal diffusivity [m^2 s^-1]
-      real alar_u(nurbmax)                    ! Roof thermal diffusivity [m^2 s^-1]
-      real csg_u(nurbmax)                     ! Specific heat of the ground material [J m^3 K^-1]
-      real csw_u(nurbmax)                     ! Specific heat of the wall material [J m^3 K^-1]
-      real csr_u(nurbmax)                     ! Specific heat of the roof material [J m^3 K^-1]
+      REAL, DIMENSION(nurbmax), INTENT(inout)            :: alag_u, alaw_u, alar_u, csg_u, csw_u,csr_u
       real twini_u(nurbmax)                   ! Initial temperature inside the building's wall [K]
       real trini_u(nurbmax)                   ! Initial temperature inside the building's roof [K]
       real tgini_u(nurbmax)                   ! Initial road temperature
@@ -246,7 +250,6 @@ use module_wrf_error
 !
 !   Building materials
 !
-
       real csg(ng_u)           ! Specific heat of the ground material [J m^3 K^-1]
       real csw(nwr_u)          ! Specific heat of the wall material for the current urban class [J m^3 K^-1]
       real csr(nwr_u)          ! Specific heat of the roof material for the current urban class [J m^3 K^-1]
@@ -283,18 +286,9 @@ use module_wrf_error
 ! for twini_u, and trini_u the initial value at the deepest level is kept constant during the simulation
 !
 !    Radiation paramters
-      real albg_u(nurbmax)                    ! Albedo of the ground
-      real albw_u(nurbmax)                    ! Albedo of the wall
-      real albr_u(nurbmax)                    ! Albedo of the roof
-      real albwin_u(nurbmax)                  ! Albedo of the windows
-      real emwind_u(nurbmax)                  ! Emissivity of windows
-      real emg_u(nurbmax)                     ! Emissivity of ground
-      real emw_u(nurbmax)                     ! Emissivity of wall
-      real emr_u(nurbmax)                     ! Emissivity of roof
-      real gr_frac_roof_u(nurbmax)
-      real pv_frac_roof_u(nurbmax)
-      integer gr_flag_u
-      integer gr_type_u
+      REAL, DIMENSION(nurbmax), INTENT(inout)            :: albg_u, albw_u, albr_u, emg_u, emw_u,     &
+        emr_u, gr_frac_roof_u, pv_frac_roof_u, albwin_u, emwind_u
+      INTEGER, INTENT(inout)                             :: gr_flag_u, gr_type_u
 
 !   fww_u,fwg_u,fgw_u,fsw_u,fsg_u are the view factors used to compute the long wave
 !   and the short wave radiation. 
@@ -306,42 +300,22 @@ use module_wrf_error
       real fsg_u(ndm,nurbmax)                   !  from sky to ground
 
 !    Roughness parameters
-      real z0g_u(nurbmax)       ! The ground's roughness length
-      real z0r_u(nurbmax)       ! The roof's roughness length
+      REAL, DIMENSION(nurbmax), INTENT(inout)            :: z0g_u, z0r_u
 
 !    Street parameters
-      integer nd_u(nurbmax)     ! Number of street direction for each urban class 
-      real strd_u(ndm,nurbmax)  ! Street length (fix to greater value to the horizontal length of the cells)
-      real drst_u(ndm,nurbmax)  ! Street direction
-      real ws_u(ndm,nurbmax)    ! Street width
-      real bs_u(ndm,nurbmax)    ! Building width
-      real h_b(nz_um,nurbmax)   ! Bulding's heights
-      real d_b(nz_um,nurbmax)   ! Probability that a building has an height h_b
-      real ss_u(nz_um,nurbmax)! Probability that a building has an height equal to z
-      real pb_u(nz_um,nurbmax)! Probability that a building has an height greater or equal to z
-
+      INTEGER, DIMENSION(nurbmax), INTENT(inout)         :: nd_u
+      REAL, DIMENSION(ndm,nurbmax), INTENT(inout)        :: strd_u, drst_u, ws_u, bs_u
+      REAL, DIMENSION(ndm,nurbmax), INTENT(inout)        :: h_b, d_b, ss_u, pb_u
 
 !    Grid parameters
-      integer nz_u(nurbmax)     ! Number of layer in the urban grid
-      
-      real z_u(nz_um)         ! Height of the urban grid levels
+      INTEGER, DIMENSION(nurbmax), INTENT(inout)         :: nz_u
+      REAL, DIMENSION(nz_um), INTENT(inout)              :: z_u
 !FS
-      real cop_u(nurbmax)
-      real bldac_frc_u(nurbmax)
-      real cooled_frc_u(nurbmax)
-      real pwin_u(nurbmax)
-      real beta_u(nurbmax)
-      integer sw_cond_u(nurbmax)
-      real time_on_u(nurbmax)
-      real time_off_u(nurbmax)
-      real targtemp_u(nurbmax)
-      real gaptemp_u(nurbmax)
-      real targhum_u(nurbmax)
-      real gaphum_u(nurbmax)
-      real perflo_u(nurbmax)
-      real hsesf_u(nurbmax)
-      real hsequip(24)
-      real irho(24)
+      REAL, DIMENSION(nurbmax), INTENT(inout)            :: cop_u, bldac_frc_u, cooled_frc_u, pwin_u, &
+        beta_u, time_on_u, time_off_u, targtemp_u, gaptemp_u, targhum_u, gaphum_u, perflo_u, hsesf_u
+      INTEGER, DIMENSION(nurbmax), INTENT(inout)         ::  sw_cond_u
+      REAL, DIMENSION(24), INTENT(inout)                 :: hsequip, irho
+
 ! 1D array used for the input and output of the routine "urban"
 
       real z1D(kms:kme)               ! vertical coordinates

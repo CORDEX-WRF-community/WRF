@@ -850,6 +850,31 @@ BENCH_START(surf_driver_tim)
      &        ,thickwin=config_flags%thickwin, cswin=config_flags%cswin &
      &        ,temp_rat=config_flags%temp_rat                           & 
      &        ,hum_rat=config_flags%hum_rat, effpv=config_flags%effpv   &
+     &        ,alag_u=grid%alag_u, alaw_u=grid%alaw_u                   &
+     &        ,alar_u=grid%alar_u, csg_u=grid%csg_u                     &
+     &        ,csw_u=grid%csw_u, csr_u=grid%csr_u                       &
+     &        ,albg_u=grid%albg_u, albw_u=grid%albw_u                   &
+     &        ,albr_u=grid%albr_u, emg_u=grid%emg_u                     &
+     &        ,emw_u=grid%emw_u, emr_u=grid%emr_u                       &
+     &        ,gr_flag_u=grid%gr_flag_u, gr_type_u=grid%gr_type_u       &
+     &        ,gr_frac_roof_u=grid%gr_frac_roof_u                       & 
+     &        ,pv_frac_roof_u=grid%pv_frac_roof_u                       &
+     &        ,albwin_u=grid%albwin_u, emwind_u=grid%emwind_u           &
+     &        ,z0g_u=grid%z0g_u, z0r_u=grid%z0r_u                       &
+     &        ,nd_u=grid%nd_u, strd_u=grid%strd_u                       &
+     &        ,drst_u=grid%drst_u, ws_u=grid%ws_u                       &
+     &        ,bs_u=grid%bs_u, h_b=grid%h_b                             &
+     &        ,d_b=grid%d_b, ss_u=grid%ss_u, pb_u=grid%pb_u             &
+     &        ,nz_u=grid%nz_u, z_u=grid%z_u                             &
+     &        ,cop_u=grid%cop_u, pwin_u=grid%pwin_u                     &
+     &        ,beta_u=grid%beta_u, sw_cond_u=grid% sw_cond_u            &
+     &        ,bldac_frc_u=grid%bldac_frc_u                             &
+     &        ,cooled_frc_u=grid%cooled_frc_u                           &
+     &        ,time_on_u=grid%time_on_u, time_off_u=grid%time_off_u     &
+     &        ,targtemp_u=grid%targtemp_u, gaptemp_u=grid%gaptemp_u     &
+     &        ,targhum_u=grid%targhum_u, gaphum_u=grid%gaphum_u         &
+     &        ,perflo_u=grid%perflo_u, hsesf_u=grid%hsesf_u             &
+     &        ,hsequip=grid%hsequip, irho=grid%irho                     &
      &        ,EP_PV_URB3D=grid%ep_pv_urb3d                               & !GRZ
      &        ,T_PV_URB3D=grid%t_pv_urb3d                                 & !GRZ
      &        ,TRV_URB4D=grid%trv_urb4d                                   & !GRZ
