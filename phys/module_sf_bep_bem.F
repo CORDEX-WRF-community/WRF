@@ -77,6 +77,7 @@ use module_wrf_error
 !   to the actual value passed from the namelist.input
                       nurbmax, ndm, nz_um, ng_u, ngr_u,                            &
                       nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num, dz_u, h_water,   &
+                      emins, albins, thickwin, cswin, temp_rat, hum_rat, effpv,    &
                       lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,                        &
                       a_u,a_v,a_t,a_e,b_u,b_v,                                     &
                       b_t,b_e,b_q,dlg,dl_u,sf,vl,                                  &
@@ -181,9 +182,12 @@ use module_wrf_error
    REAL, INTENT(IN )::   DT      ! Time step
 
    INTEGER, INTENT(in)                                            :: num_urban_nz
-   INTEGER, INTENT(in)                                            :: nurbmax, ndm, nz_um, ng_u, ngr_u,   &
-     nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num
+   INTEGER, INTENT(in)                                            :: nurbmax, ndm, nz_um, ng_u,       &
+     ngr_u, nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num
    REAL, INTENT(in)                                               :: dz_u, h_water
+   REAL, INTENT(in)                                               :: emins, albins, thickwin, cswin,  &
+     temp_rat, hum_rat, effpv
+
 #ifdef URBANSTATE
    REAL, DIMENSION(1:num_urban_nz)                                :: ua_u1D, va_u1D, pt_u1D, da_u1D,  &
      pt0_u1D, pr_u1D, qv_u1D
@@ -1776,6 +1780,7 @@ use module_wrf_error
                    time_off_u(iurb),targtemp_u(iurb),gaptemp_u(iurb),        &
                    targhum_u(iurb),gaphum_u(iurb),perflo_u(iurb),            &
                    gr_frac_roof,pv_frac_roof,gr_flag,                        & 
+                   emins, albins, thickwin, cswin, temp_rat, hum_rat, effpv, &
                    ua_u,va_u,                                                &
                    hsesf_u(iurb),hsequip,                                    &
                    dzf,csf,alaf,dzgb,csgb,alagb,dzr,csr,                     &

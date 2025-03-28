@@ -10,48 +10,27 @@ use module_wrf_error
 !  Variables and constants used in the BEM module
 ! -----------------------------------------------------------------------
          
-        real emins		!emissivity of the internal walls
-        parameter (emins=0.9) 
-        real albins	        !albedo of the internal walls
-!!      parameter (albins=0.5)
-        parameter (albins=0.3)
-
-        real thickwin           !thickness of the window [m] 
-        parameter (thickwin=0.006)
-        real cswin		!Specific heat of the windows [J/(m3.K)]
-        parameter(cswin= 2.268e+06)
-
-        real temp_rat            !power of the A.C. heating/cooling the indoor air [K/s]
-        parameter(temp_rat=0.001)
-
-        real hum_rat            !power of the A.C. drying/moistening the indoor air [(Kg/kg)/s]
-        parameter(hum_rat=1.e-06)
-
-        real,parameter :: effpv=0.19  ! Efficiency of PV panels installed at the roofs, typical values [0.10,0.15] 
-
     CONTAINS
 
 !====6================================================================72
 !====6================================================================72	
 	
-	subroutine BEM(nzcanm,nlev,nhourday,dt,bw,bl,dzlev,            &
-                       nwal,nflo,nrof,ngrd,hswalout,gswal,             &
-                       hswinout,hsrof,lsrof,gsrof,hspv,                &
-                       latent,sigma,albwal,albwin,albrof,              &
-     		       emrof,emwal,emwin,rswal,rlwal,rair,cp,          &
-     		       rhoout,tout,humout,press,                       &
-     		       rs,swddif,rl,dzwal,cswal,kwal,pwin,cop,beta,sw_cond,   &
-                       timeon,timeoff,targtemp,gaptemp,targhum,gaphum, &
-                       perflo,gr_frac_roof,pv_frac_roof,gr_flag, & 
-                       uout,vout,                                        &
-                       hsesf,hsequip,dzflo,                            &
-     		       csflo,kflo,dzgrd,csgrd,kgrd,dzrof,csrof,        &
-     		       krof,tlev,shumlev,twal,twin,tflo,tgrd,trof,     &
-     		       hsout,hlout,consump,eppv,tpv,hsvent,hlvent,hfgr,&
+	subroutine BEM(nzcanm,nlev,nhourday,dt,bw,bl,dzlev,                       &
+                       nwal,nflo,nrof,ngrd,hswalout,gswal,                        &
+                       hswinout,hsrof,lsrof,gsrof,hspv,                           &
+                       latent,sigma,albwal,albwin,albrof,                         &
+     		       emrof,emwal,emwin,rswal,rlwal,rair,cp,                     &
+     		       rhoout,tout,humout,press,                                  &
+     		       rs,swddif,rl,dzwal,cswal,kwal,pwin,cop,beta,sw_cond,       &
+                       timeon,timeoff,targtemp,gaptemp,targhum,gaphum,            &
+                       perflo,gr_frac_roof,pv_frac_roof,gr_flag,                  &
+                       emins, albins, thickwin, cswin, temp_rat, hum_rat, effpv,  &
+                       uout,vout,                                                 &
+                       hsesf,hsequip,dzflo,                                       &
+     		       csflo,kflo,dzgrd,csgrd,kgrd,dzrof,csrof,                   &
+     		       krof,tlev,shumlev,twal,twin,tflo,tgrd,trof,                &
+     		       hsout,hlout,consump,eppv,tpv,hsvent,hlvent,hfgr,           &
                        tr_av,tpv_print,sfpv,sfr_indoor)
-
-
-
 
 ! ---------------------------------------------------------------------
 	implicit none
@@ -140,6 +119,8 @@ use module_wrf_error
         real    vout(nzcanm)
         real,    intent(in) :: hsesf    ! 
         real,    intent(in) :: hsequip(24) ! 
+        REAL, INTENT(in)                                 :: emins, albins, thickwin, cswin, temp_rat, &
+          hum_rat, effpv
 	
 	real cswal(nwal)		!Specific heat of the wall [J/(m3.K)] 
 	

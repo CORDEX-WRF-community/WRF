@@ -846,6 +846,10 @@ BENCH_START(surf_driver_tim)
      &        ,nbui_max=config_flags%num_urban_nbui                     &
      &        ,p_num=config_flags%p_num, q_num=config_flags%q_num       &
      &        ,dz_u=config_flags%dz_urban, h_water=config_flags%h_water &
+     &        ,emins=config_flags%emins, albins=config_flags%albins     &
+     &        ,thickwin=config_flags%thickwin, cswin=config_flags%cswin &
+     &        ,temp_rat=config_flags%temp_rat                           & 
+     &        ,hum_rat=config_flags%hum_rat, effpv=config_flags%effpv   &
      &        ,EP_PV_URB3D=grid%ep_pv_urb3d                               & !GRZ
      &        ,T_PV_URB3D=grid%t_pv_urb3d                                 & !GRZ
      &        ,TRV_URB4D=grid%trv_urb4d                                   & !GRZ
