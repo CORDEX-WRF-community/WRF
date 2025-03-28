@@ -22,6 +22,16 @@ rconfig   real       h_water              namelist,physics      1       0.000972
 rconfig   integer    p_num                namelist,physics      1               2     rh{12}  "p_num"                        "number of panes in the windows (1,2 or 3)"
 rconfig   integer    q_num                namelist,physics      1               4     rh{12}  "q_num"                        "category number for the windows (q_num= 4, standard glasses) [max=10]"
 
+# BEM values
+rconfig   real       emins                namelist,physics      1             0.9     rh{12}  "emins"                        "emissivity of the internal walls"
+rconfig   real       albins               namelist,physics      1             0.3     rh{12}  "albins"                       "albedo of the internal walls"
+rconfig   real       thickwin             namelist,physics      1           0.006     rh{12}  "thickwin"                     "thickness of the window [m]"
+rconfig   real       cswin                namelist,physics      1       2.268e+06     rh{12}  "cswin"                        "Specific heat of the windows [J/(m3.K)]"
+rconfig   real       temp_rat             namelist,physics      1           0.001     rh{12}  "temp_rat"                     "power of the A.C. heating/cooling the indoor air [K/s]"
+rconfig   real       hum_rat              namelist,physics      1          1.e-06     rh{12}  "hum_rat"                      "power of the A.C. drying/moistening the indoor air [(Kg/kg)/s]"
+rconfig   real       effpv                namelist,physics      1            0.19     rh{12}  "effpv"                        "Efficiency of PV panels installed at the roofs, typical values [0.10,0.15]"
+
+# Combination of urban dimensions 
 rconfig   integer    urban_map_zrd        namelist,physics      1              360    rh{12}  "urban_map_zrd"                "dimension used by module BEP as num_urban_nd*num_urban_nwr*num_urban_nz"   ""
 rconfig   integer    urban_map_zwd        namelist,physics      1              5400   rh{12}  "urban_map_zwd"                "dimension used by module BEP as num_urban_nd*num_urban_nwr*num_urban_nz*num_urban_nbui"  ""
 rconfig   integer    urban_map_gd         namelist,physics      1              20     rh{12}  "urban_map_gd"                 "dimension used by module BEP as num_urban_nd*num_urban_ng"   ""
@@ -32,6 +42,73 @@ rconfig   integer    urban_map_wd         namelist,physics      1              5
 rconfig   integer    urban_map_gbd        namelist,physics      1              300    rh{12}  "urban_map_gbd"                "dimension used by module BEP as num_urban_nd*num_urban_ngb*num_urban_nbui"   ""
 rconfig   integer    urban_map_fbd        namelist,physics      1              5100   rh{12}  "urban_map_fbd"                "dimension used by module BEP as num_urban_nd*(num_urban_nz - 1)*num_urban_nf*num_urban_nbui"   ""
 rconfig   integer    urban_map_zgrd       namelist,physics      1              360    rh{12}  "urban_map_zgrd"               "dimension used by module BEP as num_urban_nd*num_urban_ngr*num_urban_nz"   ""
+
+# L. Fita, UBA/CIMA/IFAECI, March 2025
+# These variables are inherent from BEP, BEM modules. They come from the reading of URBPARM_LCZ.TBL and some internal computations
+# Because, urban dimension are now passed as arguments, these variables can not be preserved using 
+#   SAVE, the unique way I can see is to include them into the grid structure...
+#
+# If they are required to be written into the wrfurban output replace
+#         misc        -         -      -     "
+#   by
+#         misc        -         -      h{12} "
+
+#    Building parameters      
+state    real     alag_u          {umap_0}       misc        -         -      -     "alag_u"             "Ground thermal diffusivity"            "m^2 s^-1"
+state    real     alaw_u          {umap_0}       misc        -         -      -     "alaw_u"             "Wall thermal diffusivity"              "m^2 s^-1"
+state    real     alar_u          {umap_0}       misc        -         -      -     "alar_u"             "Roof thermal diffusivity"              "m^2 s^-1"
+state    real     csg_u           {umap_0}       misc        -         -      -     "csg_u"              "Specific heat of the ground material"  "J m^3 K^-1"
+state    real     csw_u           {umap_0}       misc        -         -      -     "csw_u"              "Specific heat of the wall material"    "J m^3 K^-1"
+state    real     csr_u           {umap_0}       misc        -         -      -     "csr_u"              "Specific heat of the roof material"    "J m^3 K^-1"
+
+!    Radiation parameters
+state    real     albg_u          {umap_0}       misc        -         -      -     "albg_u"             "Albedo of the ground"                  ""
+state    real     albw_u          {umap_0}       misc        -         -      -     "albw_u"             "Albedo of the wall"                    ""
+state    real     albr_u          {umap_0}       misc        -         -      -     "albr_u"             "Albedo of the roof"                    ""
+state    real     emg_u           {umap_0}       misc        -         -      -     "emg_u"              "Emissivity of ground"                  ""
+state    real     emw_u           {umap_0}       misc        -         -      -     "emw_u"              "Emissivity of wall"                    ""
+state    real     emr_u           {umap_0}       misc        -         -      -     "emr_u"              "Emissivity of roof"                    ""
+state    integer  gr_flag_u       -              misc        -         -      -     "gr_flag_u"          "1 to switch on green roof model"       ""
+state    integer  gr_type_u       -              misc        -         -      -     "gr_type_u"          "1 for GRASS, 2 for SEDUM vegetation on the green roof" ""
+state    real     gr_frac_roof_u  {umap_0}       misc        -         -      -     "gr_frac_roof_u"     "fraction of green roof over the roof"  "1"
+state    real     pv_frac_roof_u  {umap_0}       misc        -         -      -     "pv_frac_roof_u"     "fraction of photovoltaic panels over the roof"  "1"
+state    real     albwin_u        {umap_0}       misc        -         -      -     "albwin_u"           "Albedo of the windows"                 ""
+state    real     emwind_u        {umap_0}       misc        -         -      -     "emwind_u"           "Emissivity of windows"                 ""
+
+!    Roughness parameters
+state    real     z0g_u           {umap_0}       misc        -         -      -     "z0g_u"              "The ground's roughness length"         "m"
+state    real     z0r_u           {umap_0}       misc        -         -      -     "z0r_u"              "The roof's roughness length"           "m"
+
+!    Street parameters
+state    integer  nd_u            {umap_0}       misc        -         -      -     "nd_u"               "Number of street direction for each urban class"  "-"
+state    real     strd_u     {umap0}{umap_0}     misc        -         -      -     "strd_u"             "Street length (fix to greater value to the horizontal length of the cells)"  ""
+state    real     drst_u     {umap0}{umap_0}     misc        -         -      -     "drst_u"             "Street direction"                      "degree"
+state    real     ws_u       {umap0}{umap_0}     misc        -         -      -     "ws_u"               "Street width"                          "m"
+state    real     bs_u       {umap0}{umap_0}     misc        -         -      -     "bs_u"               "Building width"                        "m"
+state    real     h_b        {umap1}{umap_0}     misc        -         -      -     "h_b"                "Bulding's heights"                     "m"
+state    real     d_b        {umap1}{umap_0}     misc        -         -      -     "d_b"                "Probability that a building has an height h_b"        "1"
+state    real     ss_u       {umap1}{umap_0}     misc        -         -      -     "ss_u"               "Probability that a building has an height equal to z" "1"
+state    real     pb_u       {umap1}{umap_0}     misc        -         -      -     "pb_u"               "Probability that a building has an height greater or equal to z"  "1"
+
+!    Grid parameters
+state    integer  nz_u            {umap_0}       misc        -         -      -     "nz_u"               "Number of layer in the urban grid"     "-"
+state    real     z_u             {umap1}        misc        -         -      -     "z_u"                "Height of the urban grid levels"       "m"
+state    real     cop_u           {umap_0}       misc        -         -      -     "cop_u"              "Coefficient of performance of the A/C systems" "-"
+state    real     pwin_u          {umap_0}       misc        -         -      -     "pwin_u"             "Coverage area fraction of windows in the walls of the building" "-"
+state    real     beta_u          {umap_0}       misc        -         -      -     "beta_u"             "Thermal efficiency of heat exchanger"  ""
+state    integer  sw_cond_u       {umap_0}       misc        -         -      -     "sw_cond_u"          "Air conditioning switch, 1=ON"         ""
+state    real     bldac_frc_u     {umap_0}       misc        -         -      -     "bldac_frc_u"        "fraction of buildings installed with A/C systems" "1"
+state    real     cooled_frc_u    {umap_0}       misc        -         -      -     "cooled_frc_u"       "fraction of cooled floor area in buildings" "1"
+state    real     time_on_u       {umap_0}       misc        -         -      -     "time_on_u"          "Initial local time of A/C systems"     "hour"
+state    real     time_off_u      {umap_0}       misc        -         -      -     "time_off_u"         "End local time of A/C systems"         "hour"
+state    real     targtemp_u      {umap_0}       misc        -         -      -     "targtemp_u"         "Target Temperature of the A/C systems" "K"
+state    real     gaptemp_u       {umap_0}       misc        -         -      -     "gaptemp_u"          "Comfort Range of the indoor Temperature" "K"
+state    real     targhum_u       {umap_0}       misc        -         -      -     "targhum_u"          "Target humidity of the A/C systems"    "kgkg-1"
+state    real     gaphum_u        {umap_0}       misc        -         -      -     "gaphum_u"           "Comfort Range of the specific humidity" "kgkg-1"
+state    real     perflo_u        {umap_0}       misc        -         -      -     "perflo_u"           "Peak number of occupants per unit floor area" "person m-2"
+state    real     hsesf_u         {umap_0}       misc        -         -      -     "hsesf_u"            "Peak heat generated by equipments"     "Wm-2"
+state    real     hsequip         {xxiv}         misc        -         -      -     "hsequip"            "Diurnal heating profile of heat generated by equipments" "" 
+state    real     irho            {xxiv}         misc        -         -      -     "irho"               "--"                                    "-" 
 
 # Diagnostics for urban studies (experimental)
 #state    real     tasupav        ij     misc        -         -       h{12}     "tasupav"          "Near-surface temperature urban pavements"     "K"
