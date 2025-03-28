@@ -444,6 +444,13 @@ use module_wrf_error
 
       data first/.true./
       save first,time_bep
+
+      ! Minimal non-zero height of building
+      REAL                                               :: bldheightn
+      CHARACTER(len=4)                                   :: S4a, S4b
+      CHARACTER(len=6)                                   :: S6a, S6b
+      CHARACTER(len=512)                                 :: errmsg
+      LOGICAL                                            :: found
        
 !      save alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,                       &
 !           albg_u,albw_u,albr_u,emg_u,emw_u,emr_u,                       &
@@ -690,17 +697,31 @@ use module_wrf_error
 
       endif ! first
 
-do ix=its,ite
+      do ix=its,ite
       do iy=jts,jte
         if (FRC_URB2D(ix,iy).gt.0.) then    ! Calling BEP only for existing urban classes.
 	
          iurb=UTYPE_URB2D(ix,iy)
 
          hi_urb1D=0.
+         bldheightn = 10000.
+         found = .FALSE.
          do iz_u=1,nz_um
             hi_urb1D(iz_u)=hi_urb(ix,iz_u,iy)
-           
+            IF (hi_urb1D(iz_u) /= 0. .AND. hi_urb1D(iz_u) < bldheightn) THEN
+              bldheightn  = hi_urb(ix,iz_u,iy)
+              found = .TRUE.
+            END IF
          enddo
+         IF (.NOT.found) THEN
+           PRINT *,'  iz: hi_urb1D:', (iz, ' :', hi_urb1D(iz), iz=1,nz_um)
+           WRITE(S4a,'(I4)')ix
+           WRITE(S4b,'(I4)')iy
+           WRITE(S6a,'(F6.4)')FRC_URB2D(ix,iy)
+           errmsg = 'At module_sf_bep_bem: No building found at point i,j=' // S4a // ', ' // S4b //  &
+             'urban fraction: ' // S6a
+           FATAL_ERROR(errmsg)
+         END IF
 
          call icBEPHI_XY(iurb,hb_u,hi_urb1D,ss_urb,pb_urb,                 &
                          nz_urb(iurb),z_u, ndm, nz_um, nurbm, dz_u)
@@ -735,6 +756,17 @@ do ix=its,ite
            nbui=ibui
 	 endif	  
          end do  !iz
+
+         IF (nlev(ibui) == 0) THEN
+           WRITE(S4a,'(I4)')ix
+           WRITE(S4b,'(I4)')iy
+           WRITE(S6a,'(F6.2)')dz_u
+           WRITE(S6b,'(F6.2)')MINVAL(hi_urb)
+           errmsg = '  module_bep_bem. At point i,j:' // S4a // " ," // S4b //' Building type ' //    &
+             'found without floors ! increase dz_u, to be at least the lowest height of any ' //      &
+             'building height. Current dz_u=' // S6a // ' lowest building: ' // S6b // ' m'
+           FATAL_ERROR(errmsg)
+         END IF
 
          if (nbui.gt.nbui_max) then
             write (*,*) 'num_urban_nbui must be increased to',nbui
@@ -5708,26 +5740,28 @@ do ix=its,ite
          nzu=iz_u+1
       
          if ((nzu+1).gt.nz_um) then 
-             write(*,*) 'error, nz_um has to be increased to at least',nzu+1
+             write(*,*) 'in module_sf_bep_bem; error, num_urban_nz has to be increased to at least',  &
+               nzu+1
              stop
          endif
 
-            do iz_u=1,nzu
-               ss_u(iz_u,iurb)=0.
-               do ilu=1,nz_um
-                  if(z_u(iz_u).le.hb_u(ilu)                      &    
-                    .and.z_u(iz_u+1).gt.hb_u(ilu))then            
-                        ss_u(iz_u,iurb)=ss_u(iz_u,iurb)+hi_urb1D(ilu)
-                  endif 
-               enddo
-            enddo
+         do iz_u=1,nzu
+           ss_u(iz_u,iurb)=0.
+           do ilu=1,nz_um
+             if(z_u(iz_u).le.hb_u(ilu)                      &    
+                 .and.z_u(iz_u+1).gt.hb_u(ilu))then            
+                     ss_u(iz_u,iurb)=ss_u(iz_u,iurb)+hi_urb1D(ilu)
+             endif 
+           enddo
+         enddo
 
-            pb_u(1)=1.
-            do iz_u=1,nzu
-               pb_u(iz_u+1)=max(0.,pb_u(iz_u)-ss_u(iz_u,iurb))
-            enddo
+         pb_u(1)=1.
+         do iz_u=1,nzu
+           pb_u(iz_u+1)=max(0.,pb_u(iz_u)-ss_u(iz_u,iurb))
+         enddo
 
 20     continue    
+
        return
        end subroutine icBEPHI_XY
 !====================================================================72
