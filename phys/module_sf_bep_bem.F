@@ -708,13 +708,18 @@ use module_wrf_error
          found = .FALSE.
          do iz_u=1,nz_um
             hi_urb1D(iz_u)=hi_urb(ix,iz_u,iy)
-            IF (hi_urb1D(iz_u) /= 0. .AND. hi_urb1D(iz_u) < bldheightn) THEN
+            IF (hi_urb1D(iz_u) > 0. .AND. hi_urb1D(iz_u) < bldheightn) THEN
               bldheightn  = hi_urb(ix,iz_u,iy)
+              found = .TRUE.
+            END IF
+            IF (h_b(iz_u,iurb) > 0. .AND. h_b(iz_u,iurb) < bldheightn) THEN
+              bldheightn  = h_b(iz_u,iurb)
               found = .TRUE.
             END IF
          enddo
          IF (.NOT.found) THEN
-           PRINT *,'  iz: hi_urb1D:', (iz, ' :', hi_urb1D(iz), iz=1,nz_um)
+           PRINT *,'  NUDAPT iz; hi_urb1D:', (iz, ' :', hi_urb1D(iz), iz=1,nz_um)
+           PRINT *,'  URBPARM_LCZ; LCZ=', iurb, ' iz: h_b:', (iz, ' :', h_b(iz,iurb), iz=1,nz_um)
            WRITE(S4a,'(I4)')ix
            WRITE(S4b,'(I4)')iy
            WRITE(S6a,'(F6.4)')FRC_URB2D(ix,iy)
@@ -763,8 +768,9 @@ use module_wrf_error
            WRITE(S6a,'(F6.2)')dz_u
            WRITE(S6b,'(F6.2)')MINVAL(hi_urb)
            errmsg = '  module_bep_bem. At point i,j:' // S4a // " ," // S4b //' Building type ' //    &
-             'found without floors ! increase dz_u, to be at least the lowest height of any ' //      &
-             'building height. Current dz_u=' // S6a // ' lowest building: ' // S6b // ' m'
+             'found without floors ! increase dz_urban (height between urban layers), to be at '   // &
+             'least the lowest height of any building height. Current dz_urban=' // S6a //            &
+             ' lowest building: ' // S6b // ' m'
            FATAL_ERROR(errmsg)
          END IF
 
