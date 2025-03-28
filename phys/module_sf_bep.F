@@ -303,6 +303,11 @@ use module_wrf_error
       data first/.true./
       save first,time_bep 
 
+! L. Fita, UBA/CIMA/IFAECI, March 2025
+! Because, urban dimension are now passed as arguments, these variables can not be preserved using 
+!   SAVE, the unique way I can see is to include them into the grid structure... 
+!   Their definition is provided in Registry/registry.urbandiags
+!
 !      save alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,                      &
 !           albg_u,albw_u,albr_u,emg_u,emw_u,emr_u,                      &
 !           z0g_u,z0r_u, nd_u,strd_u,drst_u,ws_u,bs_u,h_b,d_b,ss_u,pb_u, &
