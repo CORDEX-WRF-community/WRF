@@ -171,6 +171,10 @@ MODULE module_driver_constants
    INTEGER, PARAMETER                                    :: max_num_urban_ngr = 20  
    ! maximum amount of grid levels in the walls or roofs
    INTEGER, PARAMETER                                    :: max_num_urban_nwr = 20
+   ! maximum amount of layers in the ground below the buildings
+   INTEGER, PARAMETER                                    :: max_num_urban_ngb = 20   
+   ! maximum amount of layer in the floors
+   INTEGER, PARAMETER                                    :: max_num_urban_nf = 20
 
  CONTAINS
    SUBROUTINE init_module_driver_constants
