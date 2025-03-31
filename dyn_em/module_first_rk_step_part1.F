@@ -875,6 +875,17 @@ BENCH_START(surf_driver_tim)
      &        ,targhum_u=grid%targhum_u, gaphum_u=grid%gaphum_u         &
      &        ,perflo_u=grid%perflo_u, hsesf_u=grid%hsesf_u             &
      &        ,hsequip=grid%hsequip, irho=grid%irho                     &
+     &        ,dzg_u=config_flags%dzg_urban(1:model_config_rec%num_urban_ng)     &
+     &        ,dzgr_u=config_flags%dzgr_urban(1:model_config_rec%num_urban_ngr)  &
+     &        ,qrmax=config_flags%qrmax_urban(1:model_config_rec%num_urban_ngr)  &
+     &        ,smax=config_flags%smax_urban(1:model_config_rec%num_urban_ngr)    &
+     &        ,kmax=config_flags%kmax_urban(1:model_config_rec%num_urban_ngr)    &
+     &        ,b=config_flags%b_urban(1:model_config_rec%num_urban_ngr)          &
+     &        ,cd=config_flags%cd_rban(1:model_config_rec%num_urban_ngr)         &
+     &        ,dzr=config_flags%dzr_urban(1:model_config_rec%num_urban_nwr)      &
+     &        ,dzw=config_flags%dzw_urban(1:model_config_rec%num_urban_nwr)      &
+     &        ,dzgb=config_flags%dzgb_urban(1:model_config_rec%num_urban_ngb)    &
+     &        ,dzf=config_flags%dzf_urban(1:model_config_rec%num_urban_nf)       &
      &        ,EP_PV_URB3D=grid%ep_pv_urb3d                               & !GRZ
      &        ,T_PV_URB3D=grid%t_pv_urb3d                                 & !GRZ
      &        ,TRV_URB4D=grid%trv_urb4d                                   & !GRZ
