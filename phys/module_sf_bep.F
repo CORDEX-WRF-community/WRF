@@ -61,6 +61,11 @@ use module_wrf_error
 !   have been changed from the use of their maximum value (defined in frame/module_driver_constants.F)
 !   to the actual value passed from the namelist.input
                       nurbmax, ndm, nz_um, ng_u, nwr_u, dz_u,         &
+                      alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,    &
+                      albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,    &
+                      z0g_u, z0r_u, nd_u, strd_u, drst_u,             &
+                      ws_u, bs_u, h_b, d_b, ss_u, pb_u,               &
+                      nz_u, z_u,                                      &
                       lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,           &
                       a_u,a_v,a_t,a_e,b_u,b_v,                        &
                       b_t,b_e,b_q,dlg,dl_u,sf,vl,                     &
@@ -183,12 +188,7 @@ use module_wrf_error
       integer nzurban(nurbmax)                
 
 !    Building parameters      
-      real alag_u(nurbmax)                    ! Ground thermal diffusivity [m^2 s^-1]
-      real alaw_u(nurbmax)                    ! Wall thermal diffusivity [m^2 s^-1]
-      real alar_u(nurbmax)                    ! Roof thermal diffusivity [m^2 s^-1]
-      real csg_u(nurbmax)                     ! Specific heat of the ground material [J m^3 K^-1]
-      real csw_u(nurbmax)                     ! Specific heat of the wall material [J m^3 K^-1]
-      real csr_u(nurbmax)                     ! Specific heat of the roof material [J m^3 K^-1]
+      REAL, DIMENSION(nurbmax), INTENT(inout)            :: alag_u, alaw_u, alar_u, csg_u, csw_u,csr_u
       real twini_u(nurbmax)                   ! Initial temperature inside the building's wall [K]
       real trini_u(nurbmax)                   ! Initial temperature inside the building's roof [K]
       real tgini_u(nurbmax)                   ! Initial road temperature
@@ -205,12 +205,8 @@ use module_wrf_error
 ! for twini_u, and trini_u the initial value at the deepest level is kept constant during the simulation
 !
 !    Radiation parameters
-      real albg_u(nurbmax)                    ! Albedo of the ground
-      real albw_u(nurbmax)                    ! Albedo of the wall
-      real albr_u(nurbmax)                    ! Albedo of the roof
-      real emg_u(nurbmax)                     ! Emissivity of ground
-      real emw_u(nurbmax)                     ! Emissivity of wall
-      real emr_u(nurbmax)                     ! Emissivity of roof
+      REAL, DIMENSION(nurbmax), INTENT(inout)            :: albg_u, albw_u, albr_u, emg_u, emw_u,     &
+        emr_u
 
 !   fww_u,fwg_u,fgw_u,fsw_u,fsg_u are the view factors used to compute the long wave
 !   and the short wave radation. 
@@ -222,22 +218,16 @@ use module_wrf_error
       real fsg_u(ndm,nurbmax)                   !  from sky to ground
 
 !    Roughness parameters
-      real z0g_u(nurbmax)       ! The ground's roughness length
-      real z0r_u(nurbmax)       ! The roof's roughness length
+      REAL, DIMENSION(nurbmax), INTENT(inout)            :: z0g_u, z0r_u
 
 !    Roughness parameters
       real z0(ndm,nz_um)           ! Roughness lengths "profiles"
 
 !    Street parameters
-      integer nd_u(nurbmax)     ! Number of street direction for each urban class 
-      real strd_u(ndm,nurbmax)  ! Street length (fix to greater value to the horizontal length of the cells)
-      real drst_u(ndm,nurbmax)  ! Street direction
-      real ws_u(ndm,nurbmax)    ! Street width
-      real bs_u(ndm,nurbmax)    ! Building width
-      real h_b(nz_um,nurbmax)   ! Bulding's heights
-      real d_b(nz_um,nurbmax)   ! Probability that a building has an height h_b
-      real ss_u(nz_um,nurbmax)  ! Probability that a building has an height equal to z
-      real pb_u(nz_um,nurbmax)  ! Probability that a building has an height greater or equal to z
+      INTEGER, DIMENSION(nurbmax), INTENT(inout)         :: nd_u
+      REAL, DIMENSION(ndm,nurbmax), INTENT(inout)        :: strd_u, drst_u, ws_u, bs_u
+      REAL, DIMENSION(ndm,nurbmax), INTENT(inout)        :: h_b, d_b, ss_u, pb_u
+
 !
 !    Street parameters
 !
@@ -249,10 +239,8 @@ use module_wrf_error
       real pb(nz_um)               ! Probability to have a building with an height equal
 
 !    Grid parameters
-
-      integer nz_u(nurbmax)     ! Number of layer in the urban grid
-      
-      real z_u(nz_um)         ! Height of the urban grid levels
+      INTEGER, DIMENSION(nurbmax), INTENT(inout)         :: nz_u
+      REAL, DIMENSION(nz_um), INTENT(inout)              :: z_u
 
 ! 1D array used for the input and output of the routine "urban"
 
