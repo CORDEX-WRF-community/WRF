@@ -289,15 +289,15 @@ CONTAINS
      &          ,dz_u, h_water                                       &
      &          ,emins, albins, thickwin, cswin, temp_rat, hum_rat   & 
      &          ,effpv                                               &
-     &          ,alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,        &
-     &          ,albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,        &
-     &          ,gr_flag_u, gr_type_u, gr_frac_roof_u,               &
-     &          ,pv_frac_roof_u, albwin_u, emwind_u, z0g_u, z0r_u,   &
-     &          ,nd_u, strd_u, drst_u, ws_u, bs_u, h_b, d_b, ss_u,   &
-     &          ,pb_u, nz_u, z_u, cop_u, pwin_u, beta_u, sw_cond_u,  &
-     &          ,bldac_frc_u, cooled_frc_u, time_on_u, time_off_u,   &
-     &          ,targtemp_u, gaptemp_u, targhum_u, gaphum_u,         &
-     &          ,perflo_u, hsesf_u, hsequip, irho,                   &
+     &          ,alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u         &
+     &          ,albg_u, albw_u, albr_u, emg_u, emw_u, emr_u         &
+     &          ,gr_flag_u, gr_type_u, gr_frac_roof_u                &
+     &          ,pv_frac_roof_u, albwin_u, emwind_u, z0g_u, z0r_u    &
+     &          ,nd_u, strd_u, drst_u, ws_u, bs_u, h_b, d_b, ss_u    &
+     &          ,pb_u, nz_u, z_u, cop_u, pwin_u, beta_u, sw_cond_u   &
+     &          ,bldac_frc_u, cooled_frc_u, time_on_u, time_off_u    &
+     &          ,targtemp_u, gaptemp_u, targhum_u, gaphum_u          &
+     &          ,perflo_u, hsesf_u, hsequip, irho                    &
      &          ,ep_pv_urb3d,t_pv_urb3d                              & !multi-layer urban GRZ
      &          ,trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d              & !multi-layer urban GRZ
      &          ,drain_urb4d,draingr_urb3d                           & !multi-layer urban GRZ
