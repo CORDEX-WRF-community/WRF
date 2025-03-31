@@ -2024,10 +2024,37 @@ use module_wrf_error
 
 !Define the layer sizes in the walls
 
-      dzgb=(/0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025/)
-      dzr=(/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025/)   
-      dzw=(/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025/)
-      dzf=(/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02/) 
+! This does not work yet for flexible amount of layers
+       IF (ng_bu == 10) THEN
+         dzgb = (/ 0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025 /)
+       ELSE
+         PRINT *,'ERROR -- error -- ERROR -- error'
+         PRINT *,"   In phys/module_sf_bep_bem.F, subroutine 'param' wrong amount of ground " //      &
+           "layers below the buildings"
+         PRINT *,'    by now only works with 10 ground layers, you passed:', ngb_u
+         FATAL_ERROR('modify code or namelist parameter num_urban_ngb')
+       END IF
+
+       IF (nwr_u == 10) THEN
+         dzr=(/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025/)   
+         dzw=(/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025/)
+       ELSE
+         PRINT *,'ERROR -- error -- ERROR -- error'
+         PRINT *,"   In phys/module_sf_bep_bem.F, subroutine 'param' wrong amount of ground " //      &
+           "layers in the walls"
+         PRINT *,'    by now only works with 10 layers, you passed:', nwr_u
+         FATAL_ERROR('modify code or namelist parameter num_urban_nwr')
+       END IF
+
+       IF (nf_u == 10) THEN
+         dzf=(/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02/) 
+       ELSE
+         PRINT *,'ERROR -- error -- ERROR -- error'
+         PRINT *,"   In phys/module_sf_bep_bem.F, subroutine 'param' wrong amount of ground " //      &
+           "sizes in the floors"
+         PRINT *,'    by now only works with 10 sizes, you passed:', nf_u
+         FATAL_ERROR('modify code or namelist parameter num_urban_nf')
+       END IF
   
        ihu=0
 
