@@ -42,7 +42,6 @@ rconfig   real       cd_rban              namelist,cordex     max_num_urban_ngr 
 rconfig   real       dzr_urban            namelist,cordex     max_num_urban_nwr  (/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)  r{h12}    "dzr_urban"     "Layer sizes in the roofs"   "m"  
 rconfig   real       dzw_urban            namelist,cordex     max_num_urban_nwr  (/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)  r{h12}    "dzw_urban"     "Layer sizes in the walls"   "m"
 rconfig   real       dzgb_urban           namelist,cordex     max_num_urban_ngb  (/0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)  r{h12}    "dzgb_urban"     "layer sizes in the ground below the buildings"   "m"
-rconfig   real       dzr_urban            namelist,cordex     max_num_urban_nwr  (/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)     r{h12}    "dzr_urban"     "Layer sizes in the roofs"   "m"
 rconfig   real       dzf_urban            namelist,cordex     max_num_urban_nf   (/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)   r{h12}    "dzf_urban"     "Layer sizes in the floors"   "m"
 
 # Combination of urban dimensions 
