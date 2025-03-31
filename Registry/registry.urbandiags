@@ -31,6 +31,17 @@ rconfig   real       temp_rat             namelist,physics      1           0.00
 rconfig   real       hum_rat              namelist,physics      1          1.e-06     rh{12}  "hum_rat"                      "power of the A.C. drying/moistening the indoor air [(Kg/kg)/s]"
 rconfig   real       effpv                namelist,physics      1            0.19     rh{12}  "effpv"                        "Efficiency of PV panels installed at the roofs, typical values [0.10,0.15]"
 
+# data values related to different urban-dimensions
+rconfig   real       dzg_urban            namelist,cordex     max_num_urban_ng   (/0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)
+rconfig   real       dzgr_urban           namelist,cordex     max_num_urban_ngr  (/0.1,0.003,0.06,0.003,0.05,0.04,0.02,0.0125,0.005,0.0025,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)
+rconfig   real       qrmax_urban          namelist,cordex     max_num_urban_ngr  (/0.0,0.0,0.0,0.0,0.439,0.37,0.37,0.37,0.37,0.37,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)
+rconfig   real       smax_urban           namelist,cordex     max_num_urban_ngr  (/0.0,0.0,0.0,0.0,-0.01,-0.1,-0.1,-0.1,-0.1,-0.1,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)
+rconfig   real       kmax_urban           namelist,cordex     max_num_urban_ngr  (/0.0,0.0,0.0,0.0,3.32e-3,2.162e-3,2.162e-3,2.162e-3,2.162e-3,2.162e-3,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)
+rconfig   real       b_urban              namelist,cordex     max_num_urban_ngr  (/0.0,0.0,0.0,0.0,2.7,3.9,3.9,3.9,3.9,3.9,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)
+rconfig   real       cd_rban              namelist,cordex     max_num_urban_ngr  (/0.0,0.0,0.0,0.0,331500.,1.342e6,1.342e6,1.342e6,1.342e6,1.342e6,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)
+rconfig   real       dzr_urban            namelist,cordex     max_num_urban_nwr  (/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)  
+rconfig   real       dzw_urban            namelist,cordex     max_num_urban_nwr  (/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)
+
 # Combination of urban dimensions 
 rconfig   integer    urban_map_zrd        namelist,physics      1              360    rh{12}  "urban_map_zrd"                "dimension used by module BEP as num_urban_nd*num_urban_nwr*num_urban_nz"   ""
 rconfig   integer    urban_map_zwd        namelist,physics      1              5400   rh{12}  "urban_map_zwd"                "dimension used by module BEP as num_urban_nd*num_urban_nwr*num_urban_nz*num_urban_nbui"  ""
