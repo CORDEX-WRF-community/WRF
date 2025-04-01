@@ -298,6 +298,8 @@ CONTAINS
      &          ,bldac_frc_u, cooled_frc_u, time_on_u, time_off_u    &
      &          ,targtemp_u, gaptemp_u, targhum_u, gaphum_u          &
      &          ,perflo_u, hsesf_u, hsequip, irho                    &
+     &          ,dzg_u, ,dzgr_u, qrmax, smax, kmax                   &
+     &          ,b, cd, dzr, dzw, dzgb, dzf                          &
      &          ,ep_pv_urb3d,t_pv_urb3d                              & !multi-layer urban GRZ
      &          ,trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d              & !multi-layer urban GRZ
      &          ,drain_urb4d,draingr_urb3d                           & !multi-layer urban GRZ
@@ -1051,6 +1053,11 @@ CONTAINS
      beta_u, time_on_u, time_off_u, targtemp_u, gaptemp_u, targhum_u, gaphum_u, perflo_u, hsesf_u
    INTEGER, DIMENSION(nurbmax), INTENT(inout)            ::  sw_cond_u
    REAL, DIMENSION(24), INTENT(inout)                    :: hsequip, irho
+   REAL, DIMENSION(ng_u), INTENT(in)                     :: dzg_u
+   REAL, DIMENSION(ngr_u), INTENT(in)                    :: dzgr_u, qrmax, smax, kmax, b, cd
+   REAL, DIMENSION(nwr_u), INTENT(in)                    :: dzr, dzw
+   REAL, DIMENSION(ngb_u), INTENT(in)                    :: dzgb
+   REAL, DIMENSION(nf_u), INTENT(in)                     :: dzf
 
 #ifdef URBANSTATE
 ! Data interpolated from the "mesoscale grid" to the "urban grid" (num_urban_nz)
@@ -2817,6 +2824,8 @@ CONTAINS
                 cooled_frc_u, time_on_u, time_off_u,            &
                 targtemp_u, gaptemp_u, targhum_u, gaphum_u,     &
                 perflo_u, hsesf_u, hsequip, irho,               &
+                dzg_u, ,dzgr_u, qrmax, smax, kmax,              &
+                b, cd, dzr, dzw, dzgb, dzf,                     &
                 ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
                 trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !GRZ
                 drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !GRZ
@@ -2969,6 +2978,8 @@ CONTAINS
                 cooled_frc_u, time_on_u, time_off_u, targtemp_u,&
                 gaptemp_u, targhum_u, gaphum_u, perflo_u,       &
                 hsesf_u, hsequip, irho,                         &
+                dzg_u, ,dzgr_u, qrmax, smax, kmax,              &
+                b, cd, dzr, dzw, dzgb, dzf,                     &
                 ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
                 trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !GRZ
                 drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !GRZ
@@ -3325,6 +3336,8 @@ CONTAINS
                                bldac_frc_u, cooled_frc_u, time_on_u, time_off_u,            &
                                targtemp_u, gaptemp_u, targhum_u, gaphum_u, perflo_u,        &
                                hsesf_u, hsequip, irho,                                      &              
+                               dzg_u, ,dzgr_u, qrmax, smax, kmax,                           &
+                               b, cd, dzr, dzw, dzgb, dzf,                                  &
                           trv_urb4d,       qr_urb4d,      qgr_urb3d,  tgr_urb3d,            & !GRZ
                         drain_urb4d,  draingr_urb3d,     sfrv_urb3d, lfrv_urb3d,            & !GRZ
                           dgr_urb3d,       dg_urb3d,      lfr_urb3d,  lfg_urb3d,            & !GRZ

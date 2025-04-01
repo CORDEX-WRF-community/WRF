@@ -87,6 +87,8 @@ use module_wrf_error
                       bldac_frc_u, cooled_frc_u, time_on_u, time_off_u,            &
                       targtemp_u, gaptemp_u, targhum_u, gaphum_u, perflo_u,        &
                       hsesf_u, hsequip, irho,                                      &
+                      dzg_u, ,dzgr_u, qrmax, smax, kmax,                           &
+                      b, cd, dzr, dzw, dzgb, dzf,                                  &        
                       lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,                        &
                       a_u,a_v,a_t,a_e,b_u,b_v,                                     &
                       b_t,b_e,b_q,dlg,dl_u,sf,vl,                                  &
@@ -260,10 +262,6 @@ use module_wrf_error
       real alag(ng_u)          ! Ground thermal diffusivity for the current urban class [m^2 s^-1] 
       real alagb(ngb_u+1)      ! Ground thermal diffusivity below the building at each wall layer [W/m K]
       real alaf(nf_u+1)        ! Floor thermal diffusivity at each wall layers [W/m K]  
-      real dzr(nwr_u)          ! Layer sizes in the roofs [m]
-      real dzf(nf_u)           ! Layer sizes in the floors[m]
-      real dzw(nwr_u)          ! Layer sizes in the walls [m]
-      real dzgb(ngb_u)         ! Layer sizes in the ground below the buildings [m]
 
 !
 !New street and radiation parameters
@@ -315,6 +313,11 @@ use module_wrf_error
         beta_u, time_on_u, time_off_u, targtemp_u, gaptemp_u, targhum_u, gaphum_u, perflo_u, hsesf_u
       INTEGER, DIMENSION(nurbmax), INTENT(inout)         ::  sw_cond_u
       REAL, DIMENSION(24), INTENT(inout)                 :: hsequip, irho
+      REAL, DIMENSION(ng_u), INTENT(in)                  :: dzg_u
+      REAL, DIMENSION(ngr_u), INTENT(in)                 :: dzgr_u, qrmax, smax, kmax, b, cd
+      REAL, DIMENSION(nwr_u), INTENT(in)                 :: dzr, dzw
+      REAL, DIMENSION(ngb_u), INTENT(in)                 :: dzgb
+      REAL, DIMENSION(nf_u), INTENT(in)                  :: dzf
 
 ! 1D array used for the input and output of the routine "urban"
 
@@ -1443,10 +1446,15 @@ use module_wrf_error
    
       real tmp_u(nz_um)     !Air Temperature [K]
 
-      real dzw(nwr_u)       !Layer sizes in the walls
-      real dzr(nwr_u)       !Layer sizes in the roofs
-      real dzf(nf_u)        !Layer sizes in the floors
-      real dzgb(ngb_u)      !Layer sizes in the ground below the buildings
+      !Layer sizes in the walls
+      !Layer sizes in the roofs
+      REAL, DIMENSION(nwr_u), INTENT(in)                 :: dzr, dzw
+      
+      !Layer sizes in the floors
+      REAL, DIMENSION(nf_u), INTENT(in)                  :: dzf
+      
+      !Layer sizes in the ground below the buildings
+      REAL, DIMENSION(ngb_u), INTENT(in)                 :: dzgb
 
       real csgb(ngb_u)      !Specific heat of the ground material below the buildings 
 
@@ -1916,7 +1924,7 @@ use module_wrf_error
                        alar_u,alar,csw_u,csw,alaw_u,alaw,             &
                        ws_u,ws_urb,ws,bs_u,bs_urb,bs,z0g_u,z0r_u,z0,  &  
                        strd_u,strd,drst_u,drst,ss_u,ss_urb,ss,pb_u,   &
-                       pb_urb,pb,dzw,dzr,dzf,csf,alaf,dzgb,csgb,alagb,&
+                       pb_urb,pb,csf,alaf,dzgb,csgb,alagb,            &
                        lp_urb,lb_urb,hgt_urb,frc_urb)        
 
 ! ----------------------------------------------------------------------
@@ -1971,10 +1979,11 @@ use module_wrf_error
 !INPUT/OUTPUT
 !-----------------------------------------------------------------------------
 
-      real dzw(nwr_u)       !Layer sizes in the walls [m]
-      real dzr(nwr_u)       !Layer sizes in the roofs [m]
-      real dzf(nf_u)        !Layer sizes in the floors [m]
-      real dzgb(ngb_u)      !layer sizes in the ground below the buildings [m]
+      REAL, DIMENSION(nwr_u), INTENT(in)                 :: dzr, dzw
+      !Layer sizes in the floors [m]
+      REAL, DIMENSION(nf_u), INTENT(in)                  :: dzf
+      !layer sizes in the ground below the buildings [m]
+      REAL, DIMENSION(ngb_u), INTENT(in)                 :: dzgb
 
       real csr(nwr_u)       ! Specific heat of the roof material at each roof levels
       real csw(nwr_u)       ! Specific heat of the wall material at each wall levels
@@ -1998,6 +2007,11 @@ use module_wrf_error
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------  
+
+! L. Fita, UBA/CIMA/IFAECI, March 2025
+!   Some variables are removed from this initialization, since now they are defined via the
+!     namelist.input, with their generic definition kept in Registry/registry.urbandiags
+!     these are: dzr, 
 !
 !Initialize variables
 !
@@ -2021,40 +2035,6 @@ use module_wrf_error
       strd=0.
       drst=0.
       nzurban=0
-
-!Define the layer sizes in the walls
-
-! This does not work yet for flexible amount of layers
-       IF (ng_bu == 10) THEN
-         dzgb = (/ 0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025 /)
-       ELSE
-         PRINT *,'ERROR -- error -- ERROR -- error'
-         PRINT *,"   In phys/module_sf_bep_bem.F, subroutine 'param' wrong amount of ground " //      &
-           "layers below the buildings"
-         PRINT *,'    by now only works with 10 ground layers, you passed:', ngb_u
-         FATAL_ERROR('modify code or namelist parameter num_urban_ngb')
-       END IF
-
-       IF (nwr_u == 10) THEN
-         dzr=(/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025/)   
-         dzw=(/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025/)
-       ELSE
-         PRINT *,'ERROR -- error -- ERROR -- error'
-         PRINT *,"   In phys/module_sf_bep_bem.F, subroutine 'param' wrong amount of ground " //      &
-           "layers in the walls"
-         PRINT *,'    by now only works with 10 layers, you passed:', nwr_u
-         FATAL_ERROR('modify code or namelist parameter num_urban_nwr')
-       END IF
-
-       IF (nf_u == 10) THEN
-         dzf=(/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.02/) 
-       ELSE
-         PRINT *,'ERROR -- error -- ERROR -- error'
-         PRINT *,"   In phys/module_sf_bep_bem.F, subroutine 'param' wrong amount of ground " //      &
-           "sizes in the floors"
-         PRINT *,'    by now only works with 10 sizes, you passed:', nf_u
-         FATAL_ERROR('modify code or namelist parameter num_urban_nf')
-       END IF
   
        ihu=0
 
@@ -2402,6 +2382,7 @@ use module_wrf_error
 
       subroutine surf_temp(nd,pr,dt,rl,rsg,rlg,                  &
                            ndm, nz_um, ng_u, nwr_u,              &
+                           dzg_u,                                &
                            tg,alag,csg,emg,albg,ptg,sfg,lfg,gfg) 
 
 ! ----------------------------------------------------------------------
@@ -2454,18 +2435,9 @@ use module_wrf_error
 
       real tg_tmp(ng_u)
 
-      real dzg_u(ng_u)          ! Layer sizes in the ground
+      ! Layer sizes in the ground
+      REAL, DIMENSION(ng_u), INTENT(in)                  :: dzg_u
       
-! This does not work yet for flexible amount of layers
-      IF (ng_u == 10) THEN
-        dzg_u = (/ 0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025 /)
-      ELSE
-        PRINT *,'ERROR -- error -- ERROR -- error'
-        PRINT *,"   In phys/module_sf_bep.F, subroutine 'surf_temp' wrong amount of ground layers"
-        PRINT *,'    by now only works with 10 ground layers, you passed:', ng_u
-        FATAL_ERROR('modify code or namelist parameter num_urban_ng')
-      END IF
-
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------
@@ -2502,6 +2474,7 @@ use module_wrf_error
 
       subroutine roof_temp_veg(nd,pr,dt,rl,rsr,                   &
                            ndm, nz_um, nwr_u, ngr_u,              &
+                           dzgr_u, qrmax, smax, kmax, b, cd,      & 
                            trv,ptrv,sfrv,lfrv,gfr,qr,rainbl,      &
                            drain,hfgroof,tr,alar,dzr,csr,nzu,     &
                            irri_now,gr_type,pv_frac_roof,tpvlev)
@@ -2527,7 +2500,8 @@ use module_wrf_error
       real pv_frac_roof
       real csr
 
-      real dzr          ! Layer sizes in the roofs [m]
+      ! Layer sizes in the roofs [m]
+      REAL, DIMENSION(nwr_u), INTENT(in)                 :: dzr
 
       real dt                   ! Time step
 
@@ -2570,7 +2544,9 @@ use module_wrf_error
 
       real qr_tmp(ngr_u)
       real qr_tmp_old(ngr_u)
-      real dzgr_u(ngr_u)          ! Layer sizes in the green roof
+
+      ! Layer sizes in the green roof
+      REAL, DIMENSION(ngr_u), INTENT(in)                  :: dzgr_u, qrmax, smax, kmax, b, cd
 !MODIFICA
       real cs(ngr_u)  ! Specific heat of the ground material
       real cw
@@ -2579,11 +2555,6 @@ use module_wrf_error
       real d(ngr_u)
       real k(ngr_u)
       real qr_m     ! mean soil moisture between layers
-      real qrmax(ngr_u)
-      real smax(ngr_u)
-      real kmax(ngr_u)
-      real b(ngr_u)
-      real cd(ngr_u)
       real csa(4)
       real ka(4)
       real qref
@@ -2594,21 +2565,6 @@ use module_wrf_error
       integer gr_type
       real drain(ndm,nz_um)
 
-! This does not work yet for flexible amount of layers
-      IF (ngr_u == 10) THEN
-        dzgr_u = (/ 0.1,0.003,0.06,0.003,0.05,0.04,0.02,0.0125,0.005,0.0025/)
-        qrmax = (/ 0.0,0.0,0.0,0.0,0.439,0.37,0.37,0.37,0.37,0.37 /)
-        smax = (/ 0.0,0.0,0.0,0.0,-0.01,-0.1,-0.1,-0.1,-0.1,-0.1 /)
-        kmax = (/ 0.0,0.0,0.0,0.0,3.32e-3,2.162e-3,2.162e-3,2.162e-3,2.162e-3,2.162e-3 /)
-        b = (/ 0.0,0.0,0.0,0.0,2.7,3.9,3.9,3.9,3.9,3.9 /)
-        cd = (/ 0.0,0.0,0.0,0.0,331500.,1.342e6,1.342e6,1.342e6,1.342e6,1.342e6 /)
-      ELSE
-        PRINT *,'ERROR -- error -- ERROR -- error'
-        PRINT *,"   In phys/module_sf_bep_bem.F, subroutine 'surf_temp_veg' wrong amount of grid " // & 
-          "levels in green roofs"
-        PRINT *,'    by now only works with 10 levels, you passed:', ngr_u
-        FATAL_ERROR('modify code or namelist parameter num_urban_ngr')
-      END IF 
       csa = (/ 7.5e4,2.1e6,4.48e4,2.1e6 /)
       ka = (/ 0.035,0.7,0.024,0.7 /)
 
@@ -4307,7 +4263,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 
       subroutine flux_flat_ground(dz,z0,ua,va,pt,pt0,ptg,                     &
-                          ng_u,                                               &
+                          ng_u, dzg_u,                                        &
                           uhb,vhb,sf,ehb,da,qv,pr,rsg,qg,resg,rsveg,f1,f2,f3, &
                           f4,fh,ric,utot,gr_type)
                                 
@@ -4395,20 +4351,11 @@ use module_wrf_error
       real hs
       parameter(hs=36.35)
  
-      real dzg_u(ng_u)          ! Layer sizes in the ground
+      ! Layer sizes in the ground
+      REAL, DIMENSION(ng_u), INTENT(in)                   :: dzg_u
       
       real gx,dzg_tot
       integer gr_type,iz
-
-! This does not work yet for flexible amount of layers
-      IF (ng_u == 10) THEN
-        dzg_u = (/ 0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025 /)
-      ELSE
-        PRINT *,'ERROR -- error -- ERROR -- error'
-        PRINT *,"   In phys/module_sf_bep_bem.F, subroutine 'flux_flat_ground' wrong amount of ground layers"
-        PRINT *,'    by now only works with 10 ground layers, you passed:', ng_u
-        FATAL_ERROR('modify code or namelist parameter num_urban_ng')
-      END IF
 
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
@@ -4520,7 +4467,7 @@ use module_wrf_error
 ! ===6=8===============================================================72
 ! ===6=8===============================================================72
       subroutine flux_flat_roof(dz,z0,ua,va,pt,pt0,ptg,                     &
-                          ngr_u,                                            &
+                          ngr_u, dzgr_u,                                    &
                           uhb,vhb,sf,lf,ehb,da,qv,pr,rsg,qr,resg,rsveg,f1,  &
                           f2,f3,f4,gr_type,pv_frac_roof)
 
@@ -4608,20 +4555,11 @@ use module_wrf_error
       real hs
       parameter(hs=36.35)
 
-      real dzgr_u(ngr_u)          ! Layer sizes in the ground
+      ! Layer sizes in the ground
+      REAL, DIMENSION(ngr_u), INTENT(in)                  :: dzgr_u
 
       real gx,dzgr_tot
       integer gr_type,iz
-
-! This does not work yet for flexible amount of layers
-      IF (ngr_u == 10) THEN
-        dzgr_u = (/ 0.1,0.003,0.06,0.003,0.05,0.04,0.02,0.0125,0.005,0.0025 /)
-      ELSE
-        PRINT *,'ERROR -- error -- ERROR -- error'
-        PRINT *,"   In phys/module_sf_bep_bem.F, subroutine 'flux_flat_roof' wrong amount of ground layers"
-        PRINT *,'    by now only works with 10 ground layers, you passed:', ngr_u
-        FATAL_ERROR('modify code or namelist parameter num_urban_ngr')
-      END IF
 
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS

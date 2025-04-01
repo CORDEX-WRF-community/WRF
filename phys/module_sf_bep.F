@@ -1254,6 +1254,7 @@ use module_wrf_error
 
       subroutine surf_temp(nz_u,nd,pr,dt,ss,rs,rl,rsg,rlg,rsw,rlw,     &
                           ndm, nz_um, ng_u, nwr_u,                     &
+                          dzg_u, dzw_u,                                &
                           tg,alag,csg,emg,albg,ptg,sfg,gfg,            &
                           tr,alar,csr,emr,albr,ptr,sfr,gfr,            &
                           tw,alaw,csw,emw,albw,ptw,sfw,gfw)             
@@ -1324,36 +1325,15 @@ use module_wrf_error
       real tr_tmp(nwr_u)
       real tw_tmp(nwr_u)
 
-      real dzg_u(ng_u)          ! Layer sizes in the ground
-
-      real dzr_u(nwr_u)          ! Layers sizes in the roof
-         
-      real dzw_u(nwr_u)          ! Layer sizes in the wall
+      ! Layer sizes in the ground
+      REAL, DIMENSION(ng_u), INTENT(in)                  :: dzg_u
+      ! Layers sizes in the roof   
+      ! Layer sizes in the wall
+      REAL, DIMENSION(nwr_u), INTENT(in)                 :: dzr_u, dzw_u
       
-! This does not work yet for flexible amount of layers
-      IF (ng_u == 10) THEN
-        dzg_u = (/ 0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025 /)
-      ELSE
-        PRINT *,'ERROR -- error -- ERROR -- error'
-        PRINT *,"   In phys/module_sf_bep.F, subroutine 'surf_temp' wrong amount of ground layers"
-        PRINT *,'    by now only works with 10 ground layers, you passed:', ng_u
-        FATAL_ERROR('modify code or namelist parameter num_urban_ng')
-      END IF
-      IF (nwr_u == 10) THEN
-        dzr_u = (/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025 /)  
-        dzw_u = (/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025 /)
-      ELSE
-        PRINT *,'ERROR -- error -- ERROR -- error'
-        PRINT *,"   In phys/module_sf_bep.F, subroutine 'surf_temp' wrong amount of grid levels in the walls or roofs"
-        PRINT *,'    by now only works with 10 ground layers, you passed:', nwr_u
-        FATAL_ERROR('modify code or namelist parameter num_urban_nwr')
-      END IF
-
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------
-
-        
    
       do id=1,nd
 
@@ -1362,7 +1342,7 @@ use module_wrf_error
         tg_tmp(ig)=tg(id,ig)
        end do
 !	        
-       call soil_temp(ng_u,dzg_u,tg_tmp,ptg(id),alag,csg,        &
+       call soil_temp(ng_u,dzg_u,tg_tmp,ptg(id),alag,csg,      &
                      rsg(id),rlg(id),pr(1),                    &
                      dt,emg,albg,                              &
                      rtg(id),sfg(id),gfg(id))    
@@ -1397,7 +1377,7 @@ use module_wrf_error
         do iw=1,nwr_u        
          tw_tmp(iw)=tw(2*id-1,iz,iw)
         end do
-        call soil_temp(nwr_u,dzw_u,tw_tmp,ptw(2*id-1,iz),alaw,          &
+        call soil_temp(nwr_u,dzw_u,tw_tmp,ptw(2*id-1,iz),alaw,       &
                       csw,                                           &     
                       rsw(2*id-1,iz),rlw(2*id-1,iz),                 &     
                       pr(iz),dt,emw,                                 &    
@@ -1411,7 +1391,7 @@ use module_wrf_error
          tw_tmp(iw)=tw(2*id,iz,iw)
         end do
             
-        call soil_temp(nwr_u,dzw_u,tw_tmp,ptw(2*id,iz),alaw,          &      
+        call soil_temp(nwr_u,dzw_u,tw_tmp,ptw(2*id,iz),alaw,       &      
                       csw,                                         &     
                       rsw(2*id,iz),rlw(2*id,iz),                   &     
                       pr(iz),dt,emw,                               &     
