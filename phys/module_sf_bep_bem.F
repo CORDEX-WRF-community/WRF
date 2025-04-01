@@ -959,6 +959,8 @@ use module_wrf_error
 #endif
                    nurbm, ndm, nz_um, ng_u, nwr_u, nbui_max, ngr_u, &
                    nf_u, ngb_u, dz_u, h_water,                      &
+                   dzg_u,                                           &
+                   dzgr_u, qrmax, smax, kmax, b, cd,                & 
                    dlg1D,dl_u1D,sf1D,vl1D,rl_up(ix,iy),             &
                    rs_abs(ix,iy),emiss(ix,iy),grdflx_urb(ix,iy),    &
                    qv1D,tlev1D,qlev1D,sflev1D,lflev1D,consumlev1D,  &
