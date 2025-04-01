@@ -613,7 +613,9 @@ use module_wrf_error
 
 
       if(pv_frac_roof.gt.0)then
-      call hsfluxpv(nzcanm,nlev,bl,bw,albrof,rs,swddif,emrof,rl,tr_av,tout,sigma,hspv,eppv,pv_frac_roof,uout,vout,tpv,dt)
+      call hsfluxpv(nzcanm,nlev,bl,bw,albrof,rs,swddif,emrof,rl,tr_av,tout,sigma,hspv,eppv,           &
+         effpv,                                                                                       &
+         pv_frac_roof,uout,vout,tpv,dt)
       sfpv=hspv
       tpv_print=tpv
       endif       
@@ -772,13 +774,15 @@ use module_wrf_error
 
         ! temperature regulation
 
-          call regtemp(sw_cond,nhourday,dt,Qb,hslev(ilev),       &
+          call regtemp(sw_cond,nhourday,dt,Qb,hslev(ilev),                         &
+                       temp_rat, hum_rat,                                          &
                        tlev(ilev),timeon,timeoff,targtemp,gaptemp,hsneed(ilev))
 
         ! humidity regulation 
 
 	  call reghum(sw_cond,nhourday,dt,vollev,rhoint,latent, &
-                      hllev(ilev),shumlev(ilev),timeon,timeoff,&
+                      hum_rat,                                  &
+                      hllev(ilev),shumlev(ilev),timeon,timeoff, &
                       targhum,gaphum,hlneed(ilev))
 !
 !performance of the air conditioning system for the test
@@ -801,7 +805,9 @@ use module_wrf_error
       end subroutine BEM
 !====6=8===============================================================72  
 !====6=8===============================================================72  
-      subroutine hsfluxpv(nz,n,bl,bw,albr,rs,swddif,emr,rl,tr,tair,sigma,hspv,eppv,pv_frac_roof,uout,vout,tpv,dt)
+      subroutine hsfluxpv(nz,n,bl,bw,albr,rs,swddif,emr,rl,tr,tair,sigma,hspv,eppv,pv_frac_roof,      &
+       effpv,                                                                                         &
+       uout,vout,tpv,dt)
 !
       implicit none
 !
@@ -823,6 +829,8 @@ use module_wrf_error
       real,intent(in), dimension(1:nz) :: vout
       real,intent(in)  :: dt
       real,intent(in)  :: swddif
+      REAL, INTENT(in)                                   :: effpv
+
 ! Output variables
 !
       real,intent(inout) :: hspv ! Sensible heat flux from the PV panels to the atmosphere [W/m2]
@@ -2063,7 +2071,8 @@ use module_wrf_error
 !====6=8===============================================================72 
 !====6=8===============================================================72
 	
-	subroutine regtemp(swcond,nhourday,dt,Qb,hsroo,          &
+	subroutine regtemp(swcond,nhourday,dt,Qb,hsroo,                                               &
+                           temp_rat, hum_rat,                                                         &
                            tlev,timeon,timeoff,targtemp,gaptemp,hsneed)
 	
 	implicit none
@@ -2085,6 +2094,9 @@ use module_wrf_error
         real, intent(in) :: timeoff ! Ending local time of A/C systems
         real, intent(in) :: targtemp! Target temperature of A/C systems
         real, intent(in) :: gaptemp ! Comfort range of indoor temperature
+
+        REAL, INTENT(in)                                 :: temp_rat, hum_rat
+
         
 
 !Local:
@@ -2148,7 +2160,8 @@ use module_wrf_error
 !====6=8==============================================================72
 !====6=8==============================================================72
          
-	 subroutine reghum(swcond,nhourday,dt,volroo,rhoint,latent, &
+	 subroutine reghum(swcond,nhourday,dt,volroo,rhoint,latent,                                   &
+                           hum_rat,                                                                   &
                            hlroo,shumroo,timeon,timeoff,targhum,gaphum,hlneed)
 
 	 implicit none
@@ -2172,6 +2185,7 @@ use module_wrf_error
         real, intent(in) :: timeoff ! Ending local time of A/C systems
         real, intent(in) :: targhum ! Target humidity of the A/C systems
         real, intent(in) :: gaphum  ! comfort range of the specific humidity
+        REAL, INTENT(in)                                 :: hum_rat
 
 !Local:
 !-----.

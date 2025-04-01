@@ -87,8 +87,8 @@ use module_wrf_error
                       bldac_frc_u, cooled_frc_u, time_on_u, time_off_u,            &
                       targtemp_u, gaptemp_u, targhum_u, gaphum_u, perflo_u,        &
                       hsesf_u, hsequip, irho,                                      &
-                      dzg_u, ,dzgr_u, qrmax, smax, kmax,                           &
-                      b, cd, dzr, dzw, dzgb, dzf,                                  &        
+                      dzg_u, dzgr_u, qrmax, smax, kmax,                            &
+                      b, cd, dzr, dzw, dzgb, dzf,                                  & 
                       lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,                        &
                       a_u,a_v,a_t,a_e,b_u,b_v,                                     &
                       b_t,b_e,b_q,dlg,dl_u,sf,vl,                                  &
@@ -723,7 +723,7 @@ use module_wrf_error
                     alar_u,alar,csw_u,csw,alaw_u,alaw,                     &
                     ws_u,ws_urb,ws,bs_u,bs_urb,bs,z0g_u,z0r_u,z0,          &
                     strd_u,strd,drst_u,drst,ss_u,ss_urb,ss,pb_u,           &
-                    pb_urb,pb,csf,alaf,dzgb,csgb,alagb,                    &
+                    pb_urb,pb,csf,alaf,csgb,alagb,                         &
                     lp_urb2d(ix,iy),lb_urb2d(ix,iy),                       &
                     hgt_urb2d(ix,iy),FRC_URB2D(ix,iy))
          
@@ -1214,6 +1214,8 @@ use module_wrf_error
 #endif                      
                       nurbm, ndm, nz_um, ng_u, nwr_u, nbui_max, ngr_u, &
                       nf_u, ngb_u, dz_u, h_water,                      &
+                      dzg_u,                                           &
+                      dzgr_u, qrmax, smax, kmax, b, cd,                & 
                       dlg,dl_u,sf,vl,rl_up,rs_abs,emiss,grdflx_urb,    &
                       qv,tlev,qlev,sflev,lflev,consumlev,              &
                       eppvlev,tpvlev,sfvlev,lfvlev,twlev,tglev,tflev,sfwin,tmp_u,sfr_indoor,sfrpv,gfr)    
@@ -1256,6 +1258,10 @@ use module_wrf_error
       INTEGER, INTENT(in)                                :: nurbm, ndm, nz_um, ng_u, nwr_u, nbui_max, &
         ngr_u, nf_u, ngb_u
       REAL, INTENT(in)                                   :: dz_u, h_water
+      ! Layer sizes in the ground
+      REAL, DIMENSION(ng_u), INTENT(in)                  :: dzg_u
+      ! Layer sizes in the green roof
+      REAL, DIMENSION(ngr_u), INTENT(in)                 :: dzgr_u, qrmax, smax, kmax, b, cd
 
 !    Radiation parameters
       real albg                  ! Albedo of the ground
@@ -1622,7 +1628,7 @@ use module_wrf_error
      call surf_temp(ndu,pr_u,dt,                         & 
                     rld,rsg,rlg,                         &
                     ndm, nz_um, ng_u, nwr_u,             &
-                    dzg_u,                               &                    
+                    dzg_u,                               &
                     tg,alag,csg,emg,albg,ptg,sfg,lfg,gfg)
      if(gr_flag.eq.1)then
      if(gr_frac_roof.gt.0.)then
@@ -1926,7 +1932,7 @@ use module_wrf_error
                        alar_u,alar,csw_u,csw,alaw_u,alaw,             &
                        ws_u,ws_urb,ws,bs_u,bs_urb,bs,z0g_u,z0r_u,z0,  &  
                        strd_u,strd,drst_u,drst,ss_u,ss_urb,ss,pb_u,   &
-                       pb_urb,pb,csf,alaf,dzgb,csgb,alagb,            &
+                       pb_urb,pb,csf,alaf,csgb,alagb,                 &
                        lp_urb,lb_urb,hgt_urb,frc_urb)        
 
 ! ----------------------------------------------------------------------
@@ -1981,12 +1987,6 @@ use module_wrf_error
 !INPUT/OUTPUT
 !-----------------------------------------------------------------------------
 
-      REAL, DIMENSION(nwr_u), INTENT(in)                 :: dzr, dzw
-      !Layer sizes in the floors [m]
-      REAL, DIMENSION(nf_u), INTENT(in)                  :: dzf
-      !layer sizes in the ground below the buildings [m]
-      REAL, DIMENSION(ngb_u), INTENT(in)                 :: dzgb
-
       real csr(nwr_u)       ! Specific heat of the roof material at each roof levels
       real csw(nwr_u)       ! Specific heat of the wall material at each wall levels
 
@@ -2013,7 +2013,7 @@ use module_wrf_error
 ! L. Fita, UBA/CIMA/IFAECI, March 2025
 !   Some variables are removed from this initialization, since now they are defined via the
 !     namelist.input, with their generic definition kept in Registry/registry.urbandiags
-!     these are: dzr, 
+!     these are: dzw,dzr,dzf,dzgb
 !
 !Initialize variables
 !

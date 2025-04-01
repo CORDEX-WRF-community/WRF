@@ -66,6 +66,7 @@ use module_wrf_error
                       z0g_u, z0r_u, nd_u, strd_u, drst_u,             &
                       ws_u, bs_u, h_b, d_b, ss_u, pb_u,               &
                       nz_u, z_u,                                      &
+                      dzg_u, dzr_u, dzw_u,                            &
                       lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,           &
                       a_u,a_v,a_t,a_e,b_u,b_v,                        &
                       b_t,b_e,b_q,dlg,dl_u,sf,vl,                     &
@@ -137,6 +138,12 @@ use module_wrf_error
    INTEGER, INTENT(in)                                            :: num_urban_nz
    INTEGER, INTENT(in)                                            :: nurbmax, ndm, nz_um, ng_u, nwr_u
    REAL, INTENT(in)                                               :: dz_u
+   ! Layer sizes in the ground
+   REAL, DIMENSION(ng_u), INTENT(in)                     :: dzg_u
+   ! Layers sizes in the roof
+   ! Layer sizes in the wall
+   REAL, DIMENSION(nwr_u), INTENT(in)                    :: dzr_u, dzw_u
+
 #ifdef URBANSTATE
    REAL, DIMENSION(1:num_urban_nz)                                :: ua_u1D, va_u1D, pt_u1D, da_u1D,  &
      pt0_u1D, pr_u1D
@@ -508,6 +515,7 @@ use module_wrf_error
                    ua_u1D, va_u1D, pt_u1D, da_u1D, pt0_u1D, pr_u1D, &
 #endif
                    nurbm, ndm, nz_um, ng_u, nwr_u, dz_u,            &
+                   dzg_u, dzr_u, dzw_u,                             &
                    dlg1D,dl_u1D,sf1D,vl1D,rl_up(ix,iy),             &
                    rs_abs(ix,iy),emiss(ix,iy),grdflx_urb(ix,iy))                            
 !        write(*,*) 'salgo de BEP1D'
@@ -616,7 +624,8 @@ use module_wrf_error
 #ifdef URBANSTATE
                       ua_u, va_u, pt_u, da_u, pt0_u, pr_u,            &
 #endif
-                      nurbm, ndm, nz_um, ng_u, nwr_u, dz_u,            &
+                      nurbm, ndm, nz_um, ng_u, nwr_u, dz_u,           &
+                      dzg_u, dzr_u, dzw_u,                            &
                       dlg,dl_u,sf,vl,rl_up,rs_abs,emiss,grdflx_urb)   
 
 ! ----------------------------------------------------------------------
@@ -691,6 +700,12 @@ use module_wrf_error
 
       INTEGER, INTENT(in)                                :: nurbm, ndm, nz_um, ng_u, nwr_u
       REAL, INTENT(in)                                   :: dz_u
+
+      ! Layer sizes in the ground
+      REAL, DIMENSION(ng_u), INTENT(in)                  :: dzg_u
+      ! Layers sizes in the roof
+      ! Layer sizes in the wall
+      REAL, DIMENSION(nwr_u), INTENT(in)                 :: dzr_u, dzw_u
 
 !    Building parameters      
       real alag(ng_u)            ! Ground thermal diffusivity [m^2 s^-1]
@@ -874,7 +889,7 @@ use module_wrf_error
       call surf_temp(nzu,ndu,pr_u,dt,ss,                & 
                     rs,rld,rsg,rlg,rsw,rlw,             &
                     ndm, nz_um, ng_u, nwr_u,            &
-                    dzg_u, dzr_u, dzw_u,                &                    
+                    dzg_u, dzr_u, dzw_u,                &
                     tg,alag,csg,emg,albg,ptg,sfg,gfg,   &
                     tr,alar,csr,emr,albr,ptr,sfr,gfr,   &
                     tw,alaw,csw,emw,albw,ptw,sfw,gfw)  
@@ -1260,14 +1275,11 @@ use module_wrf_error
                           tr,alar,csr,emr,albr,ptr,sfr,gfr,            &
                           tw,alaw,csw,emw,albw,ptw,sfw,gfw)             
                  
-
 ! ----------------------------------------------------------------------
 ! Computation of the surface temperatures for walls, ground and roofs 
 ! ----------------------------------------------------------------------
 
       implicit none
-      
-      
       
 ! ----------------------------------------------------------------------
 ! INPUT:
@@ -1305,7 +1317,11 @@ use module_wrf_error
       real tg(ndm,ng_u)         ! Temperature in each layer of the ground [K]
       real tr(ndm,nz_um,nwr_u) ! Temperature in each layer of the roof [K]
       real tw(2*ndm,nz_um,nwr_u) ! Temperature in each layer of the wall [K]
-      
+      ! Layer sizes in the ground
+      REAL, DIMENSION(ng_u), INTENT(in)                  :: dzg_u
+      ! Layers sizes in the roof
+      ! Layer sizes in the wall
+      REAL, DIMENSION(nwr_u), INTENT(in)                 :: dzr_u, dzw_u
 
 ! ----------------------------------------------------------------------
 ! OUTPUT:
@@ -1326,12 +1342,6 @@ use module_wrf_error
       real tr_tmp(nwr_u)
       real tw_tmp(nwr_u)
 
-      ! Layer sizes in the ground
-      REAL, DIMENSION(ng_u), INTENT(in)                  :: dzg_u
-      ! Layers sizes in the roof   
-      ! Layer sizes in the wall
-      REAL, DIMENSION(nwr_u), INTENT(in)                 :: dzr_u, dzw_u
-      
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------
