@@ -89,8 +89,8 @@ state    real     albwin_u        {umap_0}       misc        -         -      - 
 state    real     emwind_u        {umap_0}       misc        -         -      -     "emwind_u"           "Emissivity of windows"                 ""
 
 !    Roughness parameters
-state    real     z0g_u           {umap_0}       misc        -         -      -     "z0g_u"              "The ground's roughness length"         "m"
-state    real     z0r_u           {umap_0}       misc        -         -      -     "z0r_u"              "The roof's roughness length"           "m"
+state    real     z0g_u           {umap_0}       misc        -         -      -     "z0g_u"              "The ground s roughness length"         "m"
+state    real     z0r_u           {umap_0}       misc        -         -      -     "z0r_u"              "The roof s roughness length"           "m"
 
 !    Street parameters
 state    integer  nd_u            {umap_0}       misc        -         -      -     "nd_u"               "Number of street direction for each urban class"  "-"
@@ -98,7 +98,7 @@ state    real     strd_u     {umap0}{umap_0}     misc        -         -      - 
 state    real     drst_u     {umap0}{umap_0}     misc        -         -      -     "drst_u"             "Street direction"                      "degree"
 state    real     ws_u       {umap0}{umap_0}     misc        -         -      -     "ws_u"               "Street width"                          "m"
 state    real     bs_u       {umap0}{umap_0}     misc        -         -      -     "bs_u"               "Building width"                        "m"
-state    real     h_b        {umap_1}{umap_0}    misc        -         -      -     "h_b"                "Bulding's heights"                     "m"
+state    real     h_b        {umap_1}{umap_0}    misc        -         -      -     "h_b"                "Bulding s heights"                     "m"
 state    real     d_b        {umap_1}{umap_0}    misc        -         -      -     "d_b"                "Probability that a building has an height h_b"        "1"
 state    real     ss_u       {umap_1}{umap_0}    misc        -         -      -     "ss_u"               "Probability that a building has an height equal to z" "1"
 state    real     pb_u       {umap_1}{umap_0}    misc        -         -      -     "pb_u"               "Probability that a building has an height greater or equal to z"  "1"
