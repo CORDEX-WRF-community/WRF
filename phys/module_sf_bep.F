@@ -874,6 +874,7 @@ use module_wrf_error
       call surf_temp(nzu,ndu,pr_u,dt,ss,                & 
                     rs,rld,rsg,rlg,rsw,rlw,             &
                     ndm, nz_um, ng_u, nwr_u,            &
+                    dzg_u, dzr_u, dzw_u,                &                    
                     tg,alag,csg,emg,albg,ptg,sfg,gfg,   &
                     tr,alar,csr,emr,albr,ptr,sfr,gfr,   &
                     tw,alaw,csw,emw,albw,ptw,sfw,gfw)  
@@ -1254,7 +1255,7 @@ use module_wrf_error
 
       subroutine surf_temp(nz_u,nd,pr,dt,ss,rs,rl,rsg,rlg,rsw,rlw,     &
                           ndm, nz_um, ng_u, nwr_u,                     &
-                          dzg_u, dzw_u,                                &
+                          dzg_u, dzr_u, dzw_u,                         &
                           tg,alag,csg,emg,albg,ptg,sfg,gfg,            &
                           tr,alar,csr,emr,albr,ptr,sfr,gfr,            &
                           tw,alaw,csw,emw,albw,ptw,sfw,gfw)             

@@ -723,7 +723,7 @@ use module_wrf_error
                     alar_u,alar,csw_u,csw,alaw_u,alaw,                     &
                     ws_u,ws_urb,ws,bs_u,bs_urb,bs,z0g_u,z0r_u,z0,          &
                     strd_u,strd,drst_u,drst,ss_u,ss_urb,ss,pb_u,           &
-                    pb_urb,pb,dzw,dzr,dzf,csf,alaf,dzgb,csgb,alagb,        &
+                    pb_urb,pb,csf,alaf,dzgb,csgb,alagb,                    &
                     lp_urb2d(ix,iy),lb_urb2d(ix,iy),                       &
                     hgt_urb2d(ix,iy),FRC_URB2D(ix,iy))
          
@@ -1622,6 +1622,7 @@ use module_wrf_error
      call surf_temp(ndu,pr_u,dt,                         & 
                     rld,rsg,rlg,                         &
                     ndm, nz_um, ng_u, nwr_u,             &
+                    dzg_u,                               &                    
                     tg,alag,csg,emg,albg,ptg,sfg,lfg,gfg)
      if(gr_flag.eq.1)then
      if(gr_frac_roof.gt.0.)then
@@ -1629,6 +1630,7 @@ use module_wrf_error
      call roof_temp_veg(ndu,pr_u,dt,                     &
                     rld,rs,                              &
                     ndm, nz_um, nwr_u, ngr_u,            &
+                    dzgr_u, qrmax, smax, kmax, b, cd,    & 
                     trv,ptrv,sfrv,lfrv,gfr,qr,rainbl,    &
                     drain,hfgr,tr,alar(5),dzr(5),csr(5), &
                     nzu,irri_now,gr_type,pv_frac_roof,   &
@@ -2856,7 +2858,7 @@ use module_wrf_error
                  qr_tmp(il)=qr(id,iz,il)
                enddo
                call flux_flat_roof(dz,z0v,ua_u(iz),va_u(iz),pt_u(iz),pt0_u(iz),&
-                   ptrv(id,iz), ngr_u,                                         &
+                   ptrv(id,iz), ngr_u, dzgr_u,                                 &
                    uhbv(id,iz),                                                &
                    vhbv(id,iz),sfrv(id,iz),lfrv(id,iz),ehbv(id,iz),da_u(iz),   &
                    qv_u(iz),pr_u(iz),rs,qr_tmp,resg,rsveg,f1,f2,f3,f4,         &
@@ -5168,7 +5170,7 @@ use module_wrf_error
 
       integer i,iu
       integer nurb ! number of urban classes used
-        real, intent(out) :: bldac_frc_u(nurbm)
+      real, intent(out) :: bldac_frc_u(nurbm)
       real, intent(out) :: cooled_frc_u(nurbm)
       real, intent(out) :: cop_u(nurbm)
       real, intent(out) :: pwin_u(nurbm)
