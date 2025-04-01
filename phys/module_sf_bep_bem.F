@@ -961,6 +961,8 @@ use module_wrf_error
                    nf_u, ngb_u, dz_u, h_water,                      &
                    dzg_u,                                           &
                    dzgr_u, qrmax, smax, kmax, b, cd,                & 
+                   emins, albins, thickwin, cswin, temp_rat,        &
+                   hum_rat, effpv,                                  &
                    dlg1D,dl_u1D,sf1D,vl1D,rl_up(ix,iy),             &
                    rs_abs(ix,iy),emiss(ix,iy),grdflx_urb(ix,iy),    &
                    qv1D,tlev1D,qlev1D,sflev1D,lflev1D,consumlev1D,  &
@@ -1218,6 +1220,8 @@ use module_wrf_error
                       nf_u, ngb_u, dz_u, h_water,                      &
                       dzg_u,                                           &
                       dzgr_u, qrmax, smax, kmax, b, cd,                & 
+                      emins, albins, thickwin, cswin, temp_rat,        &
+                      hum_rat, effpv,                                  &
                       dlg,dl_u,sf,vl,rl_up,rs_abs,emiss,grdflx_urb,    &
                       qv,tlev,qlev,sflev,lflev,consumlev,              &
                       eppvlev,tpvlev,sfvlev,lfvlev,twlev,tglev,tflev,sfwin,tmp_u,sfr_indoor,sfrpv,gfr)    
@@ -1264,6 +1268,8 @@ use module_wrf_error
       REAL, DIMENSION(ng_u), INTENT(in)                  :: dzg_u
       ! Layer sizes in the green roof
       REAL, DIMENSION(ngr_u), INTENT(in)                 :: dzgr_u, qrmax, smax, kmax, b, cd
+      REAL, INTENT(in)                                   :: emins, albins, thickwin, cswin, temp_rat, &
+          hum_rat, effpv
 
 !    Radiation parameters
       real albg                  ! Albedo of the ground
