@@ -1745,7 +1745,7 @@ CONTAINS
                 targtemp_u, gaptemp_u, targhum_u, gaphum_u, perflo_u,  &
                 hsesf_u, hsequip, irho,                                &
                 dzg_u, dzgr_u, qrmax, smax, kmax,                      &
-                b, cd, dzr_u, dzw, dzgb, dzf,                          &
+                b, cd_u, dzr_u, dzw, dzgb, dzf,                        &
                 lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,                  &
                 a_u_bep,a_v_bep,a_t_bep,                               &
                 a_e_bep,b_u_bep,b_v_bep,                               &
