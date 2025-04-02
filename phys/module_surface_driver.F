@@ -299,7 +299,7 @@ CONTAINS
      &          ,targtemp_u, gaptemp_u, targhum_u, gaphum_u          &
      &          ,perflo_u, hsesf_u, hsequip, irho                    &
      &          ,dzg_u, dzgr_u, qrmax, smax, kmax                    &
-     &          ,b, cd, dzr, dzw, dzgb, dzf                          &
+     &          ,b, cd_u, dzr_u, dzw, dzgb, dzf                      &
      &          ,ep_pv_urb3d,t_pv_urb3d                              & !multi-layer urban GRZ
      &          ,trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d              & !multi-layer urban GRZ
      &          ,drain_urb4d,draingr_urb3d                           & !multi-layer urban GRZ
@@ -1054,8 +1054,8 @@ CONTAINS
    INTEGER, DIMENSION(nurbmax), INTENT(inout)            ::  sw_cond_u
    REAL, DIMENSION(24), INTENT(inout)                    :: hsequip, irho
    REAL, DIMENSION(ng_u), INTENT(in)                     :: dzg_u
-   REAL, DIMENSION(ngr_u), INTENT(in)                    :: dzgr_u, qrmax, smax, kmax, b, cd
-   REAL, DIMENSION(nwr_u), INTENT(in)                    :: dzr, dzw
+   REAL, DIMENSION(ngr_u), INTENT(in)                    :: dzgr_u, qrmax, smax, kmax, b, cd_u
+   REAL, DIMENSION(nwr_u), INTENT(in)                    :: dzr_u, dzw
    REAL, DIMENSION(ngb_u), INTENT(in)                    :: dzgb
    REAL, DIMENSION(nf_u), INTENT(in)                     :: dzf
 
@@ -2825,7 +2825,7 @@ CONTAINS
                 targtemp_u, gaptemp_u, targhum_u, gaphum_u,     &
                 perflo_u, hsesf_u, hsequip, irho,               &
                 dzg_u, ,dzgr_u, qrmax, smax, kmax,              &
-                b, cd, dzr, dzw, dzgb, dzf,                     &
+                b, cd_u, dzr_u, dzw, dzgb, dzf,                 &
                 ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
                 trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !GRZ
                 drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !GRZ
@@ -2979,7 +2979,7 @@ CONTAINS
                 gaptemp_u, targhum_u, gaphum_u, perflo_u,       &
                 hsesf_u, hsequip, irho,                         &
                 dzg_u, ,dzgr_u, qrmax, smax, kmax,              &
-                b, cd, dzw, dzgb, dzf,                          &
+                b, cd_u, dzw, dzgb, dzf,                        &
                 ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
                 trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !GRZ
                 drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !GRZ
@@ -3337,7 +3337,7 @@ CONTAINS
                                targtemp_u, gaptemp_u, targhum_u, gaphum_u, perflo_u,        &
                                hsesf_u, hsequip, irho,                                      &              
                                dzg_u, ,dzgr_u, qrmax, smax, kmax,                           &
-                               b, cd, dzr, dzw, dzgb, dzf,                                  &
+                               b, cd_u, dzw, dzgb, dzf,                                     &
                           trv_urb4d,       qr_urb4d,      qgr_urb3d,  tgr_urb3d,            & !GRZ
                         drain_urb4d,  draingr_urb3d,     sfrv_urb3d, lfrv_urb3d,            & !GRZ
                           dgr_urb3d,       dg_urb3d,      lfr_urb3d,  lfg_urb3d,            & !GRZ

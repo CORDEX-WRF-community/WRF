@@ -881,8 +881,8 @@ BENCH_START(surf_driver_tim)
      &        ,smax=config_flags%smax_urban(1:model_config_rec%num_urban_ngr)    &
      &        ,kmax=config_flags%kmax_urban(1:model_config_rec%num_urban_ngr)    &
      &        ,b=config_flags%b_urban(1:model_config_rec%num_urban_ngr)          &
-     &        ,cd=config_flags%cd_rban(1:model_config_rec%num_urban_ngr)         &
-     &        ,dzr=config_flags%dzr_urban(1:model_config_rec%num_urban_nwr)      &
+     &        ,cd_u=config_flags%cd_rban(1:model_config_rec%num_urban_ngr)       &
+     &        ,dzr_u=config_flags%dzr_urban(1:model_config_rec%num_urban_nwr)    &
      &        ,dzw=config_flags%dzw_urban(1:model_config_rec%num_urban_nwr)      &
      &        ,dzgb=config_flags%dzgb_urban(1:model_config_rec%num_urban_ngb)    &
      &        ,dzf=config_flags%dzf_urban(1:model_config_rec%num_urban_nf)       &
