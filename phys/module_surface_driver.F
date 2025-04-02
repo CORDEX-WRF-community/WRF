@@ -9,30 +9,82 @@ MODULE module_surface_driver
 !    SUBROUTINE subprogram.  The limit is 255.
 
   TYPE urban_scalar_values
-   ! Default values are provided in Registry/registry.urbandiags an accessible from namelist.input
-   ! distance [m] between vertical layers used by the urban module BEP
-   REAL                                                  :: dz_urban
-   ! number of panes in the windows (1,2 or 3)
-   INTEGER                                               :: p_num
-   ! category number for the windows (q_num= 4, standard glasses) [max=10]
-   INTEGER                                               :: q_num
-   ! mm of irrigation per hour
-   REAL                                                  :: h_water
-   ! emissivity of the internal walls
-   REAL                                                  :: emins
-   ! albedo of the internal walls
-   REAL                                                  :: albins
-   ! thickness of the window [m]
-   REAL                                                  :: thickwin
-   ! Specific heat of the windows [J/(m3.K)]
-   REAL                                                  :: cswin
-   ! power of the A.C. heating/cooling the indoor air [K/s]
-   REAL                                                  :: temp_rat
-   ! power of the A.C. drying/moistening the indoor air [(Kg/kg)/s]
-   REAL                                                  :: hum_rat
-   ! Efficiency of PV panels installed at the roofs, typical values [0.10,0.15]
-   REAL                                                  :: effpv
+    ! Default values are provided in Registry/registry.urbandiags an accessible from namelist.input
+    ! distance [m] between vertical layers used by the urban module BEP
+    REAL                                                 :: dz_urban
+    ! number of panes in the windows (1,2 or 3)
+    INTEGER                                              :: p_num
+    ! category number for the windows (q_num= 4, standard glasses) [max=10]
+    INTEGER                                              :: q_num
+    ! mm of irrigation per hour
+    REAL                                                 :: h_water
+    ! emissivity of the internal walls
+    REAL                                                 :: emins
+    ! albedo of the internal walls
+    REAL                                                 :: albins
+    ! thickness of the window [m]
+    REAL                                                 :: thickwin
+    ! Specific heat of the windows [J/(m3.K)]
+    REAL                                                 :: cswin
+    ! power of the A.C. heating/cooling the indoor air [K/s]
+    REAL                                                 :: temp_rat
+    ! power of the A.C. drying/moistening the indoor air [(Kg/kg)/s]
+    REAL                                                 :: hum_rat
+    ! Efficiency of PV panels installed at the roofs, typical values [0.10,0.15]
+    REAL                                                 :: effpv
+    ! 1 to switch on green roof model
+    INTEGER                                              :: gr_flag_u
+    ! 1 for GRASS, 2 for SEDUM vegetation on the green roof
+    INTEGER                                              :: gr_type_u  
   END TYPE urban_scalar_values
+
+  TYPE irrigation_scalar_values
+    ! WATER AMOUNT [mm]
+    REAL                                                 :: irr_daily_amount     
+    ! for packaging: 0=no irr; 1=drip; 2=sprinkler; 3=channel
+    INTEGER                                              :: sf_surf_irr_scheme
+    ! local start hour
+    INTEGER                                              :: irr_start_hour
+    ! Number of hours to irrigate
+    INTEGER                                              :: irr_num_hours
+    ! Julian day to start irrigation (included)
+    INTEGER                                              :: irr_start_julianday
+    ! Julian day to end irrigation (not included)
+    INTEGER                                              :: irr_end_julianday
+    ! frequency of irrigation in days
+    INTEGER                                              :: irr_freq
+    ! phase of irrigation, 0=in phase; 1=not in phase; 2=not in phase, random
+    INTEGER                                              :: irr_ph   
+  END TYPE irrigation_scalar_values
+
+  TYPE cryosphere_scalar_values
+    ! Fractional sea-ice option: 0=OFF; 1=ON
+    INTEGER                                              :: fractional_seaice
+    ! Avoid low ice temps when ice frac and Tsk are inconsistent
+    LOGICAL                                              :: tice2tsk_if2cold
+    ! Method for setting sea-ice thickness
+    INTEGER                                              :: seaice_albedo_opt
+    ! Default value for sea-ice thickness
+    REAL                                                 :: seaice_albedo_default
+    ! Method for setting sea-ice thickness
+    INTEGER                                              :: seaice_thickness_opt
+    ! Default value for sea-ice thickness
+    REAL                                                 :: seaice_thickness_default
+    ! Method for treating snow depth on sea ice
+    INTEGER                                              :: seaice_snowdepth_opt
+    ! Maximum allowed accumulation (m) of snow on sea ice
+    REAL                                                 :: seaice_snowdepth_max
+    ! Minimum snow depth (m) on sea ice
+    REAL                                                 :: seaice_snowdepth_min
+    ! ALBSI_LOGICAL
+    INTEGER                                              :: ifndalbsi
+    ! ICEDEPTH_LOGICAL
+    INTEGER                                              :: ifndicedepth
+    ! SNOWSH_LOGICAL
+    INTEGER                                              :: ifndsnowsh
+    ! SNOWSI_LOGICAL
+    INTEGER                                              :: ifndsnowsi
+  END TYPE
 
 CONTAINS
 
@@ -43,12 +95,7 @@ CONTAINS
      &          ,acsnom,acsnow,snowfallac,akhs,akms,albedo,br,canwat  &
      &          ,chklowq,dt,dx,dx2d,area2d,dz8w,dzs,glw               &
      &          ,grdflx,gsw,swdown,gz1oz0,hfx,ht,ifsnow,isfflx        &
-     &          ,fractional_seaice,seaice_albedo_opt                  &
-     &          ,seaice_albedo_default,seaice_thickness_opt,          &
-     &          seaice_thickness_default                              &
-     &          ,seaice_snowdepth_opt,seaice_snowdepth_max            &
-     &          ,seaice_snowdepth_min,tice2tsk_if2cold                &
-     &          ,ifndalbsi, ifndicedepth, ifndsnowsi                  &
+     &          ,cryosphere_scalars,                                  &
      &          ,isltyp,itimestep,julian_in,ivgtyp,lowlyr,mavail,rmol &
      &          ,num_soil_layers,p8w,pblh,pi_phy,pshltr,fm,fhh,psih   &
      &          ,psim,p_phy,q10,q2,qfx,qsfc,qshltr,qz0                &
@@ -371,9 +418,7 @@ CONTAINS
      &          ,pert_noah, perts_qvapor, perts_th, perts_smois       &
      &          ,perts_tsoil, pert_noah_qv, pert_noah_t               &
      &          ,pert_noah_smois, pert_noah_tslb                      &
-     &          ,irrigation,sf_surf_irr_scheme, irr_daily_amount      & !IRRIG
-     &          ,irr_start_hour,irr_num_hours,irr_start_julianday     &
-     &          ,irr_end_julianday,irr_freq,irr_ph,irr_rand_field     &
+     &          ,irrigation, irrigation_scalars, irr_rand_field       &
      &                                                             )
 
    USE module_state_description, ONLY : SFCLAYSCHEME              &
@@ -647,17 +692,8 @@ CONTAINS
      &          ,ips,ipe,jps,jpe,kps,kpe                              &
      &          ,kts,kte,num_tiles
 
-   INTEGER, INTENT(IN)::   FRACTIONAL_SEAICE
-   INTEGER, INTENT(IN)::   SEAICE_ALBEDO_OPT
-   REAL,    INTENT(IN)::   SEAICE_ALBEDO_DEFAULT
-   INTEGER, INTENT(IN)::   SEAICE_THICKNESS_OPT
-   REAL,    INTENT(IN)::   SEAICE_THICKNESS_DEFAULT
-   INTEGER, INTENT(IN)::   SEAICE_SNOWDEPTH_OPT
-   REAL,    INTENT(IN)::   SEAICE_SNOWDEPTH_MAX
-   REAL,    INTENT(IN)::   SEAICE_SNOWDEPTH_MIN
-   INTEGER, INTENT(IN)::   IFNDALBSI
-   INTEGER, INTENT(IN)::   IFNDICEDEPTH
-   INTEGER, INTENT(IN)::   IFNDSNOWSI
+   TYPE(cryosphere_scalar_values), INTENT(in)            :: cryosphere_scalars
+
    LOGICAL, INTENT(IN)::   do_bioe
    LOGICAL, INTENT(IN)::   do_meganfile
 
@@ -692,7 +728,6 @@ CONTAINS
    INTEGER, INTENT(IN ), OPTIONAL :: ISURBAN
    CHARACTER(LEN=*), INTENT(IN ), OPTIONAL :: MMINLU
    LOGICAL, INTENT(IN )::   WARM_RAIN
-   LOGICAL, INTENT(IN)::   tice2tsk_if2cold
    INTEGER, INTENT(INOUT ),OPTIONAL ::   NYEAR
    REAL   , INTENT(INOUT ),OPTIONAL ::   NDAY
    INTEGER, INTENT(IN ),OPTIONAL ::   YR
@@ -1544,10 +1579,9 @@ CONTAINS
    REAL :: constants_irrigation   
    REAL, DIMENSION( ims:ime, jms:jme ) :: IRRIGATION_CHANNEL      
    REAL, DIMENSION( ims:ime, jms:jme ), INTENT(IN)   , OPTIONAL::   IRRIGATION
-   REAL,  INTENT(IN),OPTIONAL::  irr_daily_amount     
+   TYPE(irrigation_scalar_values), INTENT(in), OPTIONAL  :: irrigation_scalars
    INTEGER :: phase
    INTEGER, DIMENSION( ims:ime , jms:jme ), INTENT(INOUT),OPTIONAL :: irr_rand_field
-   INTEGER, INTENT(IN ),OPTIONAL:: sf_surf_irr_scheme,irr_start_hour,irr_num_hours,irr_start_julianday,irr_end_julianday,irr_freq,irr_ph
 
 ! WRF-Solar EPS
   real, dimension (:, :, :), allocatable :: smois_tmp, tslb_tmp
@@ -1560,28 +1594,28 @@ CONTAINS
 !
 ! stop run if using ssib and fractional seaice=0  (fds 12/2010)
 
-  if(sf_surface_physics .eq. SSIBSCHEME .and. fractional_seaice .eq. 0) then
+  if(sf_surface_physics .eq. SSIBSCHEME .and. cryosphere_scalars%fractional_seaice .eq. 0) then
     WRITE( message,* ) 'Please activate fractional seaice option when using SSiB model'
     CALL wrf_error_fatal ( message )
   endif
 
   if (sf_sfclay_physics .eq. 0) return
 
-  if ( fractional_seaice == 0 ) then
+  if ( cryosphere_scalars%fractional_seaice == 0 ) then
      xice_threshold = 0.5
-  else if ( fractional_seaice == 1 ) then
+  else if ( cryosphere_scalars%fractional_seaice == 1 ) then
      xice_threshold = 0.02
   endif
 
-  if ( ( seaice_albedo_opt == 2 ) .and. ( ifndalbsi == 0 ) ) then
+  if ( ( cryosphere_scalars%seaice_albedo_opt == 2 ) .and. ( cryosphere_scalars%ifndalbsi == 0 ) ) then
       call wrf_error_fatal("Field ALBSI not found in input.  Field ALBSI is required if SEAICE_ALBEDO_OPT=2")
   endif
 
-  if ( ( seaice_thickness_opt == 1 ) .and. ( ifndicedepth == 0 ) ) then
+  if ( ( cryosphere_scalars%seaice_thickness_opt == 1 ) .and. ( cryosphere_scalars%ifndicedepth == 0 ) ) then
       call wrf_error_fatal("Field ICEDEPTH not found in input.  Field ICEDEPTH is required if SEAICE_THICKNESS_OPT=1")
   endif
 
-  if ( ( seaice_snowdepth_opt == 1 ) .and. ( ifndsnowsi == 0 ) ) then
+  if ( ( cryosphere_scalars%seaice_snowdepth_opt == 1 ) .and. ( cryosphere_scalars%ifndsnowsi == 0 ) ) then
       call wrf_error_fatal("Field SNOWSI not found in input.  Field SNOWSI is required if SEAICE_SNOWDEPTH_OPT=1")
   endif
 
@@ -1651,19 +1685,29 @@ CONTAINS
          sf_surf_irr: SELECT CASE(sf_surf_irr_scheme)
             CASE(DRIP)
                CALL drip_irrigation(                                     &
-                &  julian_in,IRRIGATION(i,j),sf_surf_irr_scheme,         &
-                &  irr_daily_amount,irr_start_hour,irr_num_hours,        &
-                &  irr_start_julianday,irr_end_julianday,                &
-                &  irr_freq,irr_ph,i,j,RAINBL(i,j),                      &
+                &  julian_in,IRRIGATION(i,j),                            &
+                &  irrigation_scalars%sf_surf_irr_scheme,                &
+                &  irrigation_scalars%irr_daily_amount,                  &
+                &  irrigation_scalars%irr_start_hour,                    &
+                &  irrigation_scalars%irr_num_hours,                     &
+                &  irrigation_scalars%irr_start_julianday,               &
+                &  irrigation_scalars%irr_end_julianday,                 &
+                &  irrigation_scalars%irr_freq,                          &
+                &  irrigation_scalars%irr_ph,i,j,RAINBL(i,j),            &
                 &  IRRIGATION_CHANNEL(i,j),gmt,xtime,dt,                 &
                 &  irr_rand_field(i,j)                                   &
                    )
             CASE(CHANNEL)
                CALL channel_irrigation(                                  &
-                &  julian_in,IRRIGATION(i,j),sf_surf_irr_scheme,         &
-                &  irr_daily_amount,irr_start_hour,irr_num_hours,        &
-                &  irr_start_julianday,irr_end_julianday,                &
-                &  irr_freq,irr_ph,i,j,RAINBL(i,j),                      &
+                &  julian_in,IRRIGATION(i,j),                            &
+                &  irrigation_scalars%sf_surf_irr_scheme,                &
+                &  irrigation_scalars%irr_daily_amount,                  &
+                &  irrigation_scalars%irr_start_hour,                    &
+                &  irrigation_scalars%irr_num_hours,                     &
+                &  irrigation_scalars%irr_start_julianday,               &
+                &  irrigation_scalars%irr_end_julianday,                 &
+                &  irrigation_scalars%irr_freq,                          &
+                &  irrigation_scalars%irr_ph,i,j,RAINBL(i,j),            &
                 &  IRRIGATION_CHANNEL(i,j),gmt,xtime,dt,                 &
                 &  irr_rand_field(i,j)                                   &
                    )
@@ -1687,20 +1731,30 @@ CONTAINS
           sf_surf_irr1: SELECT CASE(sf_surf_irr_scheme)
              CASE(DRIP)
                CALL drip_irrigation(                                     &
-                &  julian_in,IRRIGATION(i,j),sf_surf_irr_scheme,         &
-                &  irr_daily_amount,irr_start_hour,irr_num_hours,        &
-                &  irr_start_julianday,irr_end_julianday,                &
-                &  irr_freq,irr_ph,i,j,RAINBL(i,j),                      &
+                &  julian_in,IRRIGATION(i,j),                            &
+                &  irrigation_scalars%sf_surf_irr_scheme,                &
+                &  irrigation_scalars%irr_daily_amount,                  &
+                &  irrigation_scalars%irr_start_hour,                    &
+                &  irrigation_scalars%irr_num_hours,                     &
+                &  irrigation_scalars%irr_start_julianday,               &
+                &  irrigation_scalars%irr_end_julianday,                 &
+                &  irrigation_scalars%irr_freq,                          &
+                &  irrigation_scalars%irr_ph,i,j,RAINBL(i,j),            &
                 &  IRRIGATION_CHANNEL(i,j),gmt,xtime,dt,                 &
                 &  irr_rand_field(i,j)                                   &
                    )
 
             CASE(CHANNEL)
                CALL channel_irrigation(                                  &
-                &  julian_in,IRRIGATION(i,j),sf_surf_irr_scheme,         &
-                &  irr_daily_amount,irr_start_hour,irr_num_hours,        &
-                &  irr_start_julianday,irr_end_julianday,                &
-                &  irr_freq,irr_ph,i,j,RAINBL(i,j),                      &
+                &  julian_in,IRRIGATION(i,j),                            &
+                &  irrigation_scalars%sf_surf_irr_scheme,                &
+                &  irrigation_scalars%irr_daily_amount,                  &
+                &  irrigation_scalars%irr_start_hour,                    &
+                &  irrigation_scalars%irr_num_hours,                     &
+                &  irrigation_scalars%irr_start_julianday,               &
+                &  irrigation_scalars%irr_end_julianday,                 &
+                &  irrigation_scalars%irr_freq,                          &
+                &  irrigation_scalars%irr_ph,i,j,RAINBL(i,j),            &
                 &  IRRIGATION_CHANNEL(i,j),gmt,xtime,dt,                 &
                 &  irr_rand_field(i,j)                                   &
                    )
@@ -1741,12 +1795,12 @@ CONTAINS
 ! end check lake model    
          XICE_save(I,J) = XICEM(I,J) 
 
-         IF ( FRACTIONAL_SEAICE == 1 ) then
+         IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1 ) then
             IF ( ( XICE(I,J) .NE. XICEM(I,J) ) .AND. ( XICEM(I,J) .GT. XICE_THRESHOLD ) ) THEN
                ! Fractional values of ALBEDO and EMISSIVITY are valid according to the 
                ! earlier fractional seaice value, XICEM.  Recompute them for the new 
                ! seaice value XICE.
-                IF ( SEAICE_ALBEDO_OPT ==2 ) THEN
+                IF ( cryosphere_scalars%SEAICE_ALBEDO_OPT ==2 ) THEN
                     IF ( ALBSI(I,J) < -1.E6 ) THEN
                         call wrf_error_fatal("Field ALBSI not found in input.  Field ALBSI is required if SEAICE_ALBEDO_OPT=2")
                     ENDIF
@@ -1774,11 +1828,11 @@ CONTAINS
           ! emissivity.  The land-surface schemes can update these
           ! values
 
-          SELECT CASE ( SEAICE_ALBEDO_OPT )
+          SELECT CASE ( cryosphere_scalars%SEAICE_ALBEDO_OPT )
           CASE ( 0, 1 )
 
-              ALBEDO(I,J) = SEAICE_ALBEDO_DEFAULT * XICE(I,J) + 0.08 * ( 1.0-XICE(I,J) )
-              ALBBCK(I,J) = SEAICE_ALBEDO_DEFAULT
+              ALBEDO(I,J) = cryosphere_scalars%SEAICE_ALBEDO_DEFAULT * XICE(I,J) + 0.08 * ( 1.0-XICE(I,J) )
+              ALBBCK(I,J) = cryosphere_scalars%SEAICE_ALBEDO_DEFAULT
 
           CASE ( 2 ) 
               
@@ -1982,7 +2036,7 @@ CONTAINS
   myjpbl = ((bl_pbl_physics .EQ. MYJPBLSCHEME) .OR. &
             (bl_pbl_physics .EQ. QNSEPBLSCHEME) )
 
-  isisfc = ( FRACTIONAL_SEAICE .EQ. 1  .AND. (          &
+  isisfc = ( cryosphere_scalars%FRACTIONAL_SEAICE .EQ. 1  .AND. (          &
             (sf_sfclay_physics .EQ. SFCLAYSCHEME ) .OR. &
             (sf_sfclay_physics .EQ. SFCLAYREVSCHEME ) .OR. &
             (sf_sfclay_physics .EQ. PXSFCSCHEME  ) .OR. &
@@ -2120,7 +2174,7 @@ CONTAINS
            PRESENT(mol)        .AND.  PRESENT(regime)  .AND.    &
                                                       .TRUE. ) THEN
          CALL wrf_debug( 100, 'in SFCLAY' )
-         IF ( FRACTIONAL_SEAICE == 1 ) THEN
+         IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1 ) THEN
             CALL SFCLAY_SEAICE_WRAPPER(u_phytmp,v_phytmp,t_phy,qv_curr,&
                  p_phy,dz8w,cp,g,rcp,r_d,xlv,psfc,chs,chs2,cqs2,cpm, &
                  znt,ust,pblh,mavail,zol,mol,regime,psim,psih,fm,fhh, &
@@ -2132,7 +2186,7 @@ CONTAINS
                  XICE,SST,TSK_SEA,                                                  &
                  CHS2_SEA,CHS_SEA,CPM_SEA,CQS2_SEA,FLHC_SEA,FLQC_SEA,               &
                  HFX_SEA,LH_SEA,QFX_SEA,QGH_SEA,QSFC_SEA,ZNT_SEA,                   &
-                 ITIMESTEP,TICE2TSK_IF2COLD,XICE_THRESHOLD,                         &
+                 ITIMESTEP,cryosphere_scalars%TICE2TSK_IF2COLD,XICE_THRESHOLD,      &
                  ids,ide, jds,jde, kds,kde,                          &
                  ims,ime, jms,jme, kms,kme,                          &
                  i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte,    &
@@ -2173,7 +2227,7 @@ CONTAINS
                                                       .TRUE. ) THEN
          CALL wrf_debug( 100, 'in SFCLAY' )
 
-         IF ( FRACTIONAL_SEAICE == 1 ) THEN
+         IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1 ) THEN
             CALL SFCLAYREV_SEAICE_WRAPPER(u_phytmp,v_phytmp,t_phy,qv_curr,&
                  p_phy,dz8w,cp,g,rcp,r_d,xlv,psfc,chs,chs2,cqs2,cpm, &
                  znt,ust,pblh,mavail,zol,mol,regime,psim,psih,fm,fhh, &
@@ -2185,7 +2239,7 @@ CONTAINS
                  XICE,SST,TSK_SEA,                                                  &
                  CHS2_SEA,CHS_SEA,CPM_SEA,CQS2_SEA,FLHC_SEA,FLQC_SEA,               &
                  HFX_SEA,LH_SEA,QFX_SEA,QGH_SEA,QSFC_SEA,ZNT_SEA,                   &
-                 ITIMESTEP,TICE2TSK_IF2COLD,XICE_THRESHOLD,                         &
+                 ITIMESTEP,cryosphere_scalars%TICE2TSK_IF2COLD,XICE_THRESHOLD,      &
                  ids,ide, jds,jde, kds,kde,                          &
                  ims,ime, jms,jme, kms,kme,                          &
                  i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte,    &
@@ -2225,7 +2279,7 @@ CONTAINS
            PRESENT(mol)        .AND.  PRESENT(regime)  .AND.    &
                                                       .TRUE. ) THEN
          CALL wrf_debug( 100, 'in PX Surface Layer scheme' )
-         IF ( FRACTIONAL_SEAICE == 1 ) THEN
+         IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1 ) THEN
             CALL PXSFCLAY_SEAICE_WRAPPER(u_phytmp,v_phytmp,t_phy,th_phy,qv_curr,&
                  p_phy,dz8w,cp,g,rcp,r_d,xlv,psfc,chs,chs2,cqs2,cpm, &
                  znt,ust,pblh,mavail,zol,mol,regime,psim,psih,       &
@@ -2233,7 +2287,8 @@ CONTAINS
                  u10,v10,                                            &
                  gz1oz0,wspd,br,isfflx,dx,                           &
                  svp1,svp2,svp3,svpt0,ep_1,ep_2,karman,              &
-                 XICE, SST, ITIMESTEP, TICE2TSK_IF2COLD,XICE_THRESHOLD, &
+                 XICE, SST, ITIMESTEP,                               &
+                 cryosphere_scalars%TICE2TSK_IF2COLD,XICE_THRESHOLD, &
                  CHS_SEA, CHS2_SEA, CPM_SEA, CQS2_SEA,FLHC_SEA,FLQC_SEA,&
                  HFX_SEA, LH_SEA, QFX_SEA, QGH_SEA, QSFC_SEA, TSK_SEA,  &
                  ids,ide, jds,jde, kds,kde,                          &
@@ -2260,7 +2315,7 @@ CONTAINS
                                                       .TRUE. ) THEN
 
         CALL wrf_debug(100,'in MYJSFC')
-        IF ( FRACTIONAL_SEAICE == 1 ) THEN
+        IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1 ) THEN
            CALL MYJSFC_SEAICE_WRAPPER(itimestep,ht,dz8w,             &
                 p_phy,p8w,th_phy,t_phy,                              &
                 qv_curr,qc_curr,                                     &
@@ -2342,7 +2397,7 @@ CONTAINS
        IF (PRESENT(qv_curr)    .AND.  PRESENT(qc_curr) .AND.    &
                                                       .TRUE. ) THEN
             CALL wrf_debug(100,'in QNSESFC')
-             IF ( FRACTIONAL_SEAICE == 1 ) THEN
+             IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1 ) THEN
            CALL QNSESFC_SEAICE_WRAPPER(itimestep,ht,dz8w,             &
                 p_phy,p8w,th_phy,t_phy,                              &
                 qv_curr,qc_curr,                                     &
@@ -2350,7 +2405,7 @@ CONTAINS
                 tsk,qsfc,thz0,qz0,uz0,vz0,                           &
                 lowlyr,                                              &
                 xland,                                               &
-                TICE2TSK_IF2COLD,                                    & ! Extra for wrapper.
+                cryosphere_scalars%TICE2TSK_IF2COLD,                 & ! Extra for wrapper.
                 XICE_THRESHOLD,                                      & ! Extra for wrapper.
                 XICE, SST,                                           & ! Extra for wrapper.
                 CHS_SEA, CHS2_SEA, CQS2_SEA, CPM_SEA,            &
@@ -2401,7 +2456,7 @@ CONTAINS
      CASE (GFSSFCSCHEME)
        IF (PRESENT(qv_curr) .AND. .TRUE. ) THEN
        CALL wrf_debug( 100, 'in GFSSFC' )
-       IF (FRACTIONAL_SEAICE == 1) THEN
+       IF (cryosphere_scalars%FRACTIONAL_SEAICE == 1) THEN
           CALL SF_GFS_SEAICE_WRAPPER(u_phytmp,v_phytmp,t_phy,qv_curr, &
                p_phy,CP,RCP,R_d,XLV,PSFC,CHS,CHS2,CQS2,CPM,        &
                ZNT,UST,PSIM,PSIH,                                  &
@@ -2409,7 +2464,7 @@ CONTAINS
                QGH,QSFC,U10,V10,                                   &
                GZ1OZ0,WSPD,BR,ISFFLX,                              &
                EP_1,EP_2,KARMAN,itimestep,                         &
-               TICE2TSK_IF2COLD,                            &
+               cryosphere_scalars%TICE2TSK_IF2COLD,                &
                XICE_THRESHOLD,                              &
                CHS_SEA, CHS2_SEA, CPM_SEA, CQS2_SEA,        &
                FLHC_SEA, FLQC_SEA,                          &
@@ -2443,7 +2498,7 @@ CONTAINS
 
           CALL wrf_debug(100,'in MYNNSFC')
 
-         IF (FRACTIONAL_SEAICE == 1) THEN
+         IF (cryosphere_scalars%FRACTIONAL_SEAICE == 1) THEN
           CALL MYNN_SEAICE_WRAPPER(u_phytmp,v_phytmp,t_phy,qv_curr,&
                p_phy,dz8w,th_phy,rho,                              &
                cp,g,rcp,r_d,xlv,psfc,chs,chs2,cqs2,cpm,            &
@@ -2457,7 +2512,7 @@ CONTAINS
                XICE,SST,TSK_SEA,                                   &
                CHS2_SEA,CHS_SEA,CPM_SEA,CQS2_SEA,FLHC_SEA,FLQC_SEA,&
                HFX_SEA,LH_SEA,QFX_SEA,QGH_SEA,QSFC_SEA,ZNT_SEA,    &
-               TICE2TSK_IF2COLD,XICE_THRESHOLD,                    &
+               cryosphere_scalars%TICE2TSK_IF2COLD,XICE_THRESHOLD, &
                ids,ide, jds,jde, kds,kde,                          &
                ims,ime, jms,jme, kms,kme,                          &
                i_start(ij),i_end(ij),j_start(ij),j_end(ij),kts,kte,&   
@@ -2685,7 +2740,7 @@ CONTAINS
          IF( PRESENT(sr) ) THEN
            frpcpn=.true.
          ENDIF
-         IF ( FRACTIONAL_SEAICE == 1) THEN
+         IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1) THEN
             ! The fields passed to LSM need to represent the full ice values, not
             ! the fractional values.  Convert ALBEDO and EMISS from the blended value 
             ! to a value representing only the sea-ice portion.   Albedo over open 
@@ -2709,7 +2764,8 @@ CONTAINS
                CALL get_local_ice_tsk( ims, ime, jms, jme,                   &
                                        i_start(ij), i_end(ij),               & 
                                        j_start(ij), j_end(ij),               &
-                                       itimestep, .false., tice2tsk_if2cold, &
+                                       itimestep, .false.,                   &
+                                       cryosphere_scalars%tice2tsk_if2cold,  &
                                        XICE, XICE_THRESHOLD,                 &
                                        SST, TSK, TSK_SEA, TSK_LOCAL )
 
@@ -3042,9 +3098,13 @@ CONTAINS
            deallocate (smois_tmp)
          end if
 
-         call seaice_noah( SEAICE_ALBEDO_OPT, SEAICE_ALBEDO_DEFAULT, SEAICE_THICKNESS_OPT, &
-              &            SEAICE_THICKNESS_DEFAULT, SEAICE_SNOWDEPTH_OPT,             &
-              &            SEAICE_SNOWDEPTH_MAX, SEAICE_SNOWDEPTH_MIN,                 &
+         call seaice_noah( cryosphere_scalars%SEAICE_ALBEDO_OPT,                       &
+              &            cryosphere_scalars%SEAICE_ALBEDO_DEFAULT,                   &
+              &            cryosphere_scalars%SEAICE_THICKNESS_OPT,                    &
+              &            cryosphere_scalars%SEAICE_THICKNESS_DEFAULT,                &
+              &            cryosphere_scalars%SEAICE_SNOWDEPTH_OPT,                    &
+              &            cryosphere_scalars%SEAICE_SNOWDEPTH_MAX,                    &
+              &            cryosphere_scalars%SEAICE_SNOWDEPTH_MIN,                    &
               &            t_phy, qv_curr, p8w, dz8w, num_soil_layers, dt, frpcpn, sr, &
               &            glw, swdown, rainbl, snoalb, qgh, xice, xice_threshold,     &
               &            albsi, icedepth, snowsi,                                    &
@@ -3057,7 +3117,7 @@ CONTAINS
               &            ims,ime, jms,jme, kms,kme,                                  &
               &            i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte )
 
-         IF ( FRACTIONAL_SEAICE == 1 ) THEN
+         IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1 ) THEN
             ! LSM Returns full land/ice values, no fractional values.
             ! We return to a fractional component here.  SFLX currently hard-wires
             ! emissivity over sea ice to 0.98, the same value as over open water, so
@@ -3209,7 +3269,7 @@ CONTAINS
 !------------------------------------------------------------------
 
 
-         IF ( FRACTIONAL_SEAICE == 1) THEN
+         IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1) THEN
             ! The fields passed to LSM need to represent the full ice values, not
             ! the fractional values.  Convert ALBEDO and EMISS from the blended value 
             ! to a value representing only the sea-ice portion.   Albedo over open 
@@ -3233,7 +3293,8 @@ CONTAINS
                CALL get_local_ice_tsk( ims, ime, jms, jme,                   &
                                        i_start(ij), i_end(ij),               &
                                        j_start(ij), j_end(ij),               &
-                                       itimestep, .false., tice2tsk_if2cold, &
+                                       itimestep, .false.,                   &
+                                       cryosphere_scalars%tice2tsk_if2cold,  &
                                        XICE, XICE_THRESHOLD,                 &
                                        SST, TSK, TSK_SEA, TSK_LOCAL )
 
@@ -3407,9 +3468,13 @@ CONTAINS
      END IF
   END IF
 
-         call seaice_noah( SEAICE_ALBEDO_OPT, SEAICE_ALBEDO_DEFAULT, SEAICE_THICKNESS_OPT, &
-              &            SEAICE_THICKNESS_DEFAULT, SEAICE_SNOWDEPTH_OPT,             &
-              &            SEAICE_SNOWDEPTH_MAX, SEAICE_SNOWDEPTH_MIN,                 &
+         call seaice_noah( cryosphere_scalars%SEAICE_ALBEDO_OPT,                       &
+              &            cryosphere_scalars%SEAICE_ALBEDO_DEFAULT,                   &
+              &            cryosphere_scalars%SEAICE_THICKNESS_OPT,                    &
+              &            cryosphere_scalars%SEAICE_THICKNESS_DEFAULT,                &
+              &            cryosphere_scalars%SEAICE_SNOWDEPTH_OPT,                    &
+              &            cryosphere_scalars%SEAICE_SNOWDEPTH_MAX,                    &
+              &            cryosphere_scalars%SEAICE_SNOWDEPTH_MIN,                    &
               &            t_phy, qv_curr, p8w, dz8w, num_soil_layers, dt, frpcpn, sr, &
               &            glw, swdown, rainbl, snoalb, qgh, xice, xice_threshold,     &
               &            albsi, icedepth, snowsi,                                    &
@@ -3422,7 +3487,7 @@ CONTAINS
               &            ims,ime, jms,jme, kms,kme,                                  &
               &            i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte )
 
-         IF ( FRACTIONAL_SEAICE == 1 ) THEN
+         IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1 ) THEN
             ! LSM Returns full land/ice values, no fractional values.
             ! We return to a fractional component here.  SFLX currently hard-wires
             ! emissivity over sea ice to 0.98, the same value as over open water, so
@@ -3603,11 +3668,11 @@ CONTAINS
            DO j = j_start(ij) , j_end(ij)
               DO i = i_start(ij) , i_end(ij)
                  IF ( ( XICE(I,J) .GE. XICE_THRESHOLD ) .AND. ( XICE(i,j) .LE. 1. ) ) THEN
-                    ALBBCK(I,J) = SEAICE_ALBEDO_DEFAULT
+                    ALBBCK(I,J) = cryosphere_scalars%SEAICE_ALBEDO_DEFAULT
                  ENDIF
               ENDDO
            ENDDO
-           IF ( FRACTIONAL_SEAICE == 1 ) THEN
+           IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1 ) THEN
               ! The fields passed to LSMRUC need to represent the full ice values, not
               ! the fractional values.  Convert ALBEDO and EMISS from the blended value 
               ! to a value representing only the sea-ice portion.   Albedo over open 
@@ -3635,7 +3700,8 @@ CONTAINS
                  CALL get_local_ice_tsk( ims, ime, jms, jme,                   &
                                          i_start(ij), i_end(ij),               &
                                          j_start(ij), j_end(ij),               &
-                                         itimestep, .false., tice2tsk_if2cold, &
+                                         itimestep, .false.,                   &
+                                         cryosphere_scalars%tice2tsk_if2cold,  &
                                          XICE, XICE_THRESHOLD,                 &
                                          SST, TSK, TSK_SEA, TSK_LOCAL )
                  DO j = j_start(ij) , j_end(ij)
@@ -3676,7 +3742,7 @@ CONTAINS
                 ims,ime, jms,jme, kms,kme,                      &
                 i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )
 
-           IF ( FRACTIONAL_SEAICE == 1 ) THEN
+           IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1 ) THEN
               ! LSMRUC Returns full land/ice values, no fractional values.
               ! We return to a fractional component here.
               DO j=j_start(ij),j_end(ij)
@@ -3749,7 +3815,7 @@ CONTAINS
            PRESENT(emiss)      .AND.  PRESENT(t2)      .AND.    &
            PRESENT(rainbl) .AND.    &
                                                       .TRUE. ) THEN
-          IF ( FRACTIONAL_SEAICE == 1 ) THEN
+          IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1 ) THEN
 
              IF ( isisfc ) THEN
                 !
@@ -3763,7 +3829,8 @@ CONTAINS
                 CALL get_local_ice_tsk( ims, ime, jms, jme,                   &
                                         i_start(ij), i_end(ij),               &
                                         j_start(ij), j_end(ij),               &
-                                        itimestep, .false., tice2tsk_if2cold, &
+                                        itimestep, .false.,                   &
+                                        cryosphere_scalars%tice2tsk_if2cold,  &
                                         XICE, XICE_THRESHOLD,                 &
                                         SST, TSK, TSK_SEA, TSK_LOCAL )
                 DO j = j_start(ij) , j_end(ij)
@@ -3793,7 +3860,7 @@ CONTAINS
                      ids,ide, jds,jde, kds,kde,                      &
                      ims,ime, jms,jme, kms,kme,                      &
                      i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte)
-          IF ( FRACTIONAL_SEAICE == 1 ) THEN
+          IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1 ) THEN
              IF ( isisfc ) THEN
                 !
                 !  back to ice and ocean average
@@ -3861,7 +3928,7 @@ CONTAINS
          IF( PRESENT(sr) ) THEN
            frpcpn=.true.
          ENDIF
-         IF ( FRACTIONAL_SEAICE == 1) THEN
+         IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1) THEN
             ! The fields passed to LSM need to represent the full ice values, not
             ! the fractional values.  Convert ALBEDO and EMISS from the blended value 
             ! to a value representing only the sea-ice portion.   Albedo over open 
@@ -4023,7 +4090,7 @@ CONTAINS
                 ,nlcat,landusef,num_pft_input,pct_pft_input,input_pft_flag &
                  )
 
-         IF ( FRACTIONAL_SEAICE == 1 ) THEN
+         IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1 ) THEN
             DO j=j_start(ij),j_end(ij)
                DO i=i_start(ij),i_end(ij)
                   IF ( ( XICE(I,J) .GE. XICE_THRESHOLD) .AND. ( XICE(i,j) .LE.  1.0 ) ) THEN
@@ -4139,7 +4206,7 @@ CONTAINS
             ENDDO
          ENDDO
 
-         IF ( FRACTIONAL_SEAICE == 1) THEN
+         IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1) THEN
             ! The fields passed to LSM need to represent the full ice values, not
             ! the fractional values.  Convert ALBEDO and EMISS from the blended value 
             ! to a value representing only the sea-ice portion.   Albedo over open 
@@ -4162,7 +4229,8 @@ CONTAINS
                CALL get_local_ice_tsk( ims, ime, jms, jme,                   &
                                        i_start(ij), i_end(ij),               &
                                        j_start(ij), j_end(ij),               &
-                                       itimestep, .false., tice2tsk_if2cold, &
+                                       itimestep, .false.,                   &
+                                       cryosphere_scalars%tice2tsk_if2cold,  &
                                        XICE, XICE_THRESHOLD,                 &
                                        SST, TSK, TSK_SEA, TSK_LOCAL )
 
@@ -4220,9 +4288,13 @@ CONTAINS
              z0       = z0, &
              znt      = znt)
 
-         call seaice_noah( SEAICE_ALBEDO_OPT, SEAICE_ALBEDO_DEFAULT, SEAICE_THICKNESS_OPT, &
-              &            SEAICE_THICKNESS_DEFAULT, SEAICE_SNOWDEPTH_OPT,             &
-              &            SEAICE_SNOWDEPTH_MAX, SEAICE_SNOWDEPTH_MIN,                 &
+         call seaice_noah( cryosphere_scalars%SEAICE_ALBEDO_OPT,                       &
+              &            cryosphere_scalars%SEAICE_ALBEDO_DEFAULT,                   &
+              &            cryosphere_scalars%SEAICE_THICKNESS_OPT,                    &
+              &            cryosphere_scalars%SEAICE_THICKNESS_DEFAULT,                &
+              &            cryosphere_scalars%SEAICE_SNOWDEPTH_OPT,                    &
+              &            cryosphere_scalars%SEAICE_SNOWDEPTH_MAX,                    &
+              &            cryosphere_scalars%SEAICE_SNOWDEPTH_MIN,                    &
               &            t_phy, qv_curr, p8w, dz8w, num_soil_layers, dt, frpcpn, sr, &
               &            glw, swdown, rainbl, snoalb, qgh, xice, xice_threshold,     &
               &            albsi, icedepth, snowsi,                                    &
@@ -4235,7 +4307,7 @@ CONTAINS
               &            ims,ime, jms,jme, kms,kme,                                  &
               &            i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte )
 
-         IF ( FRACTIONAL_SEAICE == 1 ) THEN
+         IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1 ) THEN
             ! LSM Returns full land/ice values, no fractional values.
             ! We return to a fractional component here.  SFLX currently hard-wires
             ! emissivity over sea ice to 0.98, the same value as over open water, so
@@ -4307,7 +4379,7 @@ CONTAINS
 !---Fernando De Sales (fds 06/2010)--------------------------------------
      CALL wrf_debug(100,'in SSIB')
 !
-       IF ( FRACTIONAL_SEAICE == 1) THEN
+       IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1) THEN
           ! The fields passed to SSIB need to represent the full ice values, not
           ! the fractional values.  Convert ALBEDO from the blended value
           ! to a value representing only the sea-ice portion.   Albedo over open
@@ -4457,7 +4529,7 @@ CONTAINS
        ENDDO
        ENDDO
 !
-       IF ( FRACTIONAL_SEAICE == 1 ) THEN
+       IF ( cryosphere_scalars%FRACTIONAL_SEAICE == 1 ) THEN
           ! SSIB_seaice returns full land/ice albedo values, no fractional values.
           ! We return to a fractional component here. 
           DO j=j_start(ij),j_end(ij)

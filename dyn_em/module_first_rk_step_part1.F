@@ -41,7 +41,7 @@ CONTAINS
     USE module_domain, ONLY : domain, domain_clock_get, get_ijk_from_subgrid
     USE module_configure, ONLY : grid_config_rec_type, model_config_rec
     USE module_radiation_driver, ONLY : pre_radiation_driver, radiation_driver
-    USE module_surface_driver, ONLY : surface_driver, urban_scalar_values
+    USE module_surface_driver, ONLY : surface_driver, urban_scalar_values, irrigation_scalar_values
     USE module_cumulus_driver, ONLY : cumulus_driver
     USE module_shallowcu_driver, ONLY : shallowcu_driver
     USE module_pbl_driver, ONLY : pbl_driver
@@ -159,6 +159,7 @@ CONTAINS
 #endif
 
   TYPE(urban_scalar_values)                              :: urban_scalars
+  TYPE(irrigation_scalar_values)                         :: irrigation_scalars
 
   CALL get_ijk_from_subgrid (  grid ,                   &
                             sids, side, sjds, sjde, skds, skde,    &
@@ -614,6 +615,53 @@ BENCH_START(surf_driver_tim)
      ! Efficiency of PV panels installed at the roofs, typical values [0.10,0.15]
      urban_scalars%effpv = config_flags%effpv
 
+     ! Filling irrigation_scalars
+     ! WATER AMOUNT [mm]
+     irrigation_scalars%irr_daily_amount = config_flags%irr_daily_amount
+     ! for packaging: 0=no irr; 1=drip; 2=sprinkler; 3=channel
+     irrigation_scalars%sf_surf_irr_scheme = config_flags%sf_surf_irr_scheme
+     ! local start hour
+     irrigation_scalars%irr_start_hour = config_flags%irr_start_hour
+     ! Number of hours to irrigate
+     irrigation_scalars%irr_num_hours = config_flags%irr_num_hours
+     ! Julian day to start irrigation (included)
+     irrigation_scalars%irr_start_julianday = config_flags%irr_start_julianday
+     ! Julian day to end irrigation (not included)
+     irrigation_scalars%irr_end_julianday = config_flags%irr_end_julianday
+     ! frequency of irrigation in days
+     irrigation_scalars%irr_freq = config_flags%irr_freq
+     ! phase of irrigation, 0=in phase; 1=not in phase; 2=not in phase, random
+     irrigation_scalars%irr_ph = config_flags%irr_ph
+
+     ! Filling cryosphere_scalars
+     ! Fractional sea-ice option: 0=OFF; 1=ON
+     cryosphere_scalars%fractional_seaice = config_flags%fractional_seaice
+     ! Avoid low ice temps when ice frac and Tsk are inconsistent
+     cryosphere_scalars%tice2tsk_if2cold = config_flags%tice2tsk_if2cold
+     ! Method for setting sea-ice thickness
+     cryosphere_scalars%seaice_albedo_opt = config_flags%seaice_albedo_opt
+     ! Default value for sea-ice thickness
+     cryosphere_scalars%seaice_albedo_default = config_flags%seaice_albedo_default
+     ! Method for setting sea-ice thickness
+     cryosphere_scalars%seaice_thickness_opt = config_flags%seaice_thickness_opt
+     ! Default value for sea-ice thickness
+     cryosphere_scalars%seaice_thickness_default = config_flags%seaice_thickness_default
+     ! Method for treating snow depth on sea ice
+     cryosphere_scalars%seaice_snowdepth_opt = config_flags%seaice_snowdepth_opt
+     ! Maximum allowed accumulation (m) of snow on sea ice
+     cryosphere_scalars%seaice_snowdepth_max = config_flags%seaice_snowdepth_max
+     ! Minimum snow depth (m) on sea ice
+     cryosphere_scalars%seaice_snowdepth_min = config_flags%seaice_snowdepth_min
+     ! ALBSI_LOGICAL
+     cryosphere_scalars%ifndalbsi = config_flags%ifndalbsi
+     ! ICEDEPTH_LOGICAL
+     cryosphere_scalars%ifndicedepth = config_flags%ifndicedepth
+     ! SNOWSH_LOGICAL
+     cryosphere_scalars%ifndsnowsh = config_flags%ifndsnowsh
+     ! SNOWSI_LOGICAL
+     cryosphere_scalars%ifndsnowsi = config_flags%
+
+
       CALL surface_driver(                                                &
      &        HYDRO_dt=HYDRO_dt,  sfcheadrt=grid%sfcheadrt,               &
      &        INFXSRT=grid%INFXSRT,  soldrain=grid%soldrain,              &
@@ -630,27 +678,14 @@ BENCH_START(surf_driver_tim)
      &        ,FLQC=grid%flqc          ,GLW=grid%glw            ,GRDFLX=grid%grdflx      &
      &        ,GSW=grid%gsw    ,SWDOWN=grid%swdown        ,GZ1OZ0=gz1oz0      ,HFX=grid%hfx              &
      &        ,HT=grid%ht              ,IFSNOW=config_flags%ifsnow      ,ISFFLX=config_flags%isfflx      &
-     &        ,FRACTIONAL_SEAICE=config_flags%fractional_seaice           &
-     &        ,SEAICE_ALBEDO_OPT=config_flags%seaice_albedo_opt           &
-     &        ,SEAICE_ALBEDO_DEFAULT=config_flags%seaice_albedo_default   &
-     &        ,SEAICE_THICKNESS_OPT=config_flags%seaice_thickness_opt     &
-     &        ,SEAICE_THICKNESS_DEFAULT=config_flags%seaice_thickness_default     &
-     &        ,SEAICE_SNOWDEPTH_OPT=config_flags%seaice_snowdepth_opt     &
-     &        ,SEAICE_SNOWDEPTH_MAX=config_flags%seaice_snowdepth_max     &
-     &        ,SEAICE_SNOWDEPTH_MIN=config_flags%seaice_snowdepth_min     &
-     &        ,TICE2TSK_IF2COLD=config_flags%tice2tsk_if2cold             &
-     &        ,IFNDALBSI=grid%ifndalbsi, IFNDICEDEPTH=grid%ifndicedepth   &
+     &        ,CRYOSPHERE_scalars=cryosphere_scalars                                &
 #if ( WRF_CHEM == 1 )
               ,NE_AREA=grid%ne_area,E_BIO=grid%e_bio &
 #endif
-              ,IFNDSNOWSI=grid%ifndsnowsi, DO_BIOE=do_bioe, DO_MEGANFILE=do_meganfile          &
-     &        ,ISLTYP=grid%isltyp      ,ITIMESTEP=grid%itimestep, JULIAN_IN=grid%julian                  &
+              ,IFNDSNOWSI=grid%ifndsnowsi, DO_BIOE=do_bioe, DO_MEGANFILE=do_meganfile    &
+     &        ,ISLTYP=grid%isltyp      ,ITIMESTEP=grid%itimestep, JULIAN_IN=grid%julian  &
      &        ,IRRIGATION=grid%irrigation,SF_SURF_IRR_SCHEME=config_flags%sf_surf_irr_scheme  & 
-     &        ,IRR_DAILY_AMOUNT=config_flags%irr_daily_amount                                                & 
-     &        ,IRR_START_HOUR=config_flags%irr_start_hour,IRR_NUM_HOURS=config_flags%irr_num_hours           &
-     &        ,IRR_START_JULIANDAY=config_flags%irr_start_julianday                                          &
-     &        ,IRR_END_JULIANDAY=config_flags%irr_end_julianday                                              &
-     &        ,IRR_FREQ=config_flags%irr_freq,IRR_PH=config_flags%irr_ph,IRR_RAND_FIELD=grid%irr_rand_field  & 
+     &        ,IRRIGATION_SCALARS=irrigation_scalars, IRR_RAND_FIELD=grid%irr_rand_field & 
      &        ,IVGTYP=grid%ivgtyp      ,LH=grid%lh              ,LOWLYR=grid%lowlyr      &
      &        ,MAVAIL=grid%mavail      ,NUM_SOIL_LAYERS=config_flags%num_soil_layers        &
      &        ,P8W=grid%p_hyd_w            ,PBLH=grid%pblh          ,PI_PHY=pi_phy      &
@@ -868,7 +903,7 @@ BENCH_START(surf_driver_tim)
      &        ,nf_u=config_flags%num_urban_nf                           &
      &        ,ngb_u=config_flags%num_urban_ngb                         &
      &        ,nbui_max=config_flags%num_urban_nbui                     &
-     &        ,urban_scalars                                            &
+     &        ,URBAN_SCALARS=urban_scalars                              &
      &        ,alag_u=grid%alag_u, alaw_u=grid%alaw_u                   &
      &        ,alar_u=grid%alar_u, csg_u=grid%csg_u                     &
      &        ,csw_u=grid%csw_u, csr_u=grid%csr_u                       &
