@@ -95,7 +95,7 @@ CONTAINS
      &          ,acsnom,acsnow,snowfallac,akhs,akms,albedo,br,canwat  &
      &          ,chklowq,dt,dx,dx2d,area2d,dz8w,dzs,glw               &
      &          ,grdflx,gsw,swdown,gz1oz0,hfx,ht,ifsnow,isfflx        &
-     &          ,cryosphere_scalars,                                  &
+     &          ,cryosphere_scalars                                   &
      &          ,isltyp,itimestep,julian_in,ivgtyp,lowlyr,mavail,rmol &
      &          ,num_soil_layers,p8w,pblh,pi_phy,pshltr,fm,fhh,psih   &
      &          ,psim,p_phy,q10,q2,qfx,qsfc,qshltr,qz0                &
@@ -368,7 +368,6 @@ CONTAINS
      &          ,urban_scalars                                       &
      &          ,alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u         &
      &          ,albg_u, albw_u, albr_u, emg_u, emw_u, emr_u         &
-     &          ,gr_flag_u, gr_type_u, gr_frac_roof_u                &
      &          ,pv_frac_roof_u, albwin_u, emwind_u, z0g_u, z0r_u    &
      &          ,nd_u, strd_u, drst_u, ws_u, bs_u, h_b, d_b, ss_u    &
      &          ,pb_u, nz_u, z_u, cop_u, pwin_u, beta_u, sw_cond_u   &
@@ -418,8 +417,8 @@ CONTAINS
      &          ,pert_noah, perts_qvapor, perts_th, perts_smois       &
      &          ,perts_tsoil, pert_noah_qv, pert_noah_t               &
      &          ,pert_noah_smois, pert_noah_tslb                      &
-     &          ,irrigation, irrigation_scalars, irr_rand_field       &
-     &                                                             )
+     &          ,irrigation, sf_surf_irr_scheme, irrigation_scalars   &
+     &          ,irr_rand_field)
 
    USE module_state_description, ONLY : SFCLAYSCHEME              &
                                        ,SFCLAYREVSCHEME           &
@@ -1579,6 +1578,7 @@ CONTAINS
    REAL :: constants_irrigation   
    REAL, DIMENSION( ims:ime, jms:jme ) :: IRRIGATION_CHANNEL      
    REAL, DIMENSION( ims:ime, jms:jme ), INTENT(IN)   , OPTIONAL::   IRRIGATION
+   INTEGER, INTENT(in), OPTIONAL                         :: sf_surf_irr_scheme
    TYPE(irrigation_scalar_values), INTENT(in), OPTIONAL  :: irrigation_scalars
    INTEGER :: phase
    INTEGER, DIMENSION( ims:ime , jms:jme ), INTENT(INOUT),OPTIONAL :: irr_rand_field
@@ -2323,7 +2323,7 @@ CONTAINS
                 tsk,qsfc,thz0,qz0,uz0,vz0,                           &
                 lowlyr,                                              &
                 xland,ivgtyp,isurban,iz0tlnd,                        &
-                TICE2TSK_IF2COLD,                                    & ! Extra for wrapper.
+                cryosphere_scalars%TICE2TSK_IF2COLD,                 & ! Extra for wrapper.
                 XICE_THRESHOLD,                                      & ! Extra for wrapper.
                 XICE, SST,                                           & ! Extra for wrapper.
                 CHS_SEA, CHS2_SEA, CQS2_SEA, CPM_SEA,            &
