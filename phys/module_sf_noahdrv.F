@@ -126,7 +126,7 @@ CONTAINS
                   gaptemp_u, targhum_u, gaphum_u, perflo_u,     &
                   hsesf_u, hsequip, irho,                       &
                   dzg_u, dzgr_u, qrmax, smax, kmax,             &
-                  b, cd, dzw, dzgb, dzf,                        &
+                  b, cd_u, dzw, dzgb, dzf,                      &
                   ep_pv_urb3d,t_pv_urb3d,                         & !RMS
                   trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !RMS
                   drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !RMS
@@ -714,7 +714,7 @@ CONTAINS
    INTEGER, DIMENSION(nurbmax), INTENT(inout)            ::  sw_cond_u
    REAL, DIMENSION(24), INTENT(inout)                    :: hsequip, irho
    REAL, DIMENSION(ng_u), INTENT(in)                     :: dzg_u
-   REAL, DIMENSION(ngr_u), INTENT(in)                    :: dzgr_u, qrmax, smax, kmax, b, cd
+   REAL, DIMENSION(ngr_u), INTENT(in)                    :: dzgr_u, qrmax, smax, kmax, b, cd_u
    REAL, DIMENSION(nwr_u), INTENT(in)                    :: dzw
    REAL, DIMENSION(ngb_u), INTENT(in)                    :: dzgb
    REAL, DIMENSION(nf_u), INTENT(in)                     :: dzf
@@ -3149,7 +3149,7 @@ SUBROUTINE lsm_mosaic(DZ8W,QV3D,P8W3D,T3D,TSK,                      &
    INTEGER, DIMENSION(nurbmax), INTENT(inout)            ::  sw_cond_u
    REAL, DIMENSION(24), INTENT(inout)                    :: hsequip, irho
    REAL, DIMENSION(ng_u), INTENT(in)                     :: dzg_u
-   REAL, DIMENSION(ngr_u), INTENT(in)                    :: dzgr_u, qrmax, smax, kmax, b, cd
+   REAL, DIMENSION(ngr_u), INTENT(in)                    :: dzgr_u, qrmax, smax, kmax, b, cd_u
    REAL, DIMENSION(nwr_u), INTENT(in)                    :: dzr, dzw
    REAL, DIMENSION(ngb_u), INTENT(in)                    :: dzgb
    REAL, DIMENSION(nf_u), INTENT(in)                     :: dzf
