@@ -2804,7 +2804,7 @@ CONTAINS
                 smois,tslb,snow,canwat,                         &
                 chs, chs2, cqs2, cpm,rcp,SR,chklowq,lai,qz0,    &
                 myj,frpcpn,                                     &
-		sh2o,snowh,                                     & !h
+                sh2o,snowh,                                     & !h
                 u_phy,v_phy,                                    & !I
                 snoalb,shdmin,shdmax,                           & !i
                 snotime,                                        & !o
@@ -2908,7 +2908,7 @@ CONTAINS
                 cooled_frc_u, time_on_u, time_off_u,            &
                 targtemp_u, gaptemp_u, targhum_u, gaphum_u,     &
                 perflo_u, hsesf_u, hsequip, irho,               &
-                dzg_u, ,dzgr_u, qrmax, smax, kmax,              &
+                dzg_u, dzgr_u, qrmax, smax, kmax,               &
                 b, cd_u, dzr_u, dzw, dzgb, dzf,                 &
                 ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
                 trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !GRZ
@@ -3065,8 +3065,8 @@ CONTAINS
                 cooled_frc_u, time_on_u, time_off_u, targtemp_u,&
                 gaptemp_u, targhum_u, gaphum_u, perflo_u,       &
                 hsesf_u, hsequip, irho,                         &
-                dzg_u, ,dzgr_u, qrmax, smax, kmax,              &
-                b, cd_u, dzw, dzgb, dzf,                        &
+                dzg_u, dzgr_u, qrmax, smax, kmax,               &
+                b, cd_u, dzr_u, dzw, dzgb, dzf,                 &
                 ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
                 trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !GRZ
                 drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !GRZ
@@ -3431,7 +3431,7 @@ CONTAINS
                          targtemp_u,      gaptemp_u,      targhum_u,   gaphum_u,  perflo_u, &
                             hsesf_u,        hsequip,           irho,                        &
                               dzg_u,         dzgr_u,          qrmax,       smax,      kmax, &
-                                  b,           cd_u,            dzw,       dzgb,       dzf, &
+                                  b,           cd_u,     dzr_u, dzw,       dzgb,       dzf, &
                           trv_urb4d,       qr_urb4d,      qgr_urb3d,  tgr_urb3d,            & !GRZ
                         drain_urb4d,  draingr_urb3d,     sfrv_urb3d, lfrv_urb3d,            & !GRZ
                           dgr_urb3d,       dg_urb3d,      lfr_urb3d,  lfg_urb3d,            & !GRZ
