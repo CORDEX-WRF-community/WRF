@@ -41,7 +41,8 @@ CONTAINS
     USE module_domain, ONLY : domain, domain_clock_get, get_ijk_from_subgrid
     USE module_configure, ONLY : grid_config_rec_type, model_config_rec
     USE module_radiation_driver, ONLY : pre_radiation_driver, radiation_driver
-    USE module_surface_driver, ONLY : surface_driver, urban_scalar_values, irrigation_scalar_values
+    USE module_surface_driver, ONLY : surface_driver, urban_scalar_values, irrigation_scalar_values,  &
+      cryosphere_scalar_values
     USE module_cumulus_driver, ONLY : cumulus_driver
     USE module_shallowcu_driver, ONLY : shallowcu_driver
     USE module_pbl_driver, ONLY : pbl_driver
@@ -160,6 +161,7 @@ CONTAINS
 
   TYPE(urban_scalar_values)                              :: urban_scalars
   TYPE(irrigation_scalar_values)                         :: irrigation_scalars
+  TYPE(cryosphere_scalar_values)                         :: cryosphere_scalars
 
   CALL get_ijk_from_subgrid (  grid ,                   &
                             sids, side, sjds, sjde, skds, skde,    &
@@ -653,14 +655,13 @@ BENCH_START(surf_driver_tim)
      ! Minimum snow depth (m) on sea ice
      cryosphere_scalars%seaice_snowdepth_min = config_flags%seaice_snowdepth_min
      ! ALBSI_LOGICAL
-     cryosphere_scalars%ifndalbsi = config_flags%ifndalbsi
+     cryosphere_scalars%ifndalbsi = grid%ifndalbsi
      ! ICEDEPTH_LOGICAL
-     cryosphere_scalars%ifndicedepth = config_flags%ifndicedepth
+     cryosphere_scalars%ifndicedepth = grid%ifndicedepth
      ! SNOWSH_LOGICAL
-     cryosphere_scalars%ifndsnowsh = config_flags%ifndsnowsh
+     !cryosphere_scalars%ifndsnowsh = grid%ifndsnowsh
      ! SNOWSI_LOGICAL
-     cryosphere_scalars%ifndsnowsi = config_flags%
-
+     cryosphere_scalars%ifndsnowsi = grid%ifndsnowsi
 
       CALL surface_driver(                                                &
      &        HYDRO_dt=HYDRO_dt,  sfcheadrt=grid%sfcheadrt,               &
@@ -682,7 +683,7 @@ BENCH_START(surf_driver_tim)
 #if ( WRF_CHEM == 1 )
               ,NE_AREA=grid%ne_area,E_BIO=grid%e_bio &
 #endif
-              ,IFNDSNOWSI=grid%ifndsnowsi, DO_BIOE=do_bioe, DO_MEGANFILE=do_meganfile    &
+              ,DO_BIOE=do_bioe, DO_MEGANFILE=do_meganfile                               &
      &        ,ISLTYP=grid%isltyp      ,ITIMESTEP=grid%itimestep, JULIAN_IN=grid%julian  &
      &        ,IRRIGATION=grid%irrigation,SF_SURF_IRR_SCHEME=config_flags%sf_surf_irr_scheme  & 
      &        ,IRRIGATION_SCALARS=irrigation_scalars, IRR_RAND_FIELD=grid%irr_rand_field & 
@@ -929,17 +930,17 @@ BENCH_START(surf_driver_tim)
      &        ,targhum_u=grid%targhum_u, gaphum_u=grid%gaphum_u         &
      &        ,perflo_u=grid%perflo_u, hsesf_u=grid%hsesf_u             &
      &        ,hsequip=grid%hsequip, irho=grid%irho                     &
-     &        ,dzg_u=config_flags%dzg_urban(1:model_config_rec%num_urban_ng)     &
-     &        ,dzgr_u=config_flags%dzgr_urban(1:model_config_rec%num_urban_ngr)  &
-     &        ,qrmax=config_flags%qrmax_urban(1:model_config_rec%num_urban_ngr)  &
-     &        ,smax=config_flags%smax_urban(1:model_config_rec%num_urban_ngr)    &
-     &        ,kmax=config_flags%kmax_urban(1:model_config_rec%num_urban_ngr)    &
-     &        ,b=config_flags%b_urban(1:model_config_rec%num_urban_ngr)          &
-     &        ,cd_u=config_flags%cd_rban(1:model_config_rec%num_urban_ngr)       &
-     &        ,dzr_u=config_flags%dzr_urban(1:model_config_rec%num_urban_nwr)    &
-     &        ,dzw=config_flags%dzw_urban(1:model_config_rec%num_urban_nwr)      &
-     &        ,dzgb=config_flags%dzgb_urban(1:model_config_rec%num_urban_ngb)    &
-     &        ,dzf=config_flags%dzf_urban(1:model_config_rec%num_urban_nf)       &
+     &        ,dzg_u=config_flags%dzg_urban(1:config_flags%num_urban_ng)     &
+     &        ,dzgr_u=config_flags%dzgr_urban(1:config_flags%num_urban_ngr)  &
+     &        ,qrmax=config_flags%qrmax_urban(1:config_flags%num_urban_ngr)  &
+     &        ,smax=config_flags%smax_urban(1:config_flags%num_urban_ngr)    &
+     &        ,kmax=config_flags%kmax_urban(1:config_flags%num_urban_ngr)    &
+     &        ,b=config_flags%b_urban(1:config_flags%num_urban_ngr)          &
+     &        ,cd_u=config_flags%cd_rban(1:config_flags%num_urban_ngr)       &
+     &        ,dzr_u=config_flags%dzr_urban(1:config_flags%num_urban_nwr)    &
+     &        ,dzw=config_flags%dzw_urban(1:config_flags%num_urban_nwr)      &
+     &        ,dzgb=config_flags%dzgb_urban(1:config_flags%num_urban_ngb)    &
+     &        ,dzf=config_flags%dzf_urban(1:config_flags%num_urban_nf)       &
      &        ,EP_PV_URB3D=grid%ep_pv_urb3d                               & !GRZ
      &        ,T_PV_URB3D=grid%t_pv_urb3d                                 & !GRZ
      &        ,TRV_URB4D=grid%trv_urb4d                                   & !GRZ
