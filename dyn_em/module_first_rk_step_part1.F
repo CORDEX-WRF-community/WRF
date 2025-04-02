@@ -41,7 +41,7 @@ CONTAINS
     USE module_domain, ONLY : domain, domain_clock_get, get_ijk_from_subgrid
     USE module_configure, ONLY : grid_config_rec_type, model_config_rec
     USE module_radiation_driver, ONLY : pre_radiation_driver, radiation_driver
-    USE module_surface_driver, ONLY : surface_driver
+    USE module_surface_driver, ONLY : surface_driver, urban_scalar_values
     USE module_cumulus_driver, ONLY : cumulus_driver
     USE module_shallowcu_driver, ONLY : shallowcu_driver
     USE module_pbl_driver, ONLY : pbl_driver
@@ -157,6 +157,8 @@ CONTAINS
 #if ( WRF_DFI_RADAR == 1 )
     INTEGER  do_capsupress   ! =1 do CAP supress, other = don't
 #endif
+
+  TYPE(urban_scalar_values)                              :: urban_scalars
 
   CALL get_ijk_from_subgrid (  grid ,                   &
                             sids, side, sjds, sjde, skds, skde,    &
@@ -588,7 +590,29 @@ BENCH_START(surf_driver_tim)
       do_meganfile = .false.
 #endif
 
-
+     ! Filling urban_scalars
+     ! distance [m] between vertical layers used by the urban module BEP
+     urban_scalars%dz_urban = config_flags%dz_urban
+     ! number of panes in the windows (1,2 or 3)
+     urban_scalars%p_num = config_flags%p_num
+     ! category number for the windows (q_num= 4, standard glasses) [max=10]
+     urban_scalars%q_num = config_flags%q_num
+     ! mm of irrigation per hour
+     urban_scalars%h_water = config_flags%h_water
+     ! emissivity of the internal walls
+     urban_scalars%emins = config_flags%emins
+     ! albedo of the internal walls
+     urban_scalars%albins = config_flags%albins
+     ! thickness of the window [m]
+     urban_scalars%thickwin = config_flags%thickwin
+     ! Specific heat of the windows [J/(m3.K)]
+     urban_scalars%cswin = config_flags%cswin
+     ! power of the A.C. heating/cooling the indoor air [K/s]
+     urban_scalars%temp_rat = config_flags%temp_rat
+     ! power of the A.C. drying/moistening the indoor air [(Kg/kg)/s]
+     urban_scalars%hum_rat = config_flags%hum_rat
+     ! Efficiency of PV panels installed at the roofs, typical values [0.10,0.15]
+     urban_scalars%effpv = config_flags%effpv
 
       CALL surface_driver(                                                &
      &        HYDRO_dt=HYDRO_dt,  sfcheadrt=grid%sfcheadrt,               &
@@ -844,12 +868,7 @@ BENCH_START(surf_driver_tim)
      &        ,nf_u=config_flags%num_urban_nf                           &
      &        ,ngb_u=config_flags%num_urban_ngb                         &
      &        ,nbui_max=config_flags%num_urban_nbui                     &
-     &        ,p_num=config_flags%p_num, q_num=config_flags%q_num       &
-     &        ,dz_u=config_flags%dz_urban, h_water=config_flags%h_water &
-     &        ,emins=config_flags%emins, albins=config_flags%albins     &
-     &        ,thickwin=config_flags%thickwin, cswin=config_flags%cswin &
-     &        ,temp_rat=config_flags%temp_rat                           & 
-     &        ,hum_rat=config_flags%hum_rat, effpv=config_flags%effpv   &
+     &        ,urban_scalars                                            &
      &        ,alag_u=grid%alag_u, alaw_u=grid%alaw_u                   &
      &        ,alar_u=grid%alar_u, csg_u=grid%csg_u                     &
      &        ,csw_u=grid%csw_u, csr_u=grid%csr_u                       &

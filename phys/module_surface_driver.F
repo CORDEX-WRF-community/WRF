@@ -2,6 +2,38 @@
 !
 MODULE module_surface_driver
   real, private, parameter :: QVAPOR_MIN = 0.0, SMOIS_MIN = 0.0, SMOIS_MAX = 1.0
+
+! L. Fita, UBA/CIMA/IFAECI, April 2025
+! Defition of a type strutcture to hold all the urban non-dimensional scalar values to avoid error
+!  module_surface_driver.f90(298): error #6250: There are too many dummy arguments for a FUNCTION or 
+!    SUBROUTINE subprogram.  The limit is 255.
+
+  TYPE urban_scalar_values
+   ! Default values are provided in Registry/registry.urbandiags an accessible from namelist.input
+   ! distance [m] between vertical layers used by the urban module BEP
+   REAL                                                  :: dz_urban
+   ! number of panes in the windows (1,2 or 3)
+   INTEGER                                               :: p_num
+   ! category number for the windows (q_num= 4, standard glasses) [max=10]
+   INTEGER                                               :: q_num
+   ! mm of irrigation per hour
+   REAL                                                  :: h_water
+   ! emissivity of the internal walls
+   REAL                                                  :: emins
+   ! albedo of the internal walls
+   REAL                                                  :: albins
+   ! thickness of the window [m]
+   REAL                                                  :: thickwin
+   ! Specific heat of the windows [J/(m3.K)]
+   REAL                                                  :: cswin
+   ! power of the A.C. heating/cooling the indoor air [K/s]
+   REAL                                                  :: temp_rat
+   ! power of the A.C. drying/moistening the indoor air [(Kg/kg)/s]
+   REAL                                                  :: hum_rat
+   ! Efficiency of PV panels installed at the roofs, typical values [0.10,0.15]
+   REAL                                                  :: effpv
+  END TYPE urban_scalar_values
+
 CONTAINS
 
    SUBROUTINE surface_driver(                                         &
@@ -285,10 +317,8 @@ CONTAINS
      &          ,qv_u3D                                              &
 #endif
      &          ,nurbmax, ndm, nz_um, ng_u, ngr_u                    &
-     &          ,nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num          &
-     &          ,dz_u, h_water                                       &
-     &          ,emins, albins, thickwin, cswin, temp_rat, hum_rat   & 
-     &          ,effpv                                               &
+     &          ,nwr_u, nf_u, ngb_u, nbui_max,                       &
+     &          ,urban_scalars                                       &
      &          ,alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u         &
      &          ,albg_u, albw_u, albr_u, emg_u, emw_u, emr_u         &
      &          ,gr_flag_u, gr_type_u, gr_frac_roof_u                &
@@ -1035,10 +1065,8 @@ CONTAINS
 
    INTEGER, INTENT(in)                                   :: num_urban_nz
    INTEGER, INTENT(in)                                   :: nurbmax, ndm, nz_um, ng_u, ngr_u, nwr_u,  &
-     nf_u, ngb_u, nbui_max, p_num, q_num
-   REAL, INTENT(in)                                      :: dz_u, h_water
-   REAL, INTENT(in)                                      :: emins, albins, thickwin, cswin, temp_rat, &
-     hum_rat, effpv
+     nf_u, ngb_u, nbui_max
+   TYPE(urban_scalar_values), INTENT(in)                 :: urban_scalars
    REAL, DIMENSION(nurbmax), INTENT(inout)               :: alag_u, alaw_u, alar_u, csg_u, csw_u,csr_u
    REAL, DIMENSION(nurbmax), INTENT(inout)               :: albg_u, albw_u, albr_u, emg_u, emw_u,     &
      emr_u, gr_frac_roof_u, pv_frac_roof_u, albwin_u, emwind_u
@@ -2809,10 +2837,13 @@ CONTAINS
                 qv_u3D,                                         &
 #endif
                 nurbmax, ndm, nz_um, ng_u, ngr_u,               &
-                nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num,     &
-                dz_u, h_water,                                  &
-                emins, albins, thickwin, cswin, temp_rat,       & 
-                hum_rat, effpv,                                 &
+                nwr_u, nf_u, ngb_u, nbui_max,                   &
+                urban_scalars%p_num, urban_scalars%q_num,       &
+                urban_scalars%dz_urban, urban_scalars%h_water,  &
+                urban_scalars%emins, urban_scalars%albins,      &
+                urban_scalars%thickwin, urban_scalars%cswin,    &
+                urban_scalars%temp_rat,                         &
+                urban_scalars%hum_rat, urban_scalars%effpv,     &
                 alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,    &
                 albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,    &
                 gr_flag_u, gr_type_u, gr_frac_roof_u,           &
@@ -2964,10 +2995,13 @@ CONTAINS
                 qv_u3D,                                         &
 #endif
                 nurbmax, ndm, nz_um, ng_u, ngr_u,               &
-                nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num,     &
-                dz_u, h_water,                                  &
-                emins, albins, thickwin, cswin, temp_rat,       &
-                hum_rat, effpv,                                 &
+                nwr_u, nf_u, ngb_u, nbui_max,                   &
+                urban_scalars%p_num, urban_scalars%q_num,       &
+                urban_scalars%dz_urban, urban_scalars%h_water,  &
+                urban_scalars%emins, urban_scalars%albins,      &
+                urban_scalars%thickwin, urban_scalars%cswin,    &
+                urban_scalars%temp_rat,                         &
+                urban_scalars%hum_rat, urban_scalars%effpv,     &
                 alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,    &
                 albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,    &
                 gr_flag_u, gr_type_u, gr_frac_roof_u,           &
@@ -3324,20 +3358,22 @@ CONTAINS
                              pr_u3D,         qv_u3D,                                        &
 #endif
                              nurbmax, ndm, nz_um, ng_u, ngr_u,                              &
-                             nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num,                    &
-                               dz_u, h_water,                                               &
-                               emins, albins, thickwin, cswin, temp_rat, hum_rat, effpv,    &
-                               alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,                 &
-                               albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,                 &
-                               gr_flag_u, gr_type_u, gr_frac_roof_u, pv_frac_roof_u,        &
-                               albwin_u, emwind_u, z0g_u, z0r_u,                            &
-                               nd_u, strd_u, drst_u, ws_u, bs_u, h_b, d_b, ss_u, pb_u,      &
-                               nz_u, z_u, cop_u, pwin_u, beta_u, sw_cond_u,                 &
-                               bldac_frc_u, cooled_frc_u, time_on_u, time_off_u,            &
-                               targtemp_u, gaptemp_u, targhum_u, gaphum_u, perflo_u,        &
-                               hsesf_u, hsequip, irho,                                      &              
-                               dzg_u, ,dzgr_u, qrmax, smax, kmax,                           &
-                               b, cd_u, dzw, dzgb, dzf,                                     &
+                             nwr_u, nf_u, ngb_u, nbui_max, urban_scalars%p_num,             &
+                urban_scalars%q_num,     urban_scalars%dz_u, urban_scalars%h_water,         &
+                urban_scalars%emins,   urban_scalars%albins, urban_scalars%thickwin,        &
+                urban_scalars%cswin, urban_scalars%temp_rat, urban_scalars%hum_rat,         &
+                urban_scalars%effpv,                                                        &
+                             alag_u,         alaw_u,  alar_u, csg_u,      csw_u,     csr_u, &
+                             albg_u,         albw_u,  albr_u, emg_u,          emw_u, emr_u, &
+                          gr_flag_u,      gr_type_u, gr_frac_roof_u,        pv_frac_roof_u, &
+                           albwin_u,       emwind_u,          z0g_u,      z0r_u,            &
+                               nd_u,   strd_u, drst_u, ws_u,   bs_u, h_b, d_b, ss_u,  pb_u, &
+                               nz_u,     z_u, cop_u,         pwin_u,     beta_u, sw_cond_u, &
+                        bldac_frc_u,   cooled_frc_u,      time_on_u, time_off_u,            &
+                         targtemp_u,      gaptemp_u,      targhum_u,   gaphum_u,  perflo_u, &
+                            hsesf_u,        hsequip,           irho,                        &
+                              dzg_u,         dzgr_u,          qrmax,       smax,      kmax, &
+                                  b,           cd_u,            dzw,       dzgb,       dzf, &
                           trv_urb4d,       qr_urb4d,      qgr_urb3d,  tgr_urb3d,            & !GRZ
                         drain_urb4d,  draingr_urb3d,     sfrv_urb3d, lfrv_urb3d,            & !GRZ
                           dgr_urb3d,       dg_urb3d,      lfr_urb3d,  lfg_urb3d,            & !GRZ
