@@ -3107,9 +3107,12 @@ SUBROUTINE lsm_mosaic(DZ8W,QV3D,P8W3D,T3D,TSK,                      &
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::dl_u_bep  !Length scale
 
    INTEGER, INTENT(in)                                   :: num_urban_nz
-   INTEGER, INTENT(in)                                   :: nurbi, nd, nz_ui, ng_u, ngr_u, nwr_u,     &
-     nf_u, ngb_u, nbi, p_num, q_num
-   REAL, INTENT(in)                                      :: dz_u, h_water
+   INTEGER, INTENT(in)                                            :: nurbmax, ndm, nz_um, ng_u,       &
+     ngr_u, nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num
+   REAL, INTENT(in)                                               :: dz_u, h_water
+   REAL, INTENT(in)                                               :: emins, albins, thickwin, cswin,  &
+     temp_rat, hum_rat, effpv
+
 #ifdef URBANSTATE
 ! Data interpolated from the "mesoscale grid" to the "urban grid" (num_urban_nz)
 ! ua_u3D: Wind speed in the x direction [ms-1]
