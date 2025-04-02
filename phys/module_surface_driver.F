@@ -3417,7 +3417,7 @@ CONTAINS
 #endif
                              nurbmax, ndm, nz_um, ng_u, ngr_u,                              &
                              nwr_u, nf_u, ngb_u, nbui_max, urban_scalars%p_num,             &
-                urban_scalars%q_num,     urban_scalars%dz_u, urban_scalars%h_water,         &
+                urban_scalars%q_num,     urban_scalars%dz_urban, urban_scalars%h_water,     &
                 urban_scalars%emins,   urban_scalars%albins, urban_scalars%thickwin,        &
                 urban_scalars%cswin, urban_scalars%temp_rat, urban_scalars%hum_rat,         &
                 urban_scalars%effpv,                                                        &
