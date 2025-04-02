@@ -109,9 +109,24 @@ CONTAINS
                   ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D,      &
                   pr_u3D, qv_u3D,                               &
 #endif
-                  nurbi, nd, nz_ui, ng_u, ngr_u,                &
-                  nwr_u, nf_u, ngb_u, nbi, p_num, q_num,        &
+                  nurbmax, ndm, nz_um, ng_u, ngr_u,             &
+                  nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num,   &
                   dz_u, h_water,                                &
+                  emins, albins, thickwin, cswin, temp_rat,     &
+                  hum_rat, effpv,                               &
+                  alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,  &
+                  albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,  &
+                  gr_flag_u, gr_type_u, gr_frac_roof_u,         & 
+                  pv_frac_roof_u, albwin_u, emwind_u, z0g_u,    &
+                  z0r_u, nd_u, strd_u, drst_u, ws_u, bs_u,      &
+                  h_b, d_b, ss_u, pb_u,                         &
+                  nz_u, z_u, cop_u, pwin_u, beta_u, sw_cond_u,  &
+                  bldac_frc_u, cooled_frc_u, time_on_u,         &
+                  time_off_u, targtemp_u,                       &
+                  gaptemp_u, targhum_u, gaphum_u, perflo_u,     &
+                  hsesf_u, hsequip, irho,                       &
+                  dzg_u, dzgr_u, qrmax, smax, kmax,             &
+                  b, cd, dzw, dzgb, dzf,                        &
                   ep_pv_urb3d,t_pv_urb3d,                         & !RMS
                   trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !RMS
                   drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !RMS
@@ -679,9 +694,31 @@ CONTAINS
    REAL, OPTIONAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::dl_u_bep  !Length scale
 
    INTEGER, INTENT(in)                                   :: num_urban_nz
-   INTEGER, INTENT(in)                                   :: nurbi, nd, nz_ui, ng_u, ngr_u, nwr_u,     &
-     nf_u, ngb_u, nbi, p_num, q_num
+   INTEGER, INTENT(in)                                   :: nurbmax, ndm, nz_um, ng_u, ngr_u, nwr_u,  &
+     nf_u, ngb_u, nbui_max, p_num, q_num
    REAL, INTENT(in)                                      :: dz_u, h_water
+   REAL, INTENT(in)                                      :: emins, albins, thickwin, cswin, temp_rat, &
+     hum_rat, effpv
+   REAL, DIMENSION(nurbmax), INTENT(inout)               :: alag_u, alaw_u, alar_u, csg_u, csw_u,csr_u
+   REAL, DIMENSION(nurbmax), INTENT(inout)               :: albg_u, albw_u, albr_u, emg_u, emw_u,     &
+     emr_u, gr_frac_roof_u, pv_frac_roof_u, albwin_u, emwind_u
+   INTEGER, INTENT(inout)                                :: gr_flag_u, gr_type_u
+   REAL, DIMENSION(nurbmax), INTENT(inout)               :: z0g_u, z0r_u
+   INTEGER, DIMENSION(nurbmax), INTENT(inout)            :: nd_u
+   REAL, DIMENSION(ndm,nurbmax), INTENT(inout)           :: strd_u, drst_u, ws_u, bs_u
+   REAL, DIMENSION(ndm,nurbmax), INTENT(inout)           :: h_b, d_b, ss_u, pb_u
+   INTEGER, DIMENSION(nurbmax), INTENT(inout)            :: nz_u
+   REAL, DIMENSION(nz_um), INTENT(inout)                 :: z_u
+   REAL, DIMENSION(nurbmax), INTENT(inout)               :: cop_u, bldac_frc_u, cooled_frc_u, pwin_u, &
+     beta_u, time_on_u, time_off_u, targtemp_u, gaptemp_u, targhum_u, gaphum_u, perflo_u, hsesf_u
+   INTEGER, DIMENSION(nurbmax), INTENT(inout)            ::  sw_cond_u
+   REAL, DIMENSION(24), INTENT(inout)                    :: hsequip, irho
+   REAL, DIMENSION(ng_u), INTENT(in)                     :: dzg_u
+   REAL, DIMENSION(ngr_u), INTENT(in)                    :: dzgr_u, qrmax, smax, kmax, b, cd
+   REAL, DIMENSION(nwr_u), INTENT(in)                    :: dzw
+   REAL, DIMENSION(ngb_u), INTENT(in)                    :: dzgb
+   REAL, DIMENSION(nf_u), INTENT(in)                     :: dzf
+      
 #ifdef URBANSTATE
 ! Data interpolated from the "mesoscale grid" to the "urban grid"
 ! ua_u3D: Wind speed in the x direction [ms-1]
@@ -1639,7 +1676,13 @@ CONTAINS
 #ifdef URBANSTATE
                 ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,       &
 #endif
-                nurbi, nd, nz_ui, ng_u, nwr_u, dz_u,                   &
+               nurbmax,      ndm,    nz_um,    ng_u, nwr_u,  dz_u,     &
+                alag_u,    alaw_u,   alar_u,   csg_u, csw_u, csr_u,    &
+                albg_u,    albw_u,   albr_u,   emg_u, emw_u, emr_u,    &
+                 z0g_u,     z0r_u,     nd_u,  strd_u, drst_u,          &
+                  ws_u,      bs_u,      h_b,     d_b,   ss_u,  pb_u,   &
+                  nz_u,       z_u,                                     &
+                  dzg_u,    dzr,    dzw,                               &
                 lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,                  &
                 a_u_bep,a_v_bep,a_t_bep,                               &
                 a_e_bep,b_u_bep,b_v_bep,                               &
@@ -1689,8 +1732,20 @@ CONTAINS
                 ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,       &
                 qv_u3D,                                                &
 #endif
-                nurbi, nd, nz_ui, ng_u, ngr_u,                         &
-                nwr_u, nf_u, ngb_u, nbi, p_num, q_num, dz_u, h_water,  &
+                nurbmax, ndm, nz_um,  ng_u,        ngr_u, nwr_u,       &
+                nf_u, ngb_u,  nbui_max, p_num, q_num, dz_u, h_water,   &
+                emins, albins, thickwin, cswin, temp_rat, hum_rat,     &
+                effpv, alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,    &
+                albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,           &
+                gr_flag_u, gr_type_u, gr_frac_roof_u, pv_frac_roof_u,  &
+                albwin_u, emwind_u, z0g_u, z0r_u,                      &
+                nd_u, strd_u, drst_u, ws_u, bs_u, h_b, d_b, ss_u, pb_u,&
+                nz_u, z_u, cop_u, pwin_u, beta_u, sw_cond_u,           &
+                bldac_frc_u, cooled_frc_u, time_on_u, time_off_u,      &
+                targtemp_u, gaptemp_u, targhum_u, gaphum_u, perflo_u,  &
+                hsesf_u, hsequip, irho,                                &
+                dzg_u, dzgr_u, qrmax, smax, kmax,                      &
+                b, cd, dzr, dzw, dzgb, dzf,                            &
                 lp_urb2d,hi_urb2d,lb_urb2d,hgt_urb2d,                  &
                 a_u_bep,a_v_bep,a_t_bep,                               &
                 a_e_bep,b_u_bep,b_v_bep,                               &
