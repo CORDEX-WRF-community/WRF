@@ -2523,9 +2523,27 @@ SUBROUTINE lsm_mosaic(DZ8W,QV3D,P8W3D,T3D,TSK,                      &
                   ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,&
                   qv_u3D,                                         &
 #endif
-                  nurbi, nd, nz_ui, ng_u, ngr_u,                  &
-                  nwr_u, nf_u, ngb_u, nbi, p_num, q_num,          &
-                  dz_u, h_water,                                  &
+                  nurbmax, ndm, nz_um, ng_u, ngr_u,               &
+                  nwr_u, nf_u, ngb_u, nbui_max,                   &
+                  p_num, q_num,                                   &
+                  dz_urban, h_water,                              &
+                  emins, albins,                                  &
+                  thickwin, cswin,                                &
+                  temp_rat,                                       &
+                  hum_rat, effpv,                                 &
+                  alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,    &
+                  albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,    &
+                  gr_flag_u, gr_type_u, gr_frac_roof_u,           &
+                  pv_frac_roof_u,                                 &
+                  albwin_u, emwind_u, z0g_u, z0r_u,               &
+                  nd_u, strd_u, drst_u, ws_u, bs_u, h_b, d_b,     &
+                  ss_u, pb_u, nz_u, z_u, cop_u,                   &
+                  pwin_u, beta_u, sw_cond_u, bldac_frc_u,         &
+                  cooled_frc_u, time_on_u, time_off_u,            &
+                  targtemp_u, gaptemp_u, targhum_u, gaphum_u,     &
+                  perflo_u, hsesf_u, hsequip, irho,               &
+                  dzg_u, ,dzgr_u, qrmax, smax, kmax,              &
+                  b, cd_u, dzr_u, dzw, dzgb, dzf,                 &
                   ep_pv_urb3d,t_pv_urb3d,                         & !RMS
                   trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !RMS
                   drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !RMS
