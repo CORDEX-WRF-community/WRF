@@ -2526,7 +2526,7 @@ SUBROUTINE lsm_mosaic(DZ8W,QV3D,P8W3D,T3D,TSK,                      &
                   nurbmax, ndm, nz_um, ng_u, ngr_u,               &
                   nwr_u, nf_u, ngb_u, nbui_max,                   &
                   p_num, q_num,                                   &
-                  dz_urban, h_water,                              &
+                  dz_u, h_water,                                  &
                   emins, albins,                                  &
                   thickwin, cswin,                                &
                   temp_rat,                                       &
@@ -2542,7 +2542,7 @@ SUBROUTINE lsm_mosaic(DZ8W,QV3D,P8W3D,T3D,TSK,                      &
                   cooled_frc_u, time_on_u, time_off_u,            &
                   targtemp_u, gaptemp_u, targhum_u, gaphum_u,     &
                   perflo_u, hsesf_u, hsequip, irho,               &
-                  dzg_u, ,dzgr_u, qrmax, smax, kmax,              &
+                  dzg_u, dzgr_u, qrmax, smax, kmax,               &
                   b, cd_u, dzr_u, dzw, dzgb, dzf,                 &
                   ep_pv_urb3d,t_pv_urb3d,                         & !RMS
                   trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !RMS
