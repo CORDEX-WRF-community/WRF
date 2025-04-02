@@ -1319,8 +1319,8 @@ use module_wrf_error
       integer gr_flag
       integer gr_type
       real tpv(nbui_max)
-     real  sfpv(nbui_max)
-     real sfr_indoor(nbui_max)
+      real  sfpv(nbui_max)
+      real sfr_indoor(nbui_max)
 ! ----------------------------------------------------------------------
 ! INPUT-OUTPUT
 ! ----------------------------------------------------------------------
@@ -1409,7 +1409,7 @@ use module_wrf_error
 
 ! Solar radiation at each level of the "urban grid"
 
-     real rsg(ndm)             ! Short wave radiation from the ground
+      real rsg(ndm)             ! Short wave radiation from the ground
       real rsw(2*ndm,nz_um)     ! Short wave radiation from the walls
       real rsd(2*ndm,nz_um)     ! Direct Short wave radiation received by the walls
       real rlg(ndm)             ! Long wave radiation from the ground
@@ -1437,9 +1437,8 @@ use module_wrf_error
       real thb_u(ndm,nz_um)   ! Temperature        Horizontal surfaces, B (explicit) term
       real tva_u(2*ndm,nz_um)   ! Temperature          Vertical surfaces, A (implicit) term
       real tvb_u(2*ndm,nz_um)   ! Temperature          Vertical surfaces, B (explicit) term
+      real tvb_ac(2*ndm,nz_um)
 
-
- real tvb_ac(2*ndm,nz_um)
       real ehb_u(ndm,nz_um)   ! Energy (TKE)       Horizontal surfaces, B (explicit) term
       real evb_u(2*ndm,nz_um)   ! Energy (TKE)         Vertical surfaces, B (explicit) term
       real qhb_u(ndm,nz_um)     ! Humidity      Horizontal surfaces, B (explicit) term
@@ -1514,7 +1513,7 @@ use module_wrf_error
       real lflev1D(nz_um)         ! latent heat flux due to the air conditioning systems  [W]
       real consumlev1D(nz_um)     ! consumption due to the air conditioning systems [W]
       real eppvlev(nz_um)         ! Electricity production of PV panels [W]
-	   real tpvlev(ndm,nz_um)
+      real tpvlev(ndm,nz_um)
       real tpvlevb(ndm,nbui_max)        ! Sensible heat flux from roofs [W/m2]
       real sfvlev(nz_um,nz_um)    ! sensible heat flux due to ventilation [W]
       real lfvlev(nz_um,nz_um)    ! latent heat flux due to ventilation [W]
@@ -1901,6 +1900,7 @@ use module_wrf_error
       call buildings(iurb,ndu,nzu,z0,cdrag,ua_u,va_u,                                                 &
                      pt_u,pt0_u,                                                                      &
                      ndm, nz_um, nurbm, nbui_max, ngr_u,                                              &
+                     dzgr_u,                                                                          &
                      ptg,ptr,ptrv,da_u,qv_u,pr_u,tmp_u,ptw,ptwin,pwin_u(iurb),drst,                   &
                      uva_u,vva_u,uvb_u,vvb_u,tva_u,tvb_u,evb_u,qvb_u,qhb_u,                           &
                      uhb_u,vhb_u,thb_u,ehb_u,ss,dt,sfw,sfg,sfr,sfrpv,sfrv,lfrv,                       &
@@ -2510,8 +2510,7 @@ use module_wrf_error
       real pv_frac_roof
       real csr
 
-      ! Layer sizes in the roofs [m]
-      REAL, DIMENSION(nwr_u), INTENT(in)                 :: dzr
+      real dzr          ! Layer sizes in the roofs [m]
 
       real dt                   ! Time step
 
@@ -2521,7 +2520,7 @@ use module_wrf_error
 
       real rsr                 ! Short wave radiation at the ground
 
-     real tpvlev(ndm,nz_um)      
+      real tpvlev(ndm,nz_um)      
 
       real sfrv(ndm,nz_um)             ! Sensible heat flux from ground (road)
 
@@ -2661,6 +2660,7 @@ use module_wrf_error
 
       subroutine buildings(iurb,nd,nz,z0,cdrag,ua_u,va_u,pt_u,pt0_u,                                       &
                         ndm, nz_um, nurbm, nbui_max, ngr_u,                                                &
+                        dzgr_u,                                                                            &
                         ptg,ptr,ptrv,da_u,qv_u,pr_u,tmp_u,ptw,ptwin,pwin,                                  &
                         drst,uva_u,vva_u,uvb_u,vvb_u,                                                      &
                         tva_u,tvb_u,evb_u,qvb_u,qhb_u,                                                     &
@@ -2685,6 +2685,8 @@ use module_wrf_error
       integer ix,iy
       integer nz                ! number of vertical space steps
       INTEGER, INTENT(in)                                :: ndm, nz_um, nurbm, nbui_max, ngr_u
+      ! Layer sizes in the ground
+      REAL, DIMENSION(ngr_u), INTENT(in)                 :: dzgr_u
       real ua_u(nz_um)          ! Wind speed in the x direction on the urban grid
       real va_u(nz_um)          ! Wind speed in the y direction on the urban grid
       real da_u(nz_um)          ! air density on the urban grid

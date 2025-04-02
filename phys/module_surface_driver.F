@@ -298,7 +298,7 @@ CONTAINS
      &          ,bldac_frc_u, cooled_frc_u, time_on_u, time_off_u    &
      &          ,targtemp_u, gaptemp_u, targhum_u, gaphum_u          &
      &          ,perflo_u, hsesf_u, hsequip, irho                    &
-     &          ,dzg_u, ,dzgr_u, qrmax, smax, kmax                   &
+     &          ,dzg_u, dzgr_u, qrmax, smax, kmax                    &
      &          ,b, cd, dzr, dzw, dzgb, dzf                          &
      &          ,ep_pv_urb3d,t_pv_urb3d                              & !multi-layer urban GRZ
      &          ,trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d              & !multi-layer urban GRZ
