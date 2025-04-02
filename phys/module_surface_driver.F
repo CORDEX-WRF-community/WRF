@@ -317,7 +317,7 @@ CONTAINS
      &          ,qv_u3D                                              &
 #endif
      &          ,nurbmax, ndm, nz_um, ng_u, ngr_u                    &
-     &          ,nwr_u, nf_u, ngb_u, nbui_max,                       &
+     &          ,nwr_u, nf_u, ngb_u, nbui_max                        &
      &          ,urban_scalars                                       &
      &          ,alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u         &
      &          ,albg_u, albw_u, albr_u, emg_u, emw_u, emr_u         &
