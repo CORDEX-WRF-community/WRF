@@ -2979,7 +2979,7 @@ CONTAINS
                 gaptemp_u, targhum_u, gaphum_u, perflo_u,       &
                 hsesf_u, hsequip, irho,                         &
                 dzg_u, ,dzgr_u, qrmax, smax, kmax,              &
-                b, cd, dzr, dzw, dzgb, dzf,                     &
+                b, cd, dzw, dzgb, dzf,                          &
                 ep_pv_urb3d,t_pv_urb3d,                         & !GRZ
                 trv_urb4d,qr_urb4d,qgr_urb3d,tgr_urb3d,         & !GRZ
                 drain_urb4d,draingr_urb3d,sfrv_urb3d,           & !GRZ
