@@ -32,10 +32,6 @@ MODULE module_surface_driver
     REAL                                                 :: hum_rat
     ! Efficiency of PV panels installed at the roofs, typical values [0.10,0.15]
     REAL                                                 :: effpv
-    ! 1 to switch on green roof model
-    INTEGER                                              :: gr_flag_u
-    ! 1 for GRASS, 2 for SEDUM vegetation on the green roof
-    INTEGER                                              :: gr_type_u  
   END TYPE urban_scalar_values
 
   TYPE irrigation_scalar_values
@@ -368,6 +364,7 @@ CONTAINS
      &          ,urban_scalars                                       &
      &          ,alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u         &
      &          ,albg_u, albw_u, albr_u, emg_u, emw_u, emr_u         &
+     &          ,gr_flag_u, gr_type_u, gr_frac_roof_u                &
      &          ,pv_frac_roof_u, albwin_u, emwind_u, z0g_u, z0r_u    &
      &          ,nd_u, strd_u, drst_u, ws_u, bs_u, h_b, d_b, ss_u    &
      &          ,pb_u, nz_u, z_u, cop_u, pwin_u, beta_u, sw_cond_u   &
