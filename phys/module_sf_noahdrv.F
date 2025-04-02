@@ -3126,6 +3126,33 @@ SUBROUTINE lsm_mosaic(DZ8W,QV3D,P8W3D,T3D,TSK,                      &
      INTENT(inout)                                       :: ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D,  &
      pr_u3D, qv_u3D
 #endif
+!  Building parameters      
+   REAL, DIMENSION(nurbmax), INTENT(inout)               :: alag_u, alaw_u, alar_u, csg_u, csw_u,csr_u
+!  Radiation paramters
+   REAL, DIMENSION(nurbmax), INTENT(inout)               :: albg_u, albw_u, albr_u, emg_u, emw_u,     &
+     emr_u, gr_frac_roof_u, pv_frac_roof_u, albwin_u, emwind_u
+   INTEGER, INTENT(inout)                                :: gr_flag_u, gr_type_u
+!  Roughness parameters
+   REAL, DIMENSION(nurbmax), INTENT(inout)               :: z0g_u, z0r_u
+
+!  Street parameters
+   INTEGER, DIMENSION(nurbmax), INTENT(inout)            :: nd_u
+   REAL, DIMENSION(ndm,nurbmax), INTENT(inout)           :: strd_u, drst_u, ws_u, bs_u
+   REAL, DIMENSION(ndm,nurbmax), INTENT(inout)           :: h_b, d_b, ss_u, pb_u
+
+!  Grid parameters
+   INTEGER, DIMENSION(nurbmax), INTENT(inout)            :: nz_u
+   REAL, DIMENSION(nz_um), INTENT(inout)                 :: z_u
+!FS
+   REAL, DIMENSION(nurbmax), INTENT(inout)               :: cop_u, bldac_frc_u, cooled_frc_u, pwin_u, &
+     beta_u, time_on_u, time_off_u, targtemp_u, gaptemp_u, targhum_u, gaphum_u, perflo_u, hsesf_u
+   INTEGER, DIMENSION(nurbmax), INTENT(inout)            ::  sw_cond_u
+   REAL, DIMENSION(24), INTENT(inout)                    :: hsequip, irho
+   REAL, DIMENSION(ng_u), INTENT(in)                     :: dzg_u
+   REAL, DIMENSION(ngr_u), INTENT(in)                    :: dzgr_u, qrmax, smax, kmax, b, cd
+   REAL, DIMENSION(nwr_u), INTENT(in)                    :: dzr, dzw
+   REAL, DIMENSION(ngb_u), INTENT(in)                    :: dzgb
+   REAL, DIMENSION(nf_u), INTENT(in)                     :: dzf
 
 ! Local variables for multi-layer UCM (Martilli et al. 2002)
    REAL,    DIMENSION( its:ite, jts:jte ) :: HFX_RURAL,LH_RURAL,GRDFLX_RURAL ! ,RN_RURAL
