@@ -11,7 +11,7 @@ rconfig   integer    num_urban_ngr        namelist,physics      1              1
 rconfig   integer    num_urban_nwr        namelist,physics      1              10     rh{12}  "num_urban_nwr"                "amount of grid levels in the walls or roofs used by module BEM"   ""
 rconfig   integer    num_urban_nf         namelist,physics      1              10     rh{12}  "num_urban_nf"                 "amount of grid levels in floors used by module BEM"   ""
 rconfig   integer    num_urban_ngb        namelist,physics      1              10     rh{12}  "num_urban_ngb"                "amount of grid levels in the ground below building used by module BEM"   ""
-rconfig   integer    num_hours_day        namelist,physics      1              24     rh{12}  "num_hours_day"                "amount of hours of a day"   ""
+#rconfig   integer    num_hours_day        namelist,physics      1              24     rh{12}  "num_hours_day"                "amount of hours of a day"   ""
 
 # Variables
 rconfig   real       h_water              namelist,physics      1       0.0009722     rh{12}  "h_water"                      "mm of irrigation per hour"
