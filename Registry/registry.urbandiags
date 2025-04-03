@@ -11,6 +11,9 @@ rconfig   integer    num_urban_ngr        namelist,physics      1              1
 rconfig   integer    num_urban_nwr        namelist,physics      1              10     rh{12}  "num_urban_nwr"                "amount of grid levels in the walls or roofs used by module BEM"   ""
 rconfig   integer    num_urban_nf         namelist,physics      1              10     rh{12}  "num_urban_nf"                 "amount of grid levels in floors used by module BEM"   ""
 rconfig   integer    num_urban_ngb        namelist,physics      1              10     rh{12}  "num_urban_ngb"                "amount of grid levels in the ground below building used by module BEM"   ""
+rconfig   integer    num_hours_day        namelist,physics      1              24     rh{12}  "num_hours_day"                "amount of hours of a day"   ""
+
+# Variables
 rconfig   real       h_water              namelist,physics      1       0.0009722     rh{12}  "h_water"                      "mm of irrigation per hour"
 # FROM: phys/module_sf_bep_bem.F
 #----------------------------------------------------------------------------------
@@ -38,7 +41,7 @@ rconfig   real       qrmax_urban          namelist,physics     max_num_urban_ngr
 rconfig   real       smax_urban           namelist,physics     max_num_urban_ngr  (/0.0,0.0,0.0,0.0,-0.01,-0.1,-0.1,-0.1,-0.1,-0.1,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./) r{h12}    "smax_urban"      "soil water XX in the green roof"   "m"
 rconfig   real       kmax_urban           namelist,physics     max_num_urban_ngr  (/0.0,0.0,0.0,0.0,3.32e-3,2.162e-3,2.162e-3,2.162e-3,2.162e-3,2.162e-3,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./) r{h12}    "kmax_urban"     "soil water XX in the green roof"   "m"
 rconfig   real       b_urban              namelist,physics     max_num_urban_ngr  (/0.0,0.0,0.0,0.0,2.7,3.9,3.9,3.9,3.9,3.9,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./) r{h12}    "b_urban"     "soil water XX in the green roof"   "m"
-rconfig   real       cd_rban              namelist,physics     max_num_urban_ngr  (/0.0,0.0,0.0,0.0,331500.,1.342e6,1.342e6,1.342e6,1.342e6,1.342e6,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./) r{h12}    "cd_urban"     "soil water XX in the green roof"   "m"
+rconfig   real       cd_urban             namelist,physics     max_num_urban_ngr  (/0.0,0.0,0.0,0.0,331500.,1.342e6,1.342e6,1.342e6,1.342e6,1.342e6,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./) r{h12}    "cd_urban"     "soil water XX in the green roof"   "m"
 rconfig   real       dzr_urban            namelist,physics     max_num_urban_nwr  (/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)  r{h12}    "dzr_urban"     "Layer sizes in the roofs"   "m"  
 rconfig   real       dzw_urban            namelist,physics     max_num_urban_nwr  (/0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.01,0.005,0.0025,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)  r{h12}    "dzw_urban"     "Layer sizes in the walls"   "m"
 rconfig   real       dzgb_urban           namelist,physics     max_num_urban_ngb  (/0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)  r{h12}    "dzgb_urban"     "layer sizes in the ground below the buildings"   "m"

@@ -936,7 +936,7 @@ BENCH_START(surf_driver_tim)
      &        ,smax=model_config_rec%smax_urban(1:model_config_rec%num_urban_ngr)    &
      &        ,kmax=model_config_rec%kmax_urban(1:model_config_rec%num_urban_ngr)    &
      &        ,b=model_config_rec%b_urban(1:model_config_rec%num_urban_ngr)          &
-     &        ,cd_u=model_config_rec%cd_rban(1:model_config_rec%num_urban_ngr)       &
+     &        ,cd_u=model_config_rec%cd_urban(1:model_config_rec%num_urban_ngr)      &
      &        ,dzr_u=model_config_rec%dzr_urban(1:model_config_rec%num_urban_nwr)    &
      &        ,dzw=model_config_rec%dzw_urban(1:model_config_rec%num_urban_nwr)      &
      &        ,dzgb=model_config_rec%dzgb_urban(1:model_config_rec%num_urban_ngb)    &

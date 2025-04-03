@@ -149,4 +149,4 @@ dimspec    uamp_4   2     nmmelist=num_urban_ngr           z     num_urban_ngr
 dimspec    umap_5   2     nmmelist=num_urban_nwr           z     num_urban_nwr
 dimspec    umap_6   2     nmmelist=num_urban_nf            z     num_urban_nf
 dimspec    umap_7   2     nmmelist=num_urban_ngb           z     num_urban_ngb
-dimsepc    xxiv     2     constant=24                      z     xxiv
+dimsepc    xxiv     2     namelist=num_hours_day           z     xxiv
