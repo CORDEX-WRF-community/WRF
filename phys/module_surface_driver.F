@@ -80,7 +80,7 @@ MODULE module_surface_driver
     INTEGER                                              :: ifndsnowsh
     ! SNOWSI_LOGICAL
     INTEGER                                              :: ifndsnowsi
-  END TYPE
+  END TYPE cryosphere_scalar_values
 
 CONTAINS
 
