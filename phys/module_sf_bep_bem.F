@@ -303,7 +303,7 @@ use module_wrf_error
 !    Street parameters
       INTEGER, DIMENSION(nurbmax), INTENT(inout)         :: nd_u
       REAL, DIMENSION(ndm,nurbmax), INTENT(inout)        :: strd_u, drst_u, ws_u, bs_u
-      REAL, DIMENSION(ndm,nurbmax), INTENT(inout)        :: h_b, d_b, ss_u, pb_u
+      REAL, DIMENSION(nz_um,nurbmax), INTENT(inout)      :: h_b, d_b, ss_u, pb_u
 
 !    Grid parameters
       INTEGER, DIMENSION(nurbmax), INTENT(inout)         :: nz_u
@@ -664,6 +664,9 @@ use module_wrf_error
 
 
       if (first) then                           ! True only on first call
+         ! L. Fita, UBA/CIMA/IFAECI
+         !  Initializing time_bep
+         time_bep = 0
 
          call init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,                   &
                 nurbm, nz_um, ndm, p_num, q_num,                                  &
@@ -688,6 +691,14 @@ use module_wrf_error
         if (FRC_URB2D(ix,iy).gt.0.) then    ! Calling BEP only for existing urban classes.
 	
          iurb=UTYPE_URB2D(ix,iy)
+
+         IF (iurb > nurbmax) THEN
+           WRITE(S4a,'(I4)')iurb
+           WRITE(S4b,'(I4)')nurbmax
+           errmsg = 'At module_sf_bep_bem: urban type: ' // S4a // " larger than the amount of " //   &
+             "categories 'num_urban' provided in 'namelist.input'"
+           FATAL_ERROR(errmsg) 
+         END IF
 
          hi_urb1D=0.
          bldheightn = 10000.
