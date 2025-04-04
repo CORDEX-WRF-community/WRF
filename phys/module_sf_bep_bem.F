@@ -1665,7 +1665,7 @@ use module_wrf_error
 
 
        
-       do iz=1,nz_um !Compute the outdoor temperature 
+       do iz=1,nzu !Compute the outdoor temperature 
 	 tmp_u(iz)=pt_u(iz)*(pr_u(iz)/p0)**(rcp_u) 
        end do
 
