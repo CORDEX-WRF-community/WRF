@@ -321,20 +321,20 @@ use module_wrf_error
 
 ! 1D array used for the input and output of the routine "urban"
 
-      real z1D(kms:kme)               ! vertical coordinates
+      real z1D(kms:kme)                 ! vertical coordinates
       real ua1D(kms:kme)                ! wind speed in the x directions
       real va1D(kms:kme)                ! wind speed in the y directions
       real pt1D(kms:kme)                ! potential temperature
       real da1D(kms:kme)                ! air density
       real pr1D(kms:kme)                ! air pressure
       real pt01D(kms:kme)               ! reference potential temperature
-      real zr1D                    ! zenith angle
-      real deltar1D                ! declination of the sun
-      real ah1D                    ! hour angle (it should come from the radiation routine)
-      real rs1D                    ! solar radiation
-      real rld1D                   ! downward flux of the longwave radiation
+      real zr1D                         ! zenith angle
+      real deltar1D                     ! declination of the sun
+      real ah1D                         ! hour angle (it should come from the radiation routine)
+      real rs1D                         ! solar radiation
+      real rld1D                        ! downward flux of the longwave radiation
       real swddir1D
-      real swddif1D                ! short wave diffuse solar radiation _gl
+      real swddif1D                     ! short wave diffuse solar radiation _gl
 
 
 

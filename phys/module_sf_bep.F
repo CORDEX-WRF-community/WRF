@@ -233,7 +233,7 @@ use module_wrf_error
 !    Street parameters
       INTEGER, DIMENSION(nurbmax), INTENT(inout)         :: nd_u
       REAL, DIMENSION(ndm,nurbmax), INTENT(inout)        :: strd_u, drst_u, ws_u, bs_u
-      REAL, DIMENSION(ndm,nurbmax), INTENT(inout)        :: h_b, d_b, ss_u, pb_u
+      REAL, DIMENSION(nz_um,nurbmax), INTENT(inout)      :: h_b, d_b, ss_u, pb_u
 
 !
 !    Street parameters
