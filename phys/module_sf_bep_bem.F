@@ -682,7 +682,7 @@ use module_wrf_error
         call icBEP(nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u,                               &
                       nurbm, ndm, nz_um, dz_u)
    
-      first=.false.
+        first=.false.
 
       endif ! first
 
@@ -692,6 +692,7 @@ use module_wrf_error
 	
          iurb=UTYPE_URB2D(ix,iy)
 
+         ! Checking for consistency between amount of urban types and its allowed maximum
          IF (iurb > nurbmax) THEN
            WRITE(S4a,'(I4)')iurb
            WRITE(S4b,'(I4)')nurbmax
@@ -700,6 +701,7 @@ use module_wrf_error
            FATAL_ERROR(errmsg) 
          END IF
 
+         ! Checking for presence of buildings in an urban grid point
          hi_urb1D=0.
          bldheightn = 10000.
          found = .FALSE.
@@ -724,6 +726,34 @@ use module_wrf_error
              'urban fraction: ' // S6a
            FATAL_ERROR(errmsg)
          END IF
+
+         ! Checking for consistency of buildings heights and vertical urban discretization 
+         !   (they must be multiple of dz_u)
+         hi_urb1D=0.
+         DO iz_u=1, nz_um
+            hi_urb1D(iz_u)=hi_urb(ix,iz_u,iy)
+            IF (hi_urb1D(iz_u) > 0. .AND. MOD(hi_urb1D(iz_u),dz_u) /= 0.) THEN
+              WRITE(S4a,'(I4)')iurb
+              WRITE(S6a,'(F6.2)')dz_u
+              PRINT *,'  urban type: ' // S4a // " NUDAPT-based distribution of heights of the " //   &
+                "buildings: ", hi_urb1D(1:nz_um)
+              errmsg = 'At module_sf_bep_bem: urban type: ' // S4a // " NUDAPT-based distribution" // &
+              " of heights of the buildings is not mulitple of the vertical urban discretization" //  &
+              " dz_urban= " // S6a // " provided in 'namelist.input'"
+              FATAL_ERROR(errmsg) 
+            END IF
+            hi_urb1D(iz_u)=h_b(iz_u,iurb)
+            IF (hi_urb1D(iz_u) > 0. .AND. MOD(hi_urb1D(iz_u),dz_u) /= 0.) THEN
+              WRITE(S4a,'(I4)')iurb
+              WRITE(S6a,'(F6.2)')dz_u
+              PRINT *,'  urban type: ' // S4a // " URBPARM_LCZ.TBL distribution of heights of the "// &
+                "buildings: ", hi_urb1D(1:nz_um)
+              errmsg = 'At module_sf_bep_bem: urban type: ' // S4a // " URBPARM_LCZ.TBL-based " //    &
+              " distribution of heights of the buildings is not mulitple of the vertical urban " //   &
+              "discretization dz_urban= " // S6a // " provided in 'namelist.input'"
+              FATAL_ERROR(errmsg) 
+            END IF
+         END DO
 
          call icBEPHI_XY(iurb,hb_u,hi_urb1D,ss_urb,pb_urb,                 &
                          nz_urb(iurb),z_u, ndm, nz_um, nurbm, dz_u)
