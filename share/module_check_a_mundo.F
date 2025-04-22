@@ -3221,9 +3221,9 @@
         IF (model_config_rec%urban_map_zrd /= prodv) THEN
           labS='urban_map_zrd'
           prodS='num_urban_ndm * num_urban_nwr * num_urban_nz'
-          WRITE(ISa,'(A8)')model_config_rec%urban_map_zrd
-          WRITE(ISb,'(A8)')prodv 
-          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+          WRITE(ISa,'(I8)')model_config_rec%urban_map_zrd
+          WRITE(ISb,'(I8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // " expected value: " // &
             TRIM(ISb) // " provided value " // TRIM(ISa)
           CALL wrf_error_fatal (msg)
         END IF
@@ -3236,9 +3236,9 @@
         IF (model_config_rec%urban_map_zwd /= prodv) THEN
           labS = 'urban_map_zwd'
           prodS = 'num_urban_ndm * num_urban_nwr * num_urban_nz * num_urban_nbui'
-          WRITE(ISa,'(A8)')model_config_rec%urban_map_zwd
-          WRITE(ISb,'(A8)')prodv 
-          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+          WRITE(ISa,'(I8)')model_config_rec%urban_map_zwd
+          WRITE(ISb,'(I8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // " expected value: " // &
             TRIM(ISb) // " provided value " // TRIM(ISa)
           CALL wrf_error_fatal (msg)
         END IF
@@ -3249,9 +3249,9 @@
         IF (model_config_rec%urban_map_gd /= prodv) THEN
           labS = 'urban_map_gd'
           prodS = 'num_urban_ndm * num_urban_ng'
-          WRITE(ISa,'(A8)')model_config_rec%urban_map_gd
-          WRITE(ISb,'(A8)')prodv 
-          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+          WRITE(ISa,'(I8)')model_config_rec%urban_map_gd
+          WRITE(ISb,'(I8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // " expected value: " // &
             TRIM(ISb) // " provided value " // TRIM(ISa)
           CALL wrf_error_fatal (msg)
         END IF
@@ -3262,9 +3262,9 @@
         IF (model_config_rec%urban_map_zd /= prodv) THEN
           labS = 'urban_map_zd'
           prodS = 'num_urban_ndm * num_urban_nz * num_urban_nbui'
-          WRITE(ISa,'(A8)')model_config_rec%urban_map_zd
-          WRITE(ISb,'(A8)')prodv 
-          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+          WRITE(ISa,'(I8)')model_config_rec%urban_map_zd
+          WRITE(ISb,'(I8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // " expected value: " // &
             TRIM(ISb) // " provided value " // TRIM(ISa)
           CALL wrf_error_fatal (msg)
         END IF
@@ -3274,9 +3274,9 @@
         IF (model_config_rec%urban_map_zdf /= prodv) THEN
           labS = 'urban_map_zdf'
           prodS = 'num_urban_ndm * num_urban_nz'
-          WRITE(ISa,'(A8)')model_config_rec%urban_map_zdf
-          WRITE(ISb,'(A8)')prodv 
-          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+          WRITE(ISa,'(I8)')model_config_rec%urban_map_zdf
+          WRITE(ISb,'(I8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // " expected value: " // &
             TRIM(ISb) // " provided value " // TRIM(ISa)
           CALL wrf_error_fatal (msg)
         END IF
@@ -3287,9 +3287,9 @@
         IF (model_config_rec%urban_map_bd/= prodv) THEN
           labS = 'urban_map_bd'
           prodS = 'num_urban_nz * num_urban_nbui'
-          WRITE(ISa,'(A8)')model_config_rec%urban_map_bd
-          WRITE(ISb,'(A8)')prodv 
-          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+          WRITE(ISa,'(I8)')model_config_rec%urban_map_bd
+          WRITE(ISb,'(I8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // " expected value: " // &
             TRIM(ISb) // " provided value " // TRIM(ISa)
           CALL wrf_error_fatal (msg)
         END IF
@@ -3301,9 +3301,9 @@
         IF (model_config_rec%urban_map_wd /= prodv) THEN
           labS = 'urban_map_wd'
           prodS = 'num_urban_ndm * num_urban_nz * num_urban_nbui'
-          WRITE(ISa,'(A8)')model_config_rec%urban_map_wd
-          WRITE(ISb,'(A8)')prodv 
-          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+          WRITE(ISa,'(I8)')model_config_rec%urban_map_wd
+          WRITE(ISb,'(I8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // " expected value: " // &
             TRIM(ISb) // " provided value " // TRIM(ISa)
           CALL wrf_error_fatal (msg)
         END IF
@@ -3315,9 +3315,9 @@
         IF (model_config_rec%urban_map_gbd /= prodv) THEN
           labS = 'urban_map_gbd'
           prodS = 'num_urban_ndm * num_urban_ngb * num_urban_nbui'
-          WRITE(ISa,'(A8)')model_config_rec%urban_map_gbd
-          WRITE(ISb,'(A8)')prodv 
-          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+          WRITE(ISa,'(I8)')model_config_rec%urban_map_gbd
+          WRITE(ISb,'(I8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // " expected value: " // &
             TRIM(ISb) // " provided value " // TRIM(ISa)
           CALL wrf_error_fatal (msg)
         END IF
@@ -3330,9 +3330,9 @@
         IF (model_config_rec%urban_map_fbd /= prodv) THEN
           labS = 'urban_map_fbd'
           prodS = 'num_urban_ndm * (num_urban_nz - 1) * num_urban_nf * num_urban_nbui'
-          WRITE(ISa,'(A8)')model_config_rec%urban_map_fbd
-          WRITE(ISb,'(A8)')prodv 
-          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+          WRITE(ISa,'(I8)')model_config_rec%urban_map_fbd
+          WRITE(ISb,'(I8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // " expected value: " // &
             TRIM(ISb) // " provided value " // TRIM(ISa)
           CALL wrf_error_fatal (msg)
         END IF
@@ -3344,9 +3344,9 @@
         IF (model_config_rec%urban_map_zgrd /= prodv) THEN
           labS = 'urban_map_zgrd'
           prodS = 'num_urban_ndm * num_urban_ngr * num_urban_nz'
-          WRITE(ISa,'(A8)')model_config_rec%urban_map_zgrd
-          WRITE(ISb,'(A8)')prodv 
-          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // "expected value: " //  &
+          WRITE(ISa,'(I8)')model_config_rec%urban_map_zgrd
+          WRITE(ISb,'(I8)')prodv 
+          msg = "  Wrong value for " // TRIM(labS) // " as " // TRIM(prodS) // " expected value: " // &
             TRIM(ISb) // " provided value " // TRIM(ISa)
           CALL wrf_error_fatal (msg)
         END IF
