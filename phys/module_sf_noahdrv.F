@@ -68,6 +68,11 @@ CONTAINS
 !Optional Urban
                   TR_URB2D,TB_URB2D,TG_URB2D,TC_URB2D,QC_URB2D, & !H urban
                   UC_URB2D,                                     & !H urban
+!CORDEX
+                  T2G_URB2D,T2R_URB2D,T2VEG_URB2D,              &
+                  TCAN_URB2D,UCAN_URB2D,QCAN_URB2D,              &
+                  TGROUND_URB2D,TROOF_URB2D,              &
+!CORDEX
                   XXXR_URB2D,XXXB_URB2D,XXXG_URB2D,XXXC_URB2D,  & !H urban
                   TRL_URB3D,TBL_URB3D,TGL_URB3D,                & !H urban
                   SH_URB2D,LH_URB2D,G_URB2D,RN_URB2D,TS_URB2D,  & !H urban
@@ -535,6 +540,16 @@ CONTAINS
      REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: TB_URB2D
      REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: TG_URB2D
      REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: TC_URB2D
+!CORDEX
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: T2G_URB2D
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: T2R_URB2D
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: T2VEG_URB2D
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: TCAN_URB2D
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: UCAN_URB2D
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: QCAN_URB2D
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: TGROUND_URB2D
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: TROOF_URB2D
+!CORDEX
      REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: QC_URB2D
      REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: UC_URB2D
      REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: XXXR_URB2D
@@ -686,6 +701,9 @@ CONTAINS
    REAL :: CMR_URB, CHR_URB, CMC_URB, CHC_URB, CMGR_URB, CHGR_URB
    REAL :: frc_urb,lb_urb
    REAL :: check 
+!CORDEX
+   real aa_veg,a2_veg
+!CORDEX
 ! ----------------------------------------------------------------------
 ! DECLARATIONS END - urban
 ! ----------------------------------------------------------------------
@@ -1658,6 +1676,10 @@ CONTAINS
                 b_t_bep,b_e_bep,b_q_bep,dlg_bep,                       &
                 dl_u_bep,sf_bep,vl_bep,                                &
                 rl_up_urb,rs_abs_urb,emiss_urb,grdflx_urb,qv3d,        &
+!CORDEX
+                tground_urb2d,troof_urb2d,tcan_urb2d,                                &
+                t2g_urb2d,t2r_urb2d,ucan_urb2d,qcan_urb2d,                                &
+!CORDEX
                 ids,ide, jds,jde, kds,kde,                             &
                 ims,ime, jms,jme, kms,kme,                             &
                 its,ite, jts,jte, kts,kte )
@@ -1752,6 +1774,20 @@ CONTAINS
 !                    print*,'ust',ust(i,j)
 !                    print*,'swdown,glw',swdown(i,j),glw(i,j)
 !                endif
+!CORDEX here I do a simple log interpolation between the surface temperature of the vegetated frction, tsk_rural, and the lowest
+!model level value of temperature
+             aa_veg=alog(dz8w(i,1,j)/2./znt(i,j))
+             a2_veg=alog(2/znt(i,j))
+             t2veg_urb2d(i,j)=(1.-aa_veg/a2_veg)*tsk_rural(i,j)+aa_veg/a2_veg*th_phy(i,1,j)
+!             write(*,*)'znt=',znt(i,j)
+!             write(*,*)'aa_veg=',aa_veg
+!             write(*,*)'a2_veg=',a2_veg
+!             write(*,*)'tsk_rural=',tsk_rural(i,j)
+!             write(*,*)'th_phy=',th_phy(i,1,j)
+!             write(*,*)'p_phy=',p_phy(i,1,j)
+             
+             t2veg_urb2d(i,j)=t2veg_urb2d(i,j)*(p_phy(i,1,j)/1.e5)**0.286
+!CORDEX
             else
               SH_URB2D(I,J)    = 0.
               LH_URB2D(I,J)    = 0.
