@@ -3038,7 +3038,8 @@ CONTAINS
              IVGTYP(I,J) == LCZ_3      .or. IVGTYP(I,J) == LCZ_4 .or. IVGTYP(I,J) == LCZ_5 .or. &
              IVGTYP(I,J) == LCZ_6      .or. IVGTYP(I,J) == LCZ_7 .or. IVGTYP(I,J) == LCZ_8 .or. &
              IVGTYP(I,J) == LCZ_9      .or. IVGTYP(I,J) == LCZ_10 .or. IVGTYP(I,J) == LCZ_11 )THEN
-             T2(I,J)   = TH_PHY(i,1,j)/((1.E5/PSFC(I,J))**RCP) !urban
+            ! T2(I,J)   = TH_PHY(i,1,j)/((1.E5/PSFC(I,J))**RCP) !urban
+             T2(I,J)=FRC_URB2D(I,J)*T2G_URB2D(I,J)+(1.-FRC_URB2D(I,J))*T2VEG_URB2D(I,J)
              TH2(I,J) = TH_PHY(i,1,j) !urban
              Q2(I,J)   = qv_curr(i,1,j)  !urban
              U10(I,J)  = U_phy(I,1,J)                       !urban
@@ -3453,14 +3454,13 @@ CONTAINS
                     IVGTYP(I,J) == LCZ_6_TABLE      .or. IVGTYP(I,J) == LCZ_7_TABLE .or. IVGTYP(I,J) == LCZ_8_TABLE .or. &
                     IVGTYP(I,J) == LCZ_9_TABLE      .or. IVGTYP(I,J) == LCZ_10_TABLE .or. IVGTYP(I,J) == LCZ_11_TABLE )THEN
 !CORDEX - BUG
-                T2(I,J)   = TH_PHY(i,1,j)/((1.E5/PSFC(I,J))**RCP) !urban
+                T2VEG_URB2D(I,J)  = FVEGXY(I,J)*T2MVXY(I,J) + (1.-FVEGXY(I,J))*T2MBXY(I,J)
+              !  T2(I,J)   = TH_PHY(i,1,j)/((1.E5/PSFC(I,J))**RCP) !urban
+                T2(I,J)=FRC_URB2D(I,J)*T2G_URB2D(I,J)+(1.-FRC_URB2D(I,J))*T2VEG_URB2D(I,J)
                 TH2(I,J) = TH_PHY(i,1,j) !urban
                 Q2(I,J)   = qv_curr(i,1,j)  !urban
                 U10(I,J)  = U_phy(I,1,J)                       !urban
                 V10(I,J)  = V_phy(I,1,J)                       !urban
-!CORDEX
-                 T2VEG_URB2D(I,J)  = FVEGXY(I,J)*T2MVXY(I,J) + (1.-FVEGXY(I,J))*T2MBXY(I,J)
-!CORDEX
 !CORDEX ! for non urban points put 1.e20 for urban diagnostic variables
                 else
                  tsk_rural(i,j)=1.e20
