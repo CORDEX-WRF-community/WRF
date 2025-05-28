@@ -42,12 +42,12 @@ use module_wrf_error
 
       integer ngb_u            !Number of grid levels in the ground below building (BEM)
       parameter (ngb_u=10)
-
+!
       real dz_u                ! Urban grid resolution
-      parameter (dz_u=5.)
+      parameter (dz_u=10.) !CORDEX
 
       integer nbui_max         !maximum number of types of buildings in an urban class
-      parameter (nbui_max=15)   !must be less or equal than nz_um 
+      parameter (nbui_max=1)   !CORDEX!must be less or equal than nz_um 
 
 
       real h_water
@@ -117,6 +117,10 @@ use module_wrf_error
                       a_u,a_v,a_t,a_e,b_u,b_v,                                     &
                       b_t,b_e,b_q,dlg,dl_u,sf,vl,                                  &
                       rl_up,rs_abs,emiss,grdflx_urb,qv_phy,                        &
+!CORDEX
+                      tground_urb2d,troof_urb2d,tcan_urb2d,                                &
+                      t2g_urb2d,t2r_urb2d,ucan_urb2d,qcan_urb2d,                                &
+!CORDEX
                       ids,ide, jds,jde, kds,kde,                                   &
                       ims,ime, jms,jme, kms,kme,                                   &
                       its,ite, jts,jte, kts,kte)                    
@@ -178,6 +182,15 @@ use module_wrf_error
    REAL, DIMENSION( ims:ime, 1:urban_map_zdf, jms:jme ), INTENT(INOUT) :: drain_urb4d
    REAL, DIMENSION( ims:ime, jms:jme ), INTENT(IN) :: rainbl
    REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: draingr_urb3d
+!CORDEX
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: troof_urb2d
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: tground_urb2d
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: tcan_urb2d
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: t2g_urb2d
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: t2r_urb2d
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: ucan_urb2d
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: qcan_urb2d
+!CORDEX
 !New variables used for BEM
    REAL, DIMENSION( ims:ime, kms:kme, jms:jme ):: qv_phy
    REAL, DIMENSION( ims:ime, 1:urban_map_bd, jms:jme ), INTENT(INOUT) :: tlev_urb3d
@@ -945,7 +958,10 @@ do iz= kts,kte
                    dlg1D,dl_u1D,sf1D,vl1D,rl_up(ix,iy),             &
                    rs_abs(ix,iy),emiss(ix,iy),grdflx_urb(ix,iy),    &
                    qv1D,tlev1D,qlev1D,sflev1D,lflev1D,consumlev1D,  &
-                   eppvlev1D,tpvlev1D,sfvlev1D,lfvlev1D,twlev1D,tglev1D,tflev1D,sfwin1D,tair1D,sfr_indoor1D,sfrpv1D,gfr1D) 
+                   eppvlev1D,tpvlev1D,sfvlev1D,lfvlev1D,twlev1D,tglev1D,tflev1D,sfwin1D,tair1D,sfr_indoor1D,sfrpv1D,gfr1D, &
+!CORDEX 
+                   t2g_urb2d(ix,iy),t2r_urb2d(ix,iy),tcan_urb2d(ix,iy),ucan_urb2d(ix,iy),qcan_urb2d(ix,iy)) 
+!CORDEX 
            
           do ibui=1,nbui_max !type of building
 	    do iz=1,nz_um   !vertical levels
@@ -987,22 +1003,31 @@ do iz= kts,kte
          enddo
          enddo
 
-
+!CORDEX - initalize to zero the ground and roof average surface temperature
+            tground_urb2d(ix,iy)=0.
+            troof_urb2d(ix,iy)=0.
+!CORDEX -end
           do id=1,ndm
             do ig=1,ng_u
-              
                tgb_urb4d(ix,ind_gd(ig,id),iy)=tg1D(id,ig)
             enddo
+!CORDEX - averaging it over the different street directions
+            tground_urb2d(ix,iy)=tground_urb2d(ix,iy)+tg1D(id,ng_u)/ndm
+!CORDEX -end
             do iz_u=1,nz_um
                do ir=1,nwr_u
                   trb_urb4d(ix,ind_zrd(iz_u,ir,id),iy)=tr1D(id,iz_u,ir)
                enddo
-                if(gr_flag_u.eq.1)then
+!CORDEX - averaging it over the different street directions, and different heights
+               troof_urb2d(ix,iy)=troof_urb2d(ix,iy)+ss(iz_u)*tr1D(id,iz_u,nwr_u)/ndm
+
+!CORDEX -end
+              if(gr_flag_u.eq.1)then
                do ir=1,ngr_u
                   trv_urb4d(ix,ind_grd(iz_u,ir,id),iy)=trv1D(id,iz_u,ir)
                   qr_urb4d(ix,ind_grd(iz_u,ir,id),iy)=qr1D(id,iz_u,ir)
                enddo
-                endif
+              endif
             enddo
           enddo
 !
@@ -1182,7 +1207,10 @@ do iz= kts,kte
                       b_u,b_v,b_t,b_ac,b_e,b_q,                        & 
                       dlg,dl_u,sf,vl,rl_up,rs_abs,emiss,grdflx_urb,    &
                       qv,tlev,qlev,sflev,lflev,consumlev,              &
-                      eppvlev,tpvlev,sfvlev,lfvlev,twlev,tglev,tflev,sfwin,tmp_u,sfr_indoor,sfrpv,gfr)    
+                      eppvlev,tpvlev,sfvlev,lfvlev,twlev,tglev,tflev,sfwin,tmp_u,sfr_indoor,sfrpv,gfr, & 
+!CORDEX 
+                      t2g_urb2d,t2r_urb2d,tcan_urb2d,ucan_urb2d,qcan_urb2d)    
+!CORDEX
         ! print*,'SFR_AFT',sfr(id,iz)
 
 
@@ -1228,7 +1256,9 @@ do iz= kts,kte
       real emg                   ! Emissivity of ground
       real emw                   ! Emissivity of wall
       real emr                   ! Emissivity of roof
-
+!CORDEX
+      real tcan_urb2d,t2g_urb2d,t2r_urb2d,ucan_urb2d,qcan_urb2d
+!CORDEX
 
 !    fww,fwg,fgw,fsw,fsg are the view factors used to compute the long and 
 !    short wave radation. 
@@ -1479,6 +1509,9 @@ do iz= kts,kte
       real tr_av(ndm,nz_um)
       real tr_avb(ndm,nbui_max)
       real sfr_avb(ndm,nbui_max)
+!CORDEX
+      real zcenter, zcenter0,tc0,tc1,uc0,uc1,qc0,qc1
+!CORDEX
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------
@@ -1515,6 +1548,38 @@ do iz= kts,kte
       call interpol(kms,kme,kts,kte,nzu,z,z_u,pr,pr_u)
       call interpol(kms,kme,kts,kte,nzu,z,z_u,da,da_u)
       call interpol(kms,kme,kts,kte,nzu,z,z_u,qv,qv_u)
+!CORDEX - here I am computing the value of temperature at 2m and wind speed at 10m
+      tcan_urb2d=0.
+      ucan_urb2d=0.
+      qcan_urb2d=0.
+      do iz=1,nz_um-1
+       if(z_u(iz).le.2.and.z_u(iz+1).gt.2)then
+        if(iz.eq.1)then
+         tcan_urb2d=pt_u(1)*(pr_u(1)/1.e5)**rcp_u
+         qcan_urb2d=qv_u(1)
+        else
+         zcenter0=(z_u(iz-1)+z_u(iz))/2.
+         tc0=pt_u(iz-1)*(pr_u(iz-1)/1.e5)**rcp_u
+         tc1=pt_u(iz)*(pr_u(iz)/1.e5)**rcp_u
+         qc0=qv_u(iz-1)
+         qc1=qv_u(iz)
+         tcan_urb2d=((zcenter-2.)*tc0+(2.-zcenter0)*tc1)/(zcenter-zcenter0)
+         qcan_urb2d=((zcenter-2.)*qc0+(2.-zcenter0)*qc1)/(zcenter-zcenter0)
+        endif
+       endif
+       if(z_u(iz).le.10.and.z_u(iz+1).gt.10)then
+        if(iz.eq.1)then
+         ucan_urb2d=sqrt(ua_u(iz)**2.+va_u(iz)**2.)
+        else
+         zcenter0=(z_u(iz-1)+z_u(iz))/2.
+         uc0=sqrt(ua_u(iz-1)**2.+va_u(iz-1)**2.)
+         uc1=sqrt(ua_u(iz)**2.+va_u(iz)**2.)
+         ucan_urb2d=((zcenter-10.)*uc0+(10.-zcenter0)*uc1)/(zcenter-zcenter0)
+        endif
+       endif
+      enddo
+!CORDEX
+        
 ! Compute the modification of the radiation due to the buildings
       
 
@@ -1585,6 +1650,8 @@ do iz= kts,kte
      call surf_temp(ndu,pr_u,dt,                   & 
                     rld,rsg,rlg,                    &
                     tg,alag,csg,emg,albg,ptg,sfg,lfg,gfg)
+     if(ix.eq.50.and.iy.eq.42)write(98,'(10(2x,f15.8))')sfg(1),gfg(1),rsg(1),rlg(1),ptg(1)
+     if(ix.eq.50.and.iy.eq.42)write(99,'(10(2x,f15.8))')sfg(2),gfg(2),rsg(2),rlg(2),ptg(2)
      if(gr_flag.eq.1)then
      if(gr_frac_roof.gt.0.)then
      hfgr=0.
@@ -1729,6 +1796,7 @@ do iz= kts,kte
                    sfvlev1D,lfvlev1D,hfgrb(1,ibui),tr_avb(1,ibui),           &
                    tpv(ibui),sfpv(ibui),sfr_indoor(ibui))
           
+     if(ix.eq.50.and.iy.eq.42)write(88,'(10(2x,f15.8))')sfr_avb(1,1),gfrb(1,1),rs,rld,ptr(1,1)
 
 !
 !Temporal modifications
@@ -1845,7 +1913,10 @@ do iz= kts,kte
                      uhb_u,vhb_u,thb_u,ehb_u,ss,dt,sfw,sfg,sfr,sfrpv,sfrv,lfrv,   &
                      dgr,dg,lfr,lfg,                                                                    &
                      sfwin,pb,bs_u,dz_u,sflev,lflev,sfvlev,lfvlev,tvb_ac,ix,iy,rsg,rs,qr,gr_frac_roof,  &
-                     pv_frac_roof,gr_flag,gr_type)  
+                     pv_frac_roof,gr_flag,gr_type, &
+!CORDEX                     
+                     t2g_urb2d,t2r_urb2d)
+!CORDEX
       
 
 
@@ -1955,6 +2026,7 @@ do iz= kts,kte
 ! LOCAL:
 ! ----------------------------------------------------------------------
       integer id,ig,ir,iw,iz,iflo,ihu
+      real sstot
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------  
@@ -2601,7 +2673,10 @@ do iz= kts,kte
                         uhb_u,vhb_u,thb_u,ehb_u,ss,dt,sfw,sfg,sfr,sfrpv,sfrv,lfrv,   &
                         dgr,dg,lfr,lfg,                                               &
                         sfwin,pb,bs_u,dz_u,sflev,lflev,sfvlev,lfvlev,tvb_ac,ix,iy,rsg,rs,qr,gr_frac_roof,  &
-                        pv_frac_roof,gr_flag,gr_type)                  
+                        pv_frac_roof,gr_flag,gr_type, &
+!CORDEX
+                        t2g_urb2d,t2r_urb2d)                  
+!CORDEX
 
 ! ----------------------------------------------------------------------
 ! This routine computes the sources or sinks of the different quantities 
@@ -2644,7 +2719,10 @@ do iz= kts,kte
       real trv(ndm,nz_um,ngr_u)         ! Ground Soil Moisture
       real roof_frac
       real road_frac
-!
+!CORDEX
+      real t2g_urb2d,t2r_urb2d
+      real t2m
+!CORDEX
 !New variables (BEM)
 !
       real bs_u(ndm,nurbm)    ! Building width [m]
@@ -2722,6 +2800,8 @@ do iz= kts,kte
       real qr_tmp(ngr_u)
       data rsv /0,1/
       real fh,ric,utot
+      !local
+      real sstot
 !------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------
@@ -2763,11 +2843,19 @@ do iz= kts,kte
       enddo
 
 !        Calculation at the ground surfaces
+!CORDEX
+      t2g_urb2d=0.
+      t2r_urb2d=0.
+!CORDEX
       do id=1,nd
       
           call flux_flat(dz,z0(id,1),ua_u(1),va_u(1),pt_u(1),pt0_u(1),  &
                        ptg(id),qv_u(1),uhb(id,1),                            & 
-                       vhb(id,1),sfg(id),lfg(id),ehb(id,1),da_u(1),pr_u(1))        
+                       vhb(id,1),sfg(id),lfg(id),ehb(id,1),da_u(1),pr_u(1), &
+!CORDEX
+                       t2m)
+           t2g_urb2d=t2g_urb2d+t2m/ndm
+!CORDEX
           if(dg(id).gt.0)then
            wfg=dg(id)/dgmax
            lfg(id)=-da_u(1)*latent*(-(wfg*lfg(id))/(da_u(1)*latent))
@@ -2780,49 +2868,53 @@ do iz= kts,kte
          uhb_u(id,1)=uhb(id,1)
          ehb_u(id,1)=ehb(id,1)
          qhb_u(id,1)=-lfg(id)/(da_u(1)*latent)
+
          do iz=2,nz
-            if(ss(iz).gt.0)then
-            
+          if(ss(iz).gt.0)then
                call flux_flat(dz,z0(id,iz),ua_u(iz),&
                        va_u(iz),pt_u(iz),pt0_u(iz), &
                        ptr(id,iz),qv_u(iz),uhb(id,iz),       &
-                       vhb(id,iz),sfr(id,iz),lfr(id,iz),ehb(id,iz),da_u(iz),pr_u(iz))
-         if(dgr(id,iz).gt.0)then
-          wfr=dgr(id,iz)/drmax
-          lfr(id,iz)=-da_u(iz)*latent*(-(wfr*lfr(id,iz))/(da_u(iz)*latent))
-         else
-          lfr(id,iz)=0.
-         endif
-         if(gr_flag.eq.1.and.gr_frac_roof.gt.0.)then  
-         do il=1,ngr_u
-           qr_tmp(il)=qr(id,iz,il)
-         enddo
+                       vhb(id,iz),sfr(id,iz),lfr(id,iz),ehb(id,iz),da_u(iz),pr_u(iz), &
+!CORDEX                      
+                       t2m)
+            t2r_urb2d=t2r_urb2d+t2m/ndm*ss(iz)
+!CORDEX
+           if(dgr(id,iz).gt.0)then
+            wfr=dgr(id,iz)/drmax
+            lfr(id,iz)=-da_u(iz)*latent*(-(wfr*lfr(id,iz))/(da_u(iz)*latent))
+           else
+            lfr(id,iz)=0.
+           endif
+           if(gr_flag.eq.1.and.gr_frac_roof.gt.0.)then  
+            do il=1,ngr_u
+             qr_tmp(il)=qr(id,iz,il)
+            enddo
                call flux_flat_roof(dz,z0v,ua_u(iz),va_u(iz),pt_u(iz),pt0_u(iz),  &
                        ptrv(id,iz),uhbv(id,iz),                            &
                        vhbv(id,iz),sfrv(id,iz),lfrv(id,iz),ehbv(id,iz),da_u(iz),qv_u(iz),pr_u(iz),rs,qr_tmp,resg,rsveg,f1,f2,f3,f4,gr_type,pv_frac_roof)
-         sfr(id,iz)=sfr(id,iz)+pv_frac_roof*sfrpv(id,iz) 
-         thb_u(id,iz)=-((1.-gr_frac_roof)*sfr(id,iz)+gr_frac_roof*sfrv(id,iz))/(da_u(iz)*cp_u)
-         vhb_u(id,iz)=(1.-gr_frac_roof)*vhb(id,iz)+gr_frac_roof*vhbv(id,iz)
-         uhb_u(id,iz)=(1.-gr_frac_roof)*uhb(id,iz)+gr_frac_roof*uhbv(id,iz)
-         ehb_u(id,iz)=(1.-gr_frac_roof)*ehb(id,iz)+gr_frac_roof*ehbv(id,iz)
-         qhb_u(id,iz)=-(gr_frac_roof*lfrv(id,iz)+(1.-gr_frac_roof)*lfr(id,iz))/(da_u(iz)*latent)
-         sfr(id,iz)=sfr(id,iz)-pv_frac_roof*sfrpv(id,iz)
-         else
-         sfr(id,iz)=sfr(id,iz)+pv_frac_roof*sfrpv(id,iz)
-         thb_u(id,iz)=-sfr(id,iz)/(da_u(iz)*cp_u)
-         vhb_u(id,iz)=vhb(id,iz)
-         uhb_u(id,iz)=uhb(id,iz)
-         ehb_u(id,iz)=ehb(id,iz)
-         qhb_u(id,iz)=-lfr(id,iz)/(da_u(iz)*latent)
-         sfr(id,iz)=sfr(id,iz)-pv_frac_roof*sfrpv(id,iz)
-         endif
-            else
+            sfr(id,iz)=sfr(id,iz)+pv_frac_roof*sfrpv(id,iz) 
+            thb_u(id,iz)=-((1.-gr_frac_roof)*sfr(id,iz)+gr_frac_roof*sfrv(id,iz))/(da_u(iz)*cp_u)
+            vhb_u(id,iz)=(1.-gr_frac_roof)*vhb(id,iz)+gr_frac_roof*vhbv(id,iz)
+            uhb_u(id,iz)=(1.-gr_frac_roof)*uhb(id,iz)+gr_frac_roof*uhbv(id,iz)
+            ehb_u(id,iz)=(1.-gr_frac_roof)*ehb(id,iz)+gr_frac_roof*ehbv(id,iz)
+            qhb_u(id,iz)=-(gr_frac_roof*lfrv(id,iz)+(1.-gr_frac_roof)*lfr(id,iz))/(da_u(iz)*latent)
+            sfr(id,iz)=sfr(id,iz)-pv_frac_roof*sfrpv(id,iz)
+           else
+            sfr(id,iz)=sfr(id,iz)+pv_frac_roof*sfrpv(id,iz)
+            thb_u(id,iz)=-sfr(id,iz)/(da_u(iz)*cp_u)
+            vhb_u(id,iz)=vhb(id,iz)
+            uhb_u(id,iz)=uhb(id,iz)
+            ehb_u(id,iz)=ehb(id,iz)
+            qhb_u(id,iz)=-lfr(id,iz)/(da_u(iz)*latent)
+            sfr(id,iz)=sfr(id,iz)-pv_frac_roof*sfrpv(id,iz)
+           endif
+          else
                uhb_u(id,iz) = 0.0
                vhb_u(id,iz) = 0.0
                thb_u(id,iz) = 0.0
                ehb_u(id,iz) = 0.0
                qhb_u(id,iz) = 0.0
-            endif
+          endif
          enddo
          
          
@@ -4594,7 +4686,10 @@ do iz= kts,kte
 ! ===6=8===============================================================72
 
       subroutine flux_flat(dz,z0,ua,va,pt,pt0,ptg,qv,                   &
-                          uhb,vhb,sf,lf,ehb,da,pr)
+                          uhb,vhb,sf,lf,ehb,da,pr, &
+!CORDEX
+                        t2m)
+!CORDEX
                                 
 ! ----------------------------------------------------------------------
 !           Calculation of the flux at the ground 
@@ -4610,8 +4705,13 @@ do iz= kts,kte
       real ua                   ! wind speed
       real va                   ! wind speed
       real z0                   ! Roughness length
+      real z0t                   ! Roughness length for heat
       real da                   ! air density
       real qv
+!CORDEX
+      real t2m
+      real a2
+!CORDEX
 ! ----------------------------------------------------------------------
 ! OUTPUT:
 ! ----------------------------------------------------------------------
@@ -4632,6 +4732,7 @@ do iz= kts,kte
 ! LOCAL:
 ! ----------------------------------------------------------------------
       real aa
+      real ah
       real al
       real buu
       real c
@@ -4648,11 +4749,18 @@ do iz= kts,kte
       real zz
       real qvsg,qvs,es,esa,fbqq,tmp,resg
       real b,cm,ch,rr,tol
+      real akanda,sqvisc,ust_g
+      integer ikanda
       parameter(b=9.4,cm=7.4,ch=5.3,rr=0.74,tol=.001)
 
 ! ----------------------------------------------------------------------
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------
+      akanda=1.29
+      sqvisc = 258.2
+     
+  !    ikanda=0 !ikanda=0 => same roughness length for momentum and heat - original BEP-BEM formulation
+      ikanda=1 !ikanda=1 => Kanda et al. (2007) fromula to estimate roughness length for heat - same as for SLUCM
 
 
 ! computation of the ground temperature
@@ -4673,6 +4781,14 @@ do iz= kts,kte
               
       aa=vk/log(zz/z0)
 
+      if(ikanda.eq.0)then
+        z0t=z0
+      elseif(ikanda.eq.1)then
+        ust_g=utot*vk/alog(zz/z0)
+        z0t = exp (2.0-akanda*(sqvisc**2 * ust_g * z0)**0.25)* z0
+      endif
+
+      ah=vk/log(zz/z0t)
 
      
       tmp=ptg*(pr/(1.e+5))**(rcp_u)-273.15 
@@ -4689,13 +4805,14 @@ do iz= kts,kte
       else
          c=b*cm*aa*aa*(zz/z0)**.5
          fm=1.-b*ric/(1.+c*(-ric)**.5)
+         c=b*cm*aa*ah*(zz/z0t)**.5
          c=c*ch/cm
-         fh=1.-b*ric/(1.+c*(-ric)**.5)
+         fh=1-b*ric/(1+c*(-ric)**.5)
       endif
 
       resg= rr/(aa*aa*utot*fh)
       fbuw=-aa*aa*utot*utot*fm
-      fbpt=-aa*aa*utot*(pt-ptg)*fh/rr
+      fbpt=-aa*ah*utot*(pt-ptg)*fh/rr
       fbqq=-(qv-qvsg)/(resg)
                
       ustar=(-fbuw)**.5
@@ -4711,6 +4828,12 @@ do iz= kts,kte
       lf= ustar*qstar*da*latent 
       ehb=buu
 !!!!!!!!!!!!!!!
+!CORDEX
+      a2=vk/log(2./z0t)
+      t2m=ah/a2*pt+(1.-ah/a2)*ptg
+      t2m=t2m*(pr/1.e5)**rcp_u
+!CORDEX
+
          
       return
       end subroutine flux_flat

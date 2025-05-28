@@ -702,7 +702,11 @@ CONTAINS
    REAL :: frc_urb,lb_urb
    REAL :: check 
 !CORDEX
+<<<<<<< HEAD
    real aa_veg,a2_veg,ptg_rur,zhalf
+=======
+   real aa_veg,a2_veg
+>>>>>>> v4.5.1.7-devel
 !CORDEX
 ! ----------------------------------------------------------------------
 ! DECLARATIONS END - urban
@@ -1776,6 +1780,7 @@ CONTAINS
 !                endif
 !CORDEX here I do a simple log interpolation between the surface temperature of the vegetated frction, tsk_rural, and the lowest
 !model level value of temperature
+<<<<<<< HEAD
              zhalf=dz8w(i,1,j)/2.
              aa_veg=0.4/alog(zhalf/znt(i,j))
              a2_veg=0.4/alog(2./znt(i,j))
@@ -1784,6 +1789,19 @@ CONTAINS
              t2veg_urb2d(i,j)=t2veg_urb2d(i,j)*(p_phy(i,1,j)/1.e5)**0.286
 
              
+=======
+             aa_veg=alog(dz8w(i,1,j)/2./znt(i,j))
+             a2_veg=alog(2/znt(i,j))
+             t2veg_urb2d(i,j)=(1.-aa_veg/a2_veg)*tsk_rural(i,j)+aa_veg/a2_veg*th_phy(i,1,j)
+!             write(*,*)'znt=',znt(i,j)
+!             write(*,*)'aa_veg=',aa_veg
+!             write(*,*)'a2_veg=',a2_veg
+!             write(*,*)'tsk_rural=',tsk_rural(i,j)
+!             write(*,*)'th_phy=',th_phy(i,1,j)
+!             write(*,*)'p_phy=',p_phy(i,1,j)
+             
+             t2veg_urb2d(i,j)=t2veg_urb2d(i,j)*(p_phy(i,1,j)/1.e5)**0.286
+>>>>>>> v4.5.1.7-devel
 !CORDEX
             else
               SH_URB2D(I,J)    = 0.

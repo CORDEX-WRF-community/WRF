@@ -3461,8 +3461,6 @@ CONTAINS
                 Q2(I,J)   = qv_curr(i,1,j)  !urban
                 U10(I,J)  = U_phy(I,1,J)                       !urban
                 V10(I,J)  = V_phy(I,1,J)                       !urban
-!CORDEX
-!CORDEX
 !CORDEX ! for non urban points put 1.e20 for urban diagnostic variables
                 else
                  tsk_rural(i,j)=1.e20
