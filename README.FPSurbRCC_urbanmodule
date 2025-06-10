@@ -97,19 +97,35 @@ v.- New urban diagnostics: Not started yet
 In order to activate urban modifications user needs to follow these steps:
  1.- Download the code for CWC WRFv4.5.1 'urbanmodule' branch
 
-   git clone --recurse-submodules -b urbanmodule https://github.com/CORDEX-WRF-community/WRF.git
-
+   git clone --recurse-submodules -b urbanmodule git@github.com:CORDEX-WRF-community/WRF.git WRF_FPSurbRcc-urbanmodule
+   cd WRF_FPSurbRcc-urbanmodule/phys/noahmp
+   git checkout urban-mods
+   cd ../../
+  
  2.- Make a copy of Registry/registry.urbandiags
 
    cp Registry/registry.urbandiags Registry/registry.urbandiags_comp
 
- 3.-Modify the file accordingly to needs
+ 3.-Modify the file 'Registry/registry.urbandiags_comp' accordingly to needs 
 
    * For the urban state variables:
      a) Remove in Registry/registry.urbandiags_comp all the '##urban_state##' strings
      b) in the configure.wrf introduce the pre-compilation flag -DURBANSTATE (e.g. line below -DNETCDF)
 
- 4.- compile as usual
+ 4.- This branch incorporates also the CDXWRF module (https://wiki.cima.fcen.uba.ar/mediawiki/index.php/CDXWRF), to activate it, you will need to follow these aditional steps:
+    a) Make a copy of Registry/registry.cordex
+
+      cp Registry/registry.cordex Registry/registry.cordex_comp
+
+    b.-Modify the file 'Registry/registry.cordex_comp' accordingly to needs 
+
+      * Amount of additional diagnostics accordingly to CDXWRF [num]:
+        i.- Remove in Registry/registry.cordex_comp all the '##CDXWRF[NUM]##' strings
+      * Accordingly adapt the configure.wrf wth
+        i.- introduce the pre-compilation flag -DCORDEXDIAG (e.g. line below -DNETCDF)
+        ii.- if a number of CDXWRF module was selected introduce the pre-compilation flag -DCDXWRF=[num] (e.g. line below -DCORDEXDIAG)
+
+ 6.- compile as usual
 
    compile em_real >& compile.log
  
