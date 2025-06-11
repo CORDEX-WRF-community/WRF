@@ -835,6 +835,15 @@ BENCH_START(surf_driver_tim)
      &        ,TG_URB2D=grid%tg_urb2d                                     & !H urban
      &        ,TC_URB2D=grid%tc_urb2d ,QC_URB2D=grid%qc_urb2d             & !H urban
      &        ,UC_URB2D=grid%uc_urb2d                                     & !H urban
+!CORDEX
+     &        ,T2G_URB2D=grid%t2g_urb2d,T2R_URB2D=grid%t2r_urb2d          & 
+     &        ,T2VEG_URB2D=grid%t2veg_urb2d                               & 
+     &        ,TCAN_URB2D=grid%tcan_urb2d                                 & 
+     &        ,UCAN_URB2D=grid%ucan_urb2d                                 & 
+     &        ,QCAN_URB2D=grid%qcan_urb2d                                 & 
+     &        ,TGROUND_URB2D=grid%tground_urb2d                           & 
+     &        ,TROOF_URB2D=grid%troof_urb2d                               &  
+!CORDEX
      &        ,XXXR_URB2D=grid%xxxr_urb2d                                 &
      &        ,XXXB_URB2D=grid%xxxb_urb2d                                 & !H urban
      &        ,XXXG_URB2D=grid%xxxg_urb2d                                 &
