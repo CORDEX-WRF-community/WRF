@@ -120,6 +120,7 @@ CONTAINS
                ght_pl(i,kp,j) = missing
                s_pl  (i,kp,j) = missing
                td_pl (i,kp,j) = missing
+               q_pl  (i,kp,j) = missing
 #ifdef CORDEXDIAG
                ! L. Fita. CIMA. March 2018
                hus_pl  (i,kp,j) = missing
