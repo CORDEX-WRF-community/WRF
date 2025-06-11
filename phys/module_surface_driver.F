@@ -262,6 +262,11 @@ CONTAINS
      &          ,num_road_layers, dzr, dzb, dzg                       & !I urban
      &          ,tr_urb2d,tb_urb2d,tg_urb2d,tc_urb2d,qc_urb2d         & !H urban
      &          ,uc_urb2d                                             & !H urban
+!CORDEX
+     &          ,t2g_urb2d,t2r_urb2d,t2veg_urb2d                      &
+     &          ,tcan_urb2d,ucan_urb2d,qcan_urb2d                     &
+     &          ,tground_urb2d,troof_urb2d                            &
+!CORDEX
      &          ,xxxr_urb2d,xxxb_urb2d,xxxg_urb2d,xxxc_urb2d          & !H urban
      &          ,cmcr_urb2d,tgr_urb2d,tgrl_urb3d,smr_urb3d            & !H urban
      &          ,julian,julyr,drelr_urb2d,drelb_urb2d,drelg_urb2d     & !H urban
@@ -453,6 +458,11 @@ CONTAINS
    USE module_sf_noahdrv                           ! danli mosaic, the " ,only : lsm " needs to be deleted 
    USE module_sf_noahlsm,   only : LCZ_1,LCZ_2,LCZ_3,LCZ_4,LCZ_5,LCZ_6,LCZ_7,LCZ_8,LCZ_9,LCZ_10,LCZ_11
    USE module_sf_noahmpdrv, only : noahmplsm, noahmp_urban
+!CORDEX- BUG
+     USE NOAHMP_TABLES, ONLY: ISURBAN_TABLE,LCZ_1_TABLE,LCZ_2_TABLE,LCZ_3_TABLE,LCZ_4_TABLE, &
+                           LCZ_5_TABLE,LCZ_6_TABLE,LCZ_7_TABLE,LCZ_8_TABLE,  &
+                           LCZ_9_TABLE,LCZ_10_TABLE,LCZ_11_TABLE
+!CORDEX- BUG
    USE module_sf_noahmp_groundwater
    USE module_sf_noah_seaice_drv
 #ifdef WRF_USE_CLM
@@ -1393,6 +1403,16 @@ CONTAINS
      REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT):: TC_URB2D !urban
      REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT):: QC_URB2D !urban
      REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT):: UC_URB2D !urban
+!CORDEX
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT):: T2G_URB2D !urban
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT):: T2R_URB2D !urban
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT):: T2VEG_URB2D !urban
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT):: TCAN_URB2D !urban
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT):: UCAN_URB2D !urban
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT):: QCAN_URB2D !urban
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT):: TGROUND_URB2D !urban
+     REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT):: TROOF_URB2D !urban
+!CORDEX
      REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT):: XXXR_URB2D !urban
      REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT):: XXXB_URB2D !urban
      REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT):: XXXG_URB2D !urban
@@ -3006,6 +3026,11 @@ CONTAINS
                 ,cmgr_sfcdif,chgr_sfcdif                        &
                 ,tr_urb2d,tb_urb2d,tg_urb2d,tc_urb2d,qc_urb2d,  & !H urban
                 uc_urb2d,                                       & !H urban
+!CORDEX
+                t2g_urb2d,t2r_urb2d,t2veg_urb2d,                &
+                tcan_urb2d,ucan_urb2d,qcan_urb2d,               &
+                tground_urb2d,troof_urb2d,                      &
+!CORDEX
                 xxxr_urb2d,xxxb_urb2d,xxxg_urb2d,xxxc_urb2d,    & !H urban
                 trl_urb3d,tbl_urb3d,tgl_urb3d,                  & !H urban
                 sh_urb2d,lh_urb2d,g_urb2d,rn_urb2d,ts_urb2d,    & !H urban
@@ -3205,15 +3230,29 @@ CONTAINS
      IF((SF_URBAN_PHYSICS.eq.2).OR.(SF_URBAN_PHYSICS.eq.3)) THEN
        DO j=j_start(ij),j_end(ij)                             !urban
          DO i=i_start(ij),i_end(ij)                           !urban
+!               write(*,*)'ivgtyp',IVGTYP(I,J),LCZ_2,LCZ_6,LCZ_8
             IF( IVGTYP(I,J) == ISURBAN    .or. IVGTYP(I,J) == LCZ_1 .or. IVGTYP(I,J) == LCZ_2 .or. &
              IVGTYP(I,J) == LCZ_3      .or. IVGTYP(I,J) == LCZ_4 .or. IVGTYP(I,J) == LCZ_5 .or. &
              IVGTYP(I,J) == LCZ_6      .or. IVGTYP(I,J) == LCZ_7 .or. IVGTYP(I,J) == LCZ_8 .or. &
              IVGTYP(I,J) == LCZ_9      .or. IVGTYP(I,J) == LCZ_10 .or. IVGTYP(I,J) == LCZ_11 )THEN
-            T2(I,J)   = TH_PHY(i,1,j)/((1.E5/PSFC(I,J))**RCP) !urban
-            TH2(I,J) = TH_PHY(i,1,j) !urban
-            Q2(I,J)   = qv_curr(i,1,j)  !urban
-            U10(I,J)  = U_phy(I,1,J)                       !urban
-            V10(I,J)  = V_phy(I,1,J)                       !urban
+            ! T2(I,J)   = TH_PHY(i,1,j)/((1.E5/PSFC(I,J))**RCP) !urban
+             T2(I,J)=FRC_URB2D(I,J)*T2G_URB2D(I,J)+(1.-FRC_URB2D(I,J))*T2VEG_URB2D(I,J)
+             TH2(I,J) = TH_PHY(i,1,j) !urban
+             Q2(I,J)   = qv_curr(i,1,j)  !urban
+             U10(I,J)  = U_phy(I,1,J)                       !urban
+             V10(I,J)  = V_phy(I,1,J)                       !urban
+!CORDEX ! for non urban points put 1.e20 for urban diagnostic variables
+           else
+             tsk_rural(i,j)=1.e20
+             tcan_urb2d(i,j)=1.e20
+             ucan_urb2d(i,j)=1.e20
+             qcan_urb2d(i,j)=1.e20
+             t2g_urb2d(i,j)=1.e20
+             t2r_urb2d(i,j)=1.e20
+             t2veg_urb2d(i,j)=1.e20
+             troof_urb2d(i,j)=1.e20
+             tground_urb2d(i,j)=1.e20
+!CORDEX
            END IF                                             !urban
          ENDDO                                                !urban
        ENDDO                                                  !urban
@@ -3368,6 +3407,16 @@ CONTAINS
 
          IF(SF_URBAN_PHYSICS > 0 ) THEN  !urban
          
+           DO j=j_start(ij),j_end(ij)
+           DO i=i_start(ij),i_end(ij)
+               IF( IVGTYP(I,J) == ISURBAN    .or. IVGTYP(I,J) == LCZ_1_TABLE .or. IVGTYP(I,J) == LCZ_2_TABLE .or. &
+                   IVGTYP(I,J) == LCZ_3_TABLE      .or. IVGTYP(I,J) == LCZ_4_TABLE .or. IVGTYP(I,J) == LCZ_5_TABLE .or. &
+                   IVGTYP(I,J) == LCZ_6_TABLE      .or. IVGTYP(I,J) == LCZ_7_TABLE .or. IVGTYP(I,J) == LCZ_8_TABLE .or. &
+                   IVGTYP(I,J) == LCZ_9_TABLE      .or. IVGTYP(I,J) == LCZ_10_TABLE .or. IVGTYP(I,J) == LCZ_11_TABLE )THEN
+                    tsk_rural(i,j)=tsk(i,j)
+               ENDIF
+           ENDDO
+           ENDDO
 	   call noahmp_urban (sf_urban_physics,     NUM_SOIL_LAYERS,     IVGTYP,ITIMESTEP,  & ! IN : Model configuration 
                                DTBL,         COSZEN,     XLAT_URB2D,                        & ! IN : Time/Space-related
                               T_PHY,        QV_CURR,          U_PHY,      V_PHY,   SWDOWN,  & ! IN : Forcing
@@ -3382,6 +3431,12 @@ CONTAINS
 	                 chc_sfcdif,    cmgr_sfcdif,    chgr_sfcdif,                        &
                            tr_urb2d,       tb_urb2d,       tg_urb2d,                        & !H urban
 	                   tc_urb2d,       qc_urb2d,       uc_urb2d,                        & !H urban
+                          tsk_rural,                                                        &
+!CORDEX
+                          t2g_urb2d,      t2r_urb2d,                            &
+                          tcan_urb2d,     ucan_urb2d,   qcan_urb2d,                         &
+                          tground_urb2d,     troof_urb2d,                         &
+!CORDEX
                          xxxr_urb2d,     xxxb_urb2d,     xxxg_urb2d, xxxc_urb2d,            & !H urban
                           trl_urb3d,      tbl_urb3d,      tgl_urb3d,                        & !H urban
                            sh_urb2d,       lh_urb2d,        g_urb2d,   rn_urb2d,  ts_urb2d, & !H urban
@@ -3565,10 +3620,10 @@ CONTAINS
                  ENDIF
                    TH2(I,J) = T2(I,J)*(1.E5/PSFC(I,J))**RCP
 !             ELSEIF (IVGTYP(I,J) == ISURBAN .OR. IVGTYP(I,J) == ISICE .OR. FVEGXY(I,J) == 0.0 ) THEN
-              ELSEIF( IVGTYP(I,J) == ISURBAN    .or. IVGTYP(I,J) == LCZ_1 .or. IVGTYP(I,J) == LCZ_2 .or. &
-                      IVGTYP(I,J) == LCZ_3      .or. IVGTYP(I,J) == LCZ_4 .or. IVGTYP(I,J) == LCZ_5 .or. &
-                      IVGTYP(I,J) == LCZ_6      .or. IVGTYP(I,J) == LCZ_7 .or. IVGTYP(I,J) == LCZ_8 .or. &
-                      IVGTYP(I,J) == LCZ_9      .or. IVGTYP(I,J) == LCZ_10 .or. IVGTYP(I,J) == LCZ_11 .or. &
+              ELSEIF( IVGTYP(I,J) == ISURBAN    .or. IVGTYP(I,J) == LCZ_1_TABLE .or. IVGTYP(I,J) == LCZ_2_TABLE .or. &
+                      IVGTYP(I,J) == LCZ_3_TABLE      .or. IVGTYP(I,J) == LCZ_4_TABLE .or. IVGTYP(I,J) == LCZ_5_TABLE .or. &
+                      IVGTYP(I,J) == LCZ_6_TABLE      .or. IVGTYP(I,J) == LCZ_7_TABLE .or. IVGTYP(I,J) == LCZ_8_TABLE .or. &
+                      IVGTYP(I,J) == LCZ_9_TABLE      .or. IVGTYP(I,J) == LCZ_10_TABLE .or. IVGTYP(I,J) == LCZ_11_TABLE .or. &
                      (IVGTYP(I,J) == ISICE .AND. XICE(I,J) .LT. XICE_THRESHOLD)) THEN
 
                    Q2(I,J)  = Q2MBXY(I,J)
@@ -3593,10 +3648,10 @@ CONTAINS
          IF(SF_URBAN_PHYSICS.eq.1) THEN
            DO j=j_start(ij),j_end(ij)                             !urban
              DO i=i_start(ij),i_end(ij)                           !urban
-               IF( IVGTYP(I,J) == ISURBAN    .or. IVGTYP(I,J) == LCZ_1 .or. IVGTYP(I,J) == LCZ_2 .or. &
-                   IVGTYP(I,J) == LCZ_3      .or. IVGTYP(I,J) == LCZ_4 .or. IVGTYP(I,J) == LCZ_5 .or. &
-                   IVGTYP(I,J) == LCZ_6      .or. IVGTYP(I,J) == LCZ_7 .or. IVGTYP(I,J) == LCZ_8 .or. &
-                   IVGTYP(I,J) == LCZ_9      .or. IVGTYP(I,J) == LCZ_10 .or. IVGTYP(I,J) == LCZ_11 )THEN
+               IF( IVGTYP(I,J) == ISURBAN    .or. IVGTYP(I,J) == LCZ_1_TABLE .or. IVGTYP(I,J) == LCZ_2_TABLE .or. &
+                   IVGTYP(I,J) == LCZ_3_TABLE      .or. IVGTYP(I,J) == LCZ_4_TABLE .or. IVGTYP(I,J) == LCZ_5_TABLE .or. &
+                   IVGTYP(I,J) == LCZ_6_TABLE      .or. IVGTYP(I,J) == LCZ_7_TABLE .or. IVGTYP(I,J) == LCZ_8_TABLE .or. &
+                   IVGTYP(I,J) == LCZ_9_TABLE      .or. IVGTYP(I,J) == LCZ_10_TABLE .or. IVGTYP(I,J) == LCZ_11_TABLE )THEN
                  Q2(I,J)  = (FVEGXY(I,J)*Q2MVXY(I,J) + (1.-FVEGXY(I,J))*Q2MBXY(I,J))*(1.-FRC_URB2D(I,J)) +   &
                              Q2_URB2D(I,J)*FRC_URB2D(I,J)
                  T2(I,J)  = (FVEGXY(I,J)*T2MVXY(I,J) + (1.-FVEGXY(I,J))*T2MBXY(I,J))*(1.-FRC_URB2D(I,J)) +   &
@@ -3615,17 +3670,34 @@ CONTAINS
          ENDIF
 
          IF((SF_URBAN_PHYSICS.eq.2).OR.(SF_URBAN_PHYSICS.eq.3)) THEN
+            !     write(*,*)'entering section',j_start(ij),j_end(ij),i_start(ij),i_end(ij)
            DO j=j_start(ij),j_end(ij)                             !urban
              DO i=i_start(ij),i_end(ij)                           !urban
-                IF( IVGTYP(I,J) == ISURBAN    .or. IVGTYP(I,J) == LCZ_1 .or. IVGTYP(I,J) == LCZ_2 .or. &
-                    IVGTYP(I,J) == LCZ_3      .or. IVGTYP(I,J) == LCZ_4 .or. IVGTYP(I,J) == LCZ_5 .or. &
-                    IVGTYP(I,J) == LCZ_6      .or. IVGTYP(I,J) == LCZ_7 .or. IVGTYP(I,J) == LCZ_8 .or. &
-                    IVGTYP(I,J) == LCZ_9      .or. IVGTYP(I,J) == LCZ_10 .or. IVGTYP(I,J) == LCZ_11 )THEN
-                T2(I,J)   = TH_PHY(i,1,j)/((1.E5/PSFC(I,J))**RCP) !urban
+!CORDEX - BUG
+                IF( IVGTYP(I,J) == ISURBAN    .or. IVGTYP(I,J) == LCZ_1_TABLE .or. IVGTYP(I,J) == LCZ_2_TABLE .or. &
+                    IVGTYP(I,J) == LCZ_3_TABLE      .or. IVGTYP(I,J) == LCZ_4_TABLE .or. IVGTYP(I,J) == LCZ_5_TABLE .or. &
+                    IVGTYP(I,J) == LCZ_6_TABLE      .or. IVGTYP(I,J) == LCZ_7_TABLE .or. IVGTYP(I,J) == LCZ_8_TABLE .or. &
+                    IVGTYP(I,J) == LCZ_9_TABLE      .or. IVGTYP(I,J) == LCZ_10_TABLE .or. IVGTYP(I,J) == LCZ_11_TABLE )THEN
+!CORDEX - BUG
+                T2VEG_URB2D(I,J)  = FVEGXY(I,J)*T2MVXY(I,J) + (1.-FVEGXY(I,J))*T2MBXY(I,J)
+              !  T2(I,J)   = TH_PHY(i,1,j)/((1.E5/PSFC(I,J))**RCP) !urban
+                T2(I,J)=FRC_URB2D(I,J)*T2G_URB2D(I,J)+(1.-FRC_URB2D(I,J))*T2VEG_URB2D(I,J)
                 TH2(I,J) = TH_PHY(i,1,j) !urban
                 Q2(I,J)   = qv_curr(i,1,j)  !urban
                 U10(I,J)  = U_phy(I,1,J)                       !urban
                 V10(I,J)  = V_phy(I,1,J)                       !urban
+!CORDEX ! for non urban points put 1.e20 for urban diagnostic variables
+                else
+                 tsk_rural(i,j)=1.e20
+                 tcan_urb2d(i,j)=1.e20
+                 ucan_urb2d(i,j)=1.e20
+                 qcan_urb2d(i,j)=1.e20
+                 t2g_urb2d(i,j)=1.e20
+                 t2r_urb2d(i,j)=1.e20
+                 t2veg_urb2d(i,j)=1.e20
+                 troof_urb2d(i,j)=1.e20
+                 tground_urb2d(i,j)=1.e20
+!CORDEX
                END IF                                             !urban
              ENDDO                                                !urban
            ENDDO                                                  !urban
