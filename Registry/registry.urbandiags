@@ -33,6 +33,7 @@ rconfig   real       cswin                namelist,physics      1       2.268e+0
 rconfig   real       temp_rat             namelist,physics      1           0.001     rh{12}  "temp_rat"                     "power of the A.C. heating/cooling the indoor air [K/s]"
 rconfig   real       hum_rat              namelist,physics      1          1.e-06     rh{12}  "hum_rat"                      "power of the A.C. drying/moistening the indoor air [(Kg/kg)/s]"
 rconfig   real       effpv                namelist,physics      1            0.19     rh{12}  "effpv"                        "Efficiency of PV panels installed at the roofs, typical values [0.10,0.15]"
+rconfig   integer    ikanda               namelist,physics      1               1     rh{12}  "ikanda"                       "Kanda et al. (2007) fromula to estimate roughness length for heat - same as for SLUCM"
 
 # data values related to different urban-dimensions
 rconfig   real       dzg_urban            namelist,physics     max_num_urban_ng   (/0.2,0.12,0.08,0.05,0.03,0.02,0.02,0.01,0.005,0.0025,0.,0.,0.,0.,0.,0.,0.,0.,0.,0./)  r{h12}    "dzg_urban"     "Layer sizes in the ground"   "m"
