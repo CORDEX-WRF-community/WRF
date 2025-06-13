@@ -4827,6 +4827,7 @@ use module_wrf_error
       real ua                   ! wind speed
       real va                   ! wind speed
       real z0                   ! Roughness length
+      real z0t                  ! Roughness length for heat
       real da                   ! air density
       real qv
 !CORDEX
