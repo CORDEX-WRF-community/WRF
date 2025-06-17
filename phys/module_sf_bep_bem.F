@@ -78,6 +78,7 @@ use module_wrf_error
                       nurbmax, ndm, nz_um, ng_u, ngr_u,                            &
                       nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num, dz_u, h_water,   &
                       emins, albins, thickwin, cswin, temp_rat, hum_rat, effpv,    &
+                      urbanfirst,                                                  &
                       alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,                 &
                       albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,                 &
                       gr_flag_u, gr_type_u, gr_frac_roof_u, pv_frac_roof_u,        &
@@ -211,7 +212,7 @@ use module_wrf_error
    REAL, INTENT(in)                                               :: dz_u, h_water
    REAL, INTENT(in)                                               :: emins, albins, thickwin, cswin,  &
      temp_rat, hum_rat, effpv
-
+   INTEGER, INTENT(inout)                                         :: urbanfirst
 #ifdef URBANSTATE
    REAL, DIMENSION(1:num_urban_nz)                                :: ua_u1D, va_u1D, pt_u1D, da_u1D,  &
      pt0_u1D, pr_u1D, qv_u1D
@@ -436,6 +437,8 @@ use module_wrf_error
       logical first
       character(len=80) :: text
 
+      ! L. Fita, UBA-CIMA-IFAECI, June 2025
+      ! first does not seems to be working, this is why urbanfirst (kept in grid)
       data first/.true./
       save first,time_bep
 
@@ -446,7 +449,7 @@ use module_wrf_error
       CHARACTER(len=512)                                 :: errmsg
       LOGICAL                                            :: found
        
-! L. Fita, UBA/CIMA/IFAECI, March 2025
+! L. Fita, UBA-CIMA-IFAECI, March 2025
 ! Because, urban dimension are now passed as arguments, these variables can not be preserved using 
 !   SAVE, the unique way I can see is to include them into the grid structure... 
 !   Their definition is provided in Registry/registry.urbandiags
@@ -676,8 +679,8 @@ use module_wrf_error
       enddo
 
 
-      if (first) then                           ! True only on first call
-         ! L. Fita, UBA/CIMA/IFAECI
+      if (first .AND. urbanfirst == 0) then                           ! True only on first call
+         ! L. Fita, UBA-CIMA-IFAECI
          !  Initializing time_bep
          time_bep = 0
 
@@ -696,6 +699,7 @@ use module_wrf_error
                       nurbm, ndm, nz_um, dz_u)
    
         first=.false.
+        urbanfirst = 1
 
       endif ! first
 
@@ -2130,7 +2134,7 @@ use module_wrf_error
 ! END VARIABLES DEFINITIONS
 ! ----------------------------------------------------------------------  
 
-! L. Fita, UBA/CIMA/IFAECI, March 2025
+! L. Fita, UBA-CIMA-IFAECI, March 2025
 !   Some variables are removed from this initialization, since now they are defined via the
 !     namelist.input, with their generic definition kept in Registry/registry.urbandiags
 !     these are: dzw,dzr,dzf,dzgb

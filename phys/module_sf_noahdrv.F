@@ -118,7 +118,7 @@ CONTAINS
                   nwr_u, nf_u, ngb_u, nbui_max, p_num, q_num,   &
                   dz_u, h_water,                                &
                   emins, albins, thickwin, cswin, temp_rat,     &
-                  hum_rat, effpv,                               &
+                  hum_rat, effpv, urbanfirst,                   &
                   alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,  &
                   albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,  &
                   gr_flag_u, gr_type_u, gr_frac_roof_u,         & 
@@ -714,6 +714,7 @@ CONTAINS
    REAL, INTENT(in)                                      :: dz_u, h_water
    REAL, INTENT(in)                                      :: emins, albins, thickwin, cswin, temp_rat, &
      hum_rat, effpv
+   INTEGER, INTENT(inout)                                :: urbanfirst
    REAL, DIMENSION(nurbmax), INTENT(inout)               :: alag_u, alaw_u, alar_u, csg_u, csw_u,csr_u
    REAL, DIMENSION(nurbmax), INTENT(inout)               :: albg_u, albw_u, albr_u, emg_u, emw_u,     &
      emr_u, gr_frac_roof_u, pv_frac_roof_u, albwin_u, emwind_u
@@ -1693,6 +1694,7 @@ CONTAINS
                 ua_u3D, va_u3D, pt_u3D, da_u3D, pt0_u3D, pr_u3D,       &
 #endif
                nurbmax,      ndm,    nz_um,    ng_u, nwr_u,  dz_u,     &
+            urbanfirst,                                                &
                 alag_u,    alaw_u,   alar_u,   csg_u, csw_u, csr_u,    &
                 albg_u,    albw_u,   albr_u,   emg_u, emw_u, emr_u,    &
                  z0g_u,     z0r_u,     nd_u,  strd_u, drst_u,          &
@@ -1751,7 +1753,8 @@ CONTAINS
                 nurbmax, ndm, nz_um,  ng_u,        ngr_u, nwr_u,       &
                 nf_u, ngb_u,  nbui_max, p_num, q_num, dz_u, h_water,   &
                 emins, albins, thickwin, cswin, temp_rat, hum_rat,     &
-                effpv, alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,    &
+                effpv, urbanfirst,                                     &
+                alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,           &
                 albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,           &
                 gr_flag_u, gr_type_u, gr_frac_roof_u, pv_frac_roof_u,  &
                 albwin_u, emwind_u, z0g_u, z0r_u,                      &
@@ -2559,7 +2562,7 @@ SUBROUTINE lsm_mosaic(DZ8W,QV3D,P8W3D,T3D,TSK,                      &
                   emins, albins,                                  &
                   thickwin, cswin,                                &
                   temp_rat,                                       &
-                  hum_rat, effpv,                                 &
+                  hum_rat, effpv, urbanfirst,                     &
                   alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,    &
                   albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,    &
                   gr_flag_u, gr_type_u, gr_frac_roof_u,           &
@@ -3141,7 +3144,7 @@ SUBROUTINE lsm_mosaic(DZ8W,QV3D,P8W3D,T3D,TSK,                      &
    REAL, INTENT(in)                                               :: dz_u, h_water
    REAL, INTENT(in)                                               :: emins, albins, thickwin, cswin,  &
      temp_rat, hum_rat, effpv
-
+   INTEGER, INTENT(inout)                                         :: urbanfirst
 #ifdef URBANSTATE
 ! Data interpolated from the "mesoscale grid" to the "urban grid" (num_urban_nz)
 ! ua_u3D: Wind speed in the x direction [ms-1]

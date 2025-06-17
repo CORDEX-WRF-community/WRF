@@ -61,6 +61,7 @@ use module_wrf_error
 !   have been changed from the use of their maximum value (defined in frame/module_driver_constants.F)
 !   to the actual value passed from the namelist.input
                       nurbmax, ndm, nz_um, ng_u, nwr_u, dz_u,         &
+                      urbanfirst,                                     &
                       alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,    &
                       albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,    &
                       z0g_u, z0r_u, nd_u, strd_u, drst_u,             &
@@ -138,6 +139,7 @@ use module_wrf_error
    INTEGER, INTENT(in)                                            :: num_urban_nz
    INTEGER, INTENT(in)                                            :: nurbmax, ndm, nz_um, ng_u, nwr_u
    REAL, INTENT(in)                                               :: dz_u
+   INTEGER, INTENT(inout)                                         :: urbanfirst
    ! Layer sizes in the ground
    REAL, DIMENSION(ng_u), INTENT(in)                     :: dzg_u
    ! Layers sizes in the roof
@@ -295,10 +297,12 @@ use module_wrf_error
       real time_h,tempo
       logical first
       character(len=80) :: text
+      ! L. Fita, UBA-CIMA-IFAECI, June 2025
+      ! first does not seems to be working, this is why urbanfirst (kept in grid)
       data first/.true./
       save first,time_bep 
 
-! L. Fita, UBA/CIMA/IFAECI, March 2025
+! L. Fita, UBA-CIMA-IFAECI, March 2025
 ! Because, urban dimension are now passed as arguments, these variables can not be preserved using 
 !   SAVE, the unique way I can see is to include them into the grid structure... 
 !   Their definition is provided in Registry/registry.urbandiags
@@ -377,7 +381,7 @@ use module_wrf_error
       enddo
 
 
-      if (first) then                           ! True only on first call
+      if (first .AND. urbanfirst == 0) then                           ! True only on first call
          
          call init_para(alag_u,alaw_u,alar_u,csg_u,csw_u,csr_u,            &
                 nurbm, nz_um, ndm,                                         &
@@ -390,6 +394,7 @@ use module_wrf_error
                 nz_um, nurbm, dz_u)
           
          first=.false.
+         urbanfirst = 1
 
       endif ! first
 
