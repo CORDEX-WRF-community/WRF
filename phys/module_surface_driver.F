@@ -3,10 +3,11 @@
 MODULE module_surface_driver
   real, private, parameter :: QVAPOR_MIN = 0.0, SMOIS_MIN = 0.0, SMOIS_MAX = 1.0
 
-! L. Fita, UBA/CIMA/IFAECI, April 2025
+! L. Fita, UBA-CIMA-IFAECI, April 2025
 ! Defition of a type strutcture to hold all the urban non-dimensional scalar values to avoid error
+! (...)
 !  module_surface_driver.f90(298): error #6250: There are too many dummy arguments for a FUNCTION or 
-!    SUBROUTINE subprogram.  The limit is 255.
+!    SUBROUTINE subprogram.  The limit for intel compiler is 255.
 
   TYPE urban_scalar_values
     ! Default values are provided in Registry/registry.urbandiags an accessible from namelist.input
@@ -32,6 +33,10 @@ MODULE module_surface_driver
     REAL                                                 :: hum_rat
     ! Efficiency of PV panels installed at the roofs, typical values [0.10,0.15]
     REAL                                                 :: effpv
+    ! Kanda et al. (2007) fromula to estimate roughness length for heat - same as for SLUCM (0:no, 1: yes)
+    INTEGER                                              :: ikanda
+    ! First time urban
+    INTEGER                                              :: urbanfirst
   END TYPE urban_scalar_values
 
   TYPE irrigation_scalar_values
@@ -81,6 +86,24 @@ MODULE module_surface_driver
     ! SNOWSI_LOGICAL
     INTEGER                                              :: ifndsnowsi
   END TYPE cryosphere_scalar_values
+
+
+  ! surface perturbations
+  TYPE sfcperturb_scalar_values
+    !  turn on stochastic perturbations tailored for solar energy applications
+    INTEGER                                              :: multi_perturb
+    ! set to =.true. to activate perturbations to Noah LSM
+    LOGICAL                                              :: pert_noah
+    ! perturb qv (water vapor mixing ratio)
+    REAL                                                 :: pert_noah_qv
+    ! perturb temperature
+    REAL                                                 :: pert_noah_t
+    ! perturb smois (soil moisture)
+    REAL                                                 :: pert_noah_smois
+    ! perturb tslb (soil temperature)
+    REAL                                                 :: pert_noah_tslb
+  END TYPE sfcperturb_scalar_values
+
 
 CONTAINS
 
@@ -415,10 +438,11 @@ CONTAINS
      &          ,spp_pbl,pattern_spp_pbl                              &  !SPP
      &          ,XLAIDYN                                              &
   ! WRF-Solar EPS
-     &          ,multi_perturb                                        & 
-     &          ,pert_noah, perts_qvapor, perts_th, perts_smois       &
-     &          ,perts_tsoil, pert_noah_qv, pert_noah_t               &
-     &          ,pert_noah_smois, pert_noah_tslb                      &
+!     &          ,multi_perturb                                        & 
+!     &          ,pert_noah, perts_qvapor, perts_th, perts_smois       &
+!     &          ,perts_tsoil, pert_noah_qv, pert_noah_t               &
+!     &          ,pert_noah_smois, pert_noah_tslb                      &
+     &          ,sfcperturb_scalars                                   &
      &          ,irrigation, sf_surf_irr_scheme, irrigation_scalars   &
      &          ,irr_rand_field)
 
@@ -741,9 +765,7 @@ CONTAINS
    REAL , INTENT(IN )::   V_FRAME
 
      ! WRF-Solar EPS
-   integer, intent(in) :: multi_perturb 
-   logical, intent(in) :: pert_noah
-   real, intent(in):: pert_noah_qv,pert_noah_t, pert_noah_smois,pert_noah_tslb
+   TYPE (sfcperturb_scalars_values)                      :: sfcperturb_scalars
    real, dimension (ims:ime, kms:kme, jms:jme) ,intent(inout), optional :: perts_qvapor, perts_th, &
        perts_smois, perts_tsoil
 
@@ -2917,6 +2939,7 @@ CONTAINS
                 urban_scalars%thickwin, urban_scalars%cswin,    &
                 urban_scalars%temp_rat,                         &
                 urban_scalars%hum_rat, urban_scalars%effpv,     &
+                urban_scalars%urbanfirst,                       &
                 alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,    &
                 albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,    &
                 gr_flag_u, gr_type_u, gr_frac_roof_u,           &
@@ -2983,12 +3006,14 @@ CONTAINS
 !
 !  END FASDAS
 !
-               if (pert_noah .and. multi_perturb == 1) then
+               if (sfcperturb_scalars%pert_noah .and. sfcperturb_scalars%multi_perturb == 1) then
                  allocate (tslb_tmp(i_start(ij):i_end(ij), 1:num_soil_layers, j_start(ij):j_end(ij)))
                  allocate (smois_tmp(i_start(ij):i_end(ij), 1:num_soil_layers, j_start(ij):j_end(ij)))
 
-                 call Add_multi_perturb_lsm_perturbations (perts_qvapor, perts_th, perts_smois, perts_tsoil, &
-                   pert_noah_qv, pert_noah_t, pert_noah_smois, pert_noah_tslb, t_phy, qv_curr, tslb, smois, &
+                 call Add_multi_perturb_lsm_perturbations (perts_qvapor, perts_th, perts_smois, perts_tsoil,  &
+                   sfcperturb_scalars%pert_noah_qv, sfcperturb_scalars%pert_noah_t,                           &
+                   sfcperturb_scalars%pert_noah_smois, sfcperturb_scalars%pert_noah_tslb,                     &
+                   t_phy, qv_curr, tslb, smois,                                                               &
                    tslb_tmp, smois_tmp, num_soil_layers, i_start(ij), i_end(ij), j_start(ij), j_end(ij), ims, &
                    ime, jms, jme, kms, kme, kts, kte)
                end if
@@ -3080,6 +3105,7 @@ CONTAINS
                 urban_scalars%thickwin, urban_scalars%cswin,    &
                 urban_scalars%temp_rat,                         &
                 urban_scalars%hum_rat, urban_scalars%effpv,     &
+                urban_scalars%urbanfirst,                       &
                 alag_u, alaw_u, alar_u, csg_u, csw_u, csr_u,    &
                 albg_u, albw_u, albr_u, emg_u, emw_u, emr_u,    &
                 gr_flag_u, gr_type_u, gr_frac_roof_u,           &
@@ -3111,9 +3137,11 @@ CONTAINS
                 ,RS,XLAIDYN,IRRIGATION_CHANNEL)
          ENDIF
 
-         if (pert_noah .and. multi_perturb == 1) then
+         if (sfcperturb_scalars%pert_noah .and. sfcperturb_scalars%multi_perturb == 1) then
            call Remove_multi_perturb_lsm_perturbations (perts_qvapor, perts_th, perts_smois, perts_tsoil, &
-               pert_noah_qv, pert_noah_t, pert_noah_smois, pert_noah_tslb, t_phy, qv_curr, tslb, smois, &
+               sfcperturb_scalars%pert_noah_qv, sfcperturb_scalars%pert_noah_t,                           &
+               sfcperturb_scalars%pert_noah_smois, sfcperturb_scalars%pert_noah_tslb,                     &
+               t_phy, qv_curr, tslb, smois,                                                               &
                tslb_tmp, smois_tmp, num_soil_layers, i_start(ij), i_end(ij), j_start(ij), j_end(ij), ims, &
                ime, jms, jme, kms, kme, kts, kte)
            deallocate (tslb_tmp)
@@ -3475,7 +3503,7 @@ CONTAINS
                 urban_scalars%q_num,     urban_scalars%dz_urban, urban_scalars%h_water,     &
                 urban_scalars%emins,   urban_scalars%albins, urban_scalars%thickwin,        &
                 urban_scalars%cswin, urban_scalars%temp_rat, urban_scalars%hum_rat,         &
-                urban_scalars%effpv,                                                        &
+                urban_scalars%effpv, urban_scalars%urbanfirst,                              &
                              alag_u,         alaw_u,  alar_u, csg_u,      csw_u,     csr_u, &
                              albg_u,         albw_u,  albr_u, emg_u,          emw_u, emr_u, &
                           gr_flag_u,      gr_type_u, gr_frac_roof_u,        pv_frac_roof_u, &
