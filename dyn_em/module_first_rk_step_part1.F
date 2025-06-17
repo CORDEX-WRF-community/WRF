@@ -42,7 +42,7 @@ CONTAINS
     USE module_configure, ONLY : grid_config_rec_type, model_config_rec
     USE module_radiation_driver, ONLY : pre_radiation_driver, radiation_driver
     USE module_surface_driver, ONLY : surface_driver, urban_scalar_values, irrigation_scalar_values,  &
-      cryosphere_scalar_values, surfperturb_scalar_values
+      cryosphere_scalar_values, sfcperturb_scalar_values
     USE module_cumulus_driver, ONLY : cumulus_driver
     USE module_shallowcu_driver, ONLY : shallowcu_driver
     USE module_pbl_driver, ONLY : pbl_driver
@@ -1218,7 +1218,7 @@ BENCH_START(surf_driver_tim)
   ! WRF-Solar EPS: Noah LSM
      &        ,sfcperturb_scalars = sfcperturb_scalars                               &
 !     &        ,multi_perturb=config_flags% multi_perturb                             & 
-     &        ,pert_noah=config_flags%pert_noah                                      &
+!     &        ,pert_noah=config_flags%pert_noah                                      &
      &        ,perts_qvapor=grid%pert3d(:,:,:,P_PQVAPOR)                             &
      &        ,perts_th=grid%pert3d(:,:,:,P_PTH)                                     &
      &        ,perts_smois=grid%pert3d(:,:,:,P_PSMOIS)                               &

@@ -438,9 +438,8 @@ CONTAINS
      &          ,spp_pbl,pattern_spp_pbl                              &  !SPP
      &          ,XLAIDYN                                              &
   ! WRF-Solar EPS
-!     &          ,multi_perturb                                        & 
-!     &          ,pert_noah, perts_qvapor, perts_th, perts_smois       &
-!     &          ,perts_tsoil, pert_noah_qv, pert_noah_t               &
+     &          , perts_qvapor, perts_th, perts_smois, perts_tsoil    &
+!     &          , pert_noah_qv, pert_noah_t               &
 !     &          ,pert_noah_smois, pert_noah_tslb                      &
      &          ,sfcperturb_scalars                                   &
      &          ,irrigation, sf_surf_irr_scheme, irrigation_scalars   &
@@ -765,7 +764,7 @@ CONTAINS
    REAL , INTENT(IN )::   V_FRAME
 
      ! WRF-Solar EPS
-   TYPE (sfcperturb_scalars_values)                      :: sfcperturb_scalars
+   TYPE (sfcperturb_scalar_values), INTENT(inout)        :: sfcperturb_scalars
    real, dimension (ims:ime, kms:kme, jms:jme) ,intent(inout), optional :: perts_qvapor, perts_th, &
        perts_smois, perts_tsoil
 
@@ -1129,7 +1128,7 @@ CONTAINS
    INTEGER, INTENT(in)                                   :: num_urban_nz
    INTEGER, INTENT(in)                                   :: nurbmax, ndm, nz_um, ng_u, ngr_u, nwr_u,  &
      nf_u, ngb_u, nbui_max
-   TYPE(urban_scalar_values), INTENT(in)                 :: urban_scalars
+   TYPE(urban_scalar_values), INTENT(inout)              :: urban_scalars
    REAL, DIMENSION(nurbmax), INTENT(inout)               :: alag_u, alaw_u, alar_u, csg_u, csw_u,csr_u
    REAL, DIMENSION(nurbmax), INTENT(inout)               :: albg_u, albw_u, albr_u, emg_u, emw_u,     &
      emr_u, gr_frac_roof_u, pv_frac_roof_u, albwin_u, emwind_u
