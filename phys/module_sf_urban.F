@@ -2538,7 +2538,8 @@ ENDIF
                              TRV_URB4D_clpd, QR_URB4D_clpd,                &
 #endif
 
-                             FRC_URB2D, UTYPE_URB2D,USE_WUDAPT_LCZ)                         ! inout
+                             FRC_URB2D, UTYPE_URB2D,USE_WUDAPT_LCZ,        &                         ! inout
+                             urbanfirst)
    IMPLICIT NONE
 
    INTEGER, INTENT(IN) :: ISURBAN, sf_urban_physics,use_wudapt_lcz
@@ -2659,6 +2660,8 @@ ENDIF
 !
    REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: FRC_URB2D
    INTEGER, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: UTYPE_URB2D
+   
+   INTEGER, INTENT(inout)                                :: urbanfist
 
 #ifdef URBANCOLAPSE
 ! L. Fita, CIMA, UBA-CONICET-CRNS-IRD IFAECI
@@ -2765,6 +2768,8 @@ ENDIF
    INTEGER :: I,J,K,CHECK
 
    CHECK = 0
+   
+   urbanfirst = 0
 
 #ifdef URBANCOLAPSE                      
    urban_map_zrd_mask = 0
