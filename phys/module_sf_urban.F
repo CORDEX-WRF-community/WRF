@@ -2661,7 +2661,7 @@ ENDIF
    REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: FRC_URB2D
    INTEGER, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: UTYPE_URB2D
    
-   INTEGER, INTENT(inout)                                :: urbanfist
+   INTEGER, INTENT(inout)                                :: urbanfirst
 
 #ifdef URBANCOLAPSE
 ! L. Fita, CIMA, UBA-CONICET-CRNS-IRD IFAECI
