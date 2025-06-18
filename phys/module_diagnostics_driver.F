@@ -191,10 +191,8 @@ CONTAINS
       TYPE(WRFU_TimeInterval)                            :: dtint, histint, aux9int, aux23int
       CHARACTER(len=256)                                 :: message, timestr
 #ifdef CDXWRF
-#if CDXWRF==3
       INTEGER                                            :: i
       CHARACTER(len=1024)                                :: msg
-#endif
 #endif
 
 #endif
@@ -1331,7 +1329,7 @@ CONTAINS
          CALL wrf_debug ( 100 , '--> CALL DIAGNOSTICS PACKAGE: CORDEX DIAGNOSTICS' )
          
 #ifdef CDXWRF
-#if CDXWRF==3
+#if CDXWRF>=2
          ! Initialization (there might be a more correct way to do it)
          !   Trying to imitate what is done for eta_levels in 'dyn_em/module_initialize_real.F'
 ! Removing IF, might it work?
@@ -1422,7 +1420,7 @@ CONTAINS
                     ,FOGVARS = config_flags%fogvars                        &
                     ,ZMLAGEN_DIAG = config_flags%zmlagen_diag              &
 #ifdef CDXWRF
-#if CDXWRF==3
+#if CDXWRF>=2
                     ,NHTASRNG = config_flags%nhtasrng                      &
                     ,NHHURSRNG = config_flags%nhhursrng                    &
                     ,NLTASRNG = config_flags%nltasrng                      &
@@ -1490,9 +1488,9 @@ CONTAINS
                     !      CDM = (ust/wss)**2
                     ,CHS=grid%ch, CDM=grid%cd, BR=grid%br, ZOL=grid%zol    &
 #ifdef CDXWRF
-#if CDXWRF==1
+#if CDXWRF>=1
 
-#elif CDXWRF>=2
+#elif CDXWRF>=3
                     ,DIABH=grid%h_diabatic                                 &
                     ,QVTTEND=grid%qvttend, QCTTEND=grid%qcttend            & 
                     ,QRTTEND=grid%qrttend, QSTTEND=grid%qsttend            &
@@ -1575,6 +1573,8 @@ CONTAINS
                     ,TDSMEAN=grid%tdsmean                                  &
                     ,TWSMIN=grid%twsmin, TWSMAX=grid%twsmax                &
                     ,TWSMEAN=grid%twsmean                                  &
+#endif
+#if CDXWRF>=3
                     !! Water-budget
                     ,WBACDH=grid%wbacdiabh                                 & 
                     ,WBACPW=grid%wbacpw, WBACPWC=grid%wbacpwc              &
@@ -1628,7 +1628,7 @@ CONTAINS
                     ,WBACZLH=grid%wbaczlh, WBACZMH=grid%wbaczmh            &
                     ,WBACZHH=grid%wbaczhh                                  &
 #endif
-#if CDXWRF==3
+#if CDXWRF>=2
                     ,TASHURSTRESHIGHRES=grid%tashurstreshighres            &
                     ,TASHURSTRESLOWRES=grid%tashurstreslowres              &
 #endif

@@ -100,7 +100,7 @@ MODULE module_diag_cordex
 !!! snd: mean snow depth [m]
 !!! mrros: mean surface Runoff [kgm-2s-1]
 !!! mrro: mean total  Runoff [kgm-2s-1]
-!!! mrsol: mean total water content of soil layer [kgm-2]
+!!! mrsol: water content of soil layer [kgm-2]
 !!! flxpr: precipitation flux [kgm-2s-1]
 !!! flxprl: large scale precipitation flux [kgm-2s-1]
 !!! flxprc: convective precipitation flux [kgm-2s-1]
@@ -198,7 +198,7 @@ CONTAINS
                       visibility_diag, fogvars, zmlagen_diag,                                         &
 
 #ifdef CDXWRF
-#if CDXWRF==3
+#if CDXWRF>=2
                       Nhtasrng, Nhhursrng, Nltasrng, Nlhursrng,                                       &
                       Nhtashursrng, Nltashursrng,                                                     &
                       tashrng, hurshrng, taslrng, hurslrng,                                           &
@@ -232,7 +232,7 @@ CONTAINS
 #if CDXWRF>=1
 #endif
 
-#if CDXWRF>=2
+#if CDXWRF>=3
                       diabh,                                                                          &
                       qvttend, qcttend, qrttend, qsttend, qittend, qgttend, qhttend,                  &
                       qvhadv, qchadv, qrhadv, qshadv, qihadv, qghadv, qhhadv,                         &
@@ -259,7 +259,7 @@ CONTAINS
                       cdcdx, cdgen,                                                                   &
                       snc, snd,                                                                       &
                       pmrros, pmrro,                                                                  &
-                      mrros, mrro, mrsol,                                                             &
+                      mrros, mrro, mrsol, mrsos,                                                      &
                       flxpr, flxprl, flxprc, flxprsh, flxprsn, snw,                                   &
                       rsdt, rsut, rlut,                                                               &
                       tas_hm, qvs_hm,                                                                 &
@@ -272,17 +272,15 @@ CONTAINS
                       capemean, cinmean, zlfcmean, plfcmean,                                          &
                       iutmean, ivtmean,                                                               &
                       zeroith,                                                                        &
-
-#endif
-#if CDXWRF==1
                       lidxmin, lidxmax, lidxmean,                                                     &
 #endif
 #if CDXWRF>=2
-                      lidxmin, lidxmax, lidxmean,                                                     &
                       ua, va, ws, zg, ta, press, hur, hus,                                            &
                       tfog, fogvisbltymin, fogvisbltymax, fogvisbltymean,                             &
                       tdsmin, tdsmax, tdsmean,                                                        &
                       twsmin, twsmax, twsmean,                                                        &
+#endif
+#if CDXWRF>=3
                    ! Water-budget
                       wbacdh,                                                                         &
                       wbacpw, wbacpwc, wbacpwr, wbacpws, wbacpwi, wbacpwg, wbacpwh,                   &
@@ -297,7 +295,7 @@ CONTAINS
                       wbacpwlg,wbacpwmg,wbacpwhg,wbacflg,wbacfmg, wbacfhg, wbaczlg, wbaczmg, wbaczhg, &
                       wbacpwlh,wbacpwmh,wbacpwhh,wbacflh,wbacfmh, wbacfhh, wbaczlh, wbaczmh, wbaczhh, &
 #endif
-#if CDXWRF==3
+#if CDXWRF>=2
                       tashurstreshighres, tashurstreslowres,                                          &
 #endif
 #endif
@@ -505,6 +503,7 @@ CONTAINS
 ! plfc: Pressure at the Level of free convection [Pa]
 ! lidx: Lifted index [1]
 ! mrso: total soil moisture content [kgm-2]
+! mrsos: first layer soil moisture content (0-10 cm) [kgm-2]
 ! slw: total liquid water content [kgm-2]
 ! wbacpw, wbacpw[c/r/s/i/g/h]: Water-budget vertically integrated accumulated total tendency for water 
 !   vapour, cloud, rain, snow, ice, graupel, hail [mm]
@@ -551,7 +550,7 @@ CONTAINS
 ! pmrro: previous accumulated mean total  Runoff [kgm-2]
 ! mrros: mean surface Runoff [kgm-2s-1]
 ! mrro: mean total  Runoff [kgm-2s-1]
-! mrsol: mean total water content of soil layer [kgm-2]
+! mrsol: total water content per soil layer [kgm-2]
 ! flxpr: precipitation flux [kgm-2s-1]
 ! flxprl: large scale precipitation flux [kgm-2s-1]
 ! flxprc: convective precipitation flux [kgm-2s-1]
@@ -621,7 +620,7 @@ CONTAINS
 #if CDXWRF>=1
 #endif
 
-#if CDXWRF>=2
+#if CDXWRF>=3
   REAL, DIMENSION(ims:ime,kms:kme,jms:jme), INTENT(in)   :: diabh
   REAL, DIMENSION(ims:ime,kms:kme,jms:jme), INTENT(in)   :: qvttend, qcttend, qrttend, qsttend,       &
     qittend, qgttend, qhttend
@@ -630,7 +629,7 @@ CONTAINS
   REAL, DIMENSION(ims:ime,kms:kme,jms:jme), INTENT(in)   :: qvzadv, qczadv, qrzadv, qszadv, qizadv,   &
     qgzadv, qhzadv
 #endif
-#if CDXWRF==3
+#if CDXWRF>=2
   INTEGER, INTENT(in)                                    :: Nhtasrng, Nhhursrng, Nltasrng, Nlhursrng
   INTEGER, INTENT(in)                                    :: Nhtashursrng, Nltashursrng
   REAL, DIMENSION(Nhtasrng), INTENT(in)                  :: tashrng
@@ -682,9 +681,9 @@ CONTAINS
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: cltmean, cllmean, clmmean, clhmean
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(out)          :: prw, clwvi, clivi
 #ifdef CDXWRF
-#if CDXWRF==1
-  REAL, DIMENSION(ims:ime,kms:kme,jms:jme)               :: ta, press, zg, hur
-#endif
+!#if CDXWRF>=1
+!  REAL, DIMENSION(ims:ime,kms:kme,jms:jme)               :: ta, press, zg, hur
+!#endif
 #if CDXWRF>=1
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(out)          :: zmla
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(out)          :: clgvi, clhvi
@@ -701,6 +700,8 @@ CONTAINS
     fogvisbltymean
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: tdsmin, tdsmax, tdsmean
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: twsmin, twsmax, twsmean
+#endif
+#if CDXWRF>=3
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: wbacdh
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: wbacpw, wbacpwc, wbacpwr, wbacpws,        &
     wbacpwi, wbacpwg, wbacpwh
@@ -719,7 +720,7 @@ CONTAINS
     wbaczlc, wbaczmc, wbaczhc, wbaczlr, wbaczmr, wbaczhr, wbaczls, wbaczms, wbaczhs,                  &
     wbaczli, wbaczmi, wbaczhi, wbaczlg, wbaczmg, wbaczhg, wbaczlh, wbaczmh, wbaczhh
 #endif
-#if CDXWRF==3
+#if CDXWRF>=2
 !  REAL, DIMENSION(ims:ime,jms:jme,Nhtasrng,Nhhursrng),                                                &
 !    INTENT(inout)                                        :: tashurstreshighres
 !  REAL, DIMENSION(ims:ime,jms:jme,Nltasrng,Nlhursrng),                                                &
@@ -734,7 +735,7 @@ CONTAINS
 #endif
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(out)          :: uas, vas, wss, hurs, huss
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(out)          :: psl
-  REAL, DIMENSION(ims:ime,jms:jme), INTENT(out)          :: mrso, slw
+  REAL, DIMENSION(ims:ime,jms:jme), INTENT(out)          :: slw
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: wsgsmax, ugsmax, vgsmax, percengust
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: totwsgsmax, totugsmax, totvgsmax,         &
     totpercengust
@@ -749,7 +750,9 @@ CONTAINS
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: cdgen, evspsblpot, evspsblpotgen
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: snc, snd
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: pmrros, pmrro
-  REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: mrros, mrro, mrsol
+  REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: mrros, mrro, mrsos, mrso
+  REAL, DIMENSION(ims:ime,1:num_soil_layers,jms:jme),                                                 &
+    INTENT(inout)                                        :: mrsol
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: flxpr, flxprl, flxprc, flxprsh, flxprsn,  &
     snw
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: rsdt, rsut, rlut
@@ -794,9 +797,9 @@ CONTAINS
   REAL, DIMENSION(ims:ime,jms:jme)                       :: vis
   REAL, DIMENSION(ims:ime,jms:jme)                       :: tds
   REAL, DIMENSION(ims:ime,jms:jme)                       :: tws
+  INTEGER                                                :: itas, ihurs
 #endif
 #if CDXWRF>=3
-  INTEGER                                                :: itas, ihurs
 #endif
 #endif
 !! End of INSTVALS
@@ -1131,42 +1134,6 @@ CONTAINS
         ! 2m wet-bulb temperature
         CALL var_tws_S11(t2(i,j), hurs(i,j), tws(i,j))
 
-        ! Water budget
-        IF (wbout == 1) THEN
-          WRITE(msg,*)'    ' // TRIM(fname) // ' Water species: vapor:', m_qv,' cloud:', m_qc,        &
-            ' rain:', m_qr, ' snow:', m_qs,' ice:', m_qi, ' graupel:', m_qg,' hail:', m_qh
-          IF (ijdbg) CALL wrf_debug(100,msg)
-
-          ! Grouping variables         
-          CALL moist_group2D(n_moist, dimz, m_qv, m_qc, m_qr, m_qs, m_qi, m_qg, m_qh,                 &
-            qvttend(i,:,j), qcttend(i,:,j), qrttend(i,:,j), qsttend(i,:,j), qittend(i,:,j),           &
-            qgttend(i,:,j), qhttend(i,:,j), qvarttend)
-          IF (ijdbg) THEN
-            WRITE(message,*)'moist ttend 2: v', qvttend(i,2,j), ' c', qcttend(i,2,j), ' r',           &
-              qrttend(i,2,j), ' s', qsttend(i,2,j), ' i', qittend(i,2,j), ' g', qgttend(i,2,j),       &
-              ' h', qhttend(i,2,j)
-            CALL wrf_debug(100,message)
-            WRITE(message,*)'qvarttend:',  qvarttend(2,:)
-            CALL wrf_debug(100,message)
-          END IF
-          CALL moist_group2D(n_moist, dimz, m_qv, m_qc, m_qr, m_qs, m_qi, m_qg, m_qh,                 &
-            qvhadv(i,:,j), qchadv(i,:,j), qrhadv(i,:,j), qshadv(i,:,j), qihadv(i,:,j), qghadv(i,:,j), &
-            qhhadv(i,:,j), qvarhadv)
-          IF (ijdbg) THEN
-            WRITE(message,*)' 2 hadv: v', qvhadv(i,2,j), ' c', qchadv(i,2,j), ' r', qrhadv(i,2,j),   &
-              ' s', qshadv(i,2,j), ' i', qihadv(i,2,j), ' g', qghadv(i,2,j), ' h', qhhadv(i,2,j)
-            CALL wrf_debug(100,message)
-            WRITE(message,*)'qvarhadv:',  qvarhadv(2,:)
-            CALL wrf_debug(100,message)
-          END IF
-          CALL moist_group2D(n_moist, dimz, m_qv, m_qc, m_qr, m_qs, m_qi, m_qg, m_qh,                 &
-            qvzadv(i,:,j), qczadv(i,:,j), qrzadv(i,:,j), qszadv(i,:,j), qizadv(i,:,j), qgzadv(i,:,j), &
-            qhzadv(i,:,j), qvarzadv)
-
-          CALL water_budget(dimz, n_moist, mutot(i,j), deta, dt, qvarttend, qvarhadv, qvarzadv,       &
-            pwqvar(i,:,j,:), fqvar(i,:,j,:), zqvar(i,:,j,:))
-        END IF
-
         ! fog
         ! Avoiding seg faults
         IF (curr_secs2 > 0. ) THEN
@@ -1219,6 +1186,43 @@ CONTAINS
         ELSE
           fog(i,j) = 0
           vis(i,j) = 0.
+        END IF
+#endif
+#if CDXWRF>=3
+        ! Water budget
+        IF (wbout == 1) THEN
+          WRITE(msg,*)'    ' // TRIM(fname) // ' Water species: vapor:', m_qv,' cloud:', m_qc,        &
+            ' rain:', m_qr, ' snow:', m_qs,' ice:', m_qi, ' graupel:', m_qg,' hail:', m_qh
+          IF (ijdbg) CALL wrf_debug(100,msg)
+
+          ! Grouping variables         
+          CALL moist_group2D(n_moist, dimz, m_qv, m_qc, m_qr, m_qs, m_qi, m_qg, m_qh,                 &
+            qvttend(i,:,j), qcttend(i,:,j), qrttend(i,:,j), qsttend(i,:,j), qittend(i,:,j),           &
+            qgttend(i,:,j), qhttend(i,:,j), qvarttend)
+          IF (ijdbg) THEN
+            WRITE(message,*)'moist ttend 2: v', qvttend(i,2,j), ' c', qcttend(i,2,j), ' r',           &
+              qrttend(i,2,j), ' s', qsttend(i,2,j), ' i', qittend(i,2,j), ' g', qgttend(i,2,j),       &
+              ' h', qhttend(i,2,j)
+            CALL wrf_debug(100,message)
+            WRITE(message,*)'qvarttend:',  qvarttend(2,:)
+            CALL wrf_debug(100,message)
+          END IF
+          CALL moist_group2D(n_moist, dimz, m_qv, m_qc, m_qr, m_qs, m_qi, m_qg, m_qh,                 &
+            qvhadv(i,:,j), qchadv(i,:,j), qrhadv(i,:,j), qshadv(i,:,j), qihadv(i,:,j), qghadv(i,:,j), &
+            qhhadv(i,:,j), qvarhadv)
+          IF (ijdbg) THEN
+            WRITE(message,*)' 2 hadv: v', qvhadv(i,2,j), ' c', qchadv(i,2,j), ' r', qrhadv(i,2,j),   &
+              ' s', qshadv(i,2,j), ' i', qihadv(i,2,j), ' g', qghadv(i,2,j), ' h', qhhadv(i,2,j)
+            CALL wrf_debug(100,message)
+            WRITE(message,*)'qvarhadv:',  qvarhadv(2,:)
+            CALL wrf_debug(100,message)
+          END IF
+          CALL moist_group2D(n_moist, dimz, m_qv, m_qc, m_qr, m_qs, m_qi, m_qg, m_qh,                 &
+            qvzadv(i,:,j), qczadv(i,:,j), qrzadv(i,:,j), qszadv(i,:,j), qizadv(i,:,j), qgzadv(i,:,j), &
+            qhzadv(i,:,j), qvarzadv)
+
+          CALL water_budget(dimz, n_moist, mutot(i,j), deta, dt, qvarttend, qvarhadv, qvarzadv,       &
+            pwqvar(i,:,j,:), fqvar(i,:,j,:), zqvar(i,:,j,:))
         END IF
 
 #endif
@@ -1335,7 +1339,12 @@ CONTAINS
           pmrro(i,j) = sfcrunoff(i,j) + udrunoff(i,j)
 
           ! First layer soil
-          mrsol(i,j) = smois(i,1,j)*dzs(1)
+          ! FROM: https://wcrp-cordex.github.io/cordex-cmip6-data-request/
+          mrsos(i,j) = smois(i,1,j)*dzs(1)
+          DO k=1, num_soil_layers
+            mrso(i,j) = smois(i,k,j)*dzs(k)
+            mrsol(i,k,j) = sh2o(i,k,j)*dzs(k)*1000.
+          END DO
 
           ! Precipitations
           flxpr(i,j) = prc(i,j) + prnc(i,j) + prsh(i,j)
@@ -1374,9 +1383,32 @@ CONTAINS
           ! Horizontal water transport
           iutmean(i,j) = iut(i,j)
           ivtmean(i,j) = ivt(i,j)
+
+          ! fog
+          IF (fog(i,j) == 1) THEN
+            tfog(i,j) = dt
+            fogvisbltymin(i,j) = vis(i,j)
+            fogvisbltymax(i,j) = vis(i,j)
+            fogvisbltymean(i,j) = vis(i,j)
+          ELSE
+            tfog(i,j) = 0.
+            fogvisbltymin(i,j) = 0.
+            fogvisbltymax(i,j) = 0.
+            fogvisbltymean(i,j) = 0.
+          END IF
+
+          ! tds
+          tdsmin(i,j) = tds(i,j)
+          tdsmax(i,j) = tds(i,j)
+          tdsmean(i,j) = tds(i,j)
+
+          ! tws
+          twsmin(i,j) = tws(i,j)
+          twsmax(i,j) = tws(i,j)
+          twsmean(i,j) = tws(i,j)
 #endif
 
-#if CDXWRF>=2
+#if CDXWRF>=3
           IF (wbout == 1) THEN
             wbacdh(i,j) = SUM(diabh(i,:,j))*dt
             ! Vertical intervals
@@ -1444,30 +1476,8 @@ CONTAINS
               wbaczhg(i,j), wbaczhh(i,j))
           END IF
 
-          ! fog
-          IF (fog(i,j) == 1) THEN
-            tfog(i,j) = dt
-            fogvisbltymin(i,j) = vis(i,j)
-            fogvisbltymax(i,j) = vis(i,j)
-            fogvisbltymean(i,j) = vis(i,j)
-          ELSE
-            tfog(i,j) = 0.
-            fogvisbltymin(i,j) = 0.
-            fogvisbltymax(i,j) = 0.
-            fogvisbltymean(i,j) = 0.
-          END IF
-
-          ! tds
-          tdsmin(i,j) = tds(i,j)
-          tdsmax(i,j) = tds(i,j)
-          tdsmean(i,j) = tds(i,j)
-
-          ! tws
-          twsmin(i,j) = tws(i,j)
-          twsmax(i,j) = tws(i,j)
-          twsmean(i,j) = tws(i,j)
 #endif
-#if CDXWRF==3
+#if CDXWRF>=2
           ! temporal residence
           ! Checking consistency
           ! L. Fita, January 2024. Removed for efficiency
@@ -1577,9 +1587,17 @@ CONTAINS
             END IF
             WRITE(msg,*) '    iut:', iut(i,j), ' ivt:', ivt(i,j)
             CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    fog:', fog(i,j), ' tfog:', tfog(i,j), ' vis:', vis(i,j), ' vismin:',     &
+              fogvisbltymin(i,j), ' vismax:', fogvisbltymax(i,j), ' vismean:', fogvisbltymean(i,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    tds:', tds(i,j), ' min:', tdsmin(i,j), ' max:', tdsmax(i,j),             &
+              ' mean:', tdsmean(i,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    tws:', tws(i,j), ' min:', twsmin(i,j), ' max:', twsmax(i,j),             &
+              ' mean:', twsmean(i,j)
 #endif
 
-#if CDXWRF>=2
+#if CDXWRF>=3
             WRITE(msg,*) '    diabh:', SUM(diabh(i,:,j))*dt, ' wbacdh:', wbacdh(i,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*) '      dhl:', wbacdhl(i,j), 'dhm:', wbacdhm(i,j), 'dhh:', wbacdhh(i,j)
@@ -1598,17 +1616,9 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'       qv: zh', varlmh(3), ' aczhv:', wbaczhv(i,j)
             CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    fog:', fog(i,j), ' tfog:', tfog(i,j), ' vis:', vis(i,j), ' vismin:',     &
-              fogvisbltymin(i,j), ' vismax:', fogvisbltymax(i,j), ' vismean:', fogvisbltymean(i,j)
-            CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    tds:', tds(i,j), ' min:', tdsmin(i,j), ' max:', tdsmax(i,j),             &
-              ' mean:', tdsmean(i,j)
-            CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    tws:', tws(i,j), ' min:', twsmin(i,j), ' max:', twsmax(i,j),             &
-              ' mean:', twsmean(i,j)
 
 #endif
-#if CDXWRF==3
+#if CDXWRF>=2
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    tashurstreshighres: ',tashurstreshighres(i,INT(Nhtasrng/2*Nhhursrng/2),j),&
               ' tashurstreslowres: ', tashurstreslowres(i,INT(Nltasrng/2*Nlhursrng/2),j)
@@ -1688,7 +1698,11 @@ CONTAINS
           mrro(i,j) = sfcrunoff(i,j) + udrunoff(i,j)
 
           ! Soil
-          mrsol(i,j) = mrsol(i,j) + smois(i,1,j)*dzs(1)
+          mrsos(i,j) = mrsos(i,j) + smois(i,1,j)*dzs(1)
+          DO k=1, num_soil_layers
+            mrso(i,j) = mrso(i,k,j) + smois(i,k,j)*dzs(k)
+            mrsol(i,k,j) = mrsol(i,k,j) + sh2o(i,k,j)*dzs(k)*1000
+          END DO
 
           ! Precipitations
           flxpr(i,j) = flxpr(i,j) + prc(i,j) + prnc(i,j) + prsh(i,j)
@@ -1727,9 +1741,27 @@ CONTAINS
           ! Horizontal water transport
           iutmean(i,j) = iutmean(i,j) + iut(i,j)
           ivtmean(i,j) = ivtmean(i,j) + ivt(i,j)
+
+          ! fog
+          IF (fog(i,j) == 1) THEN
+            tfog(i,j) = tfog(i,j) + dt
+            IF (fogvisbltymin(i,j) > vis(i,j)) fogvisbltymin(i,j) = vis(i,j)
+            IF (fogvisbltymax(i,j) < vis(i,j)) fogvisbltymax(i,j) = vis(i,j)
+            fogvisbltymean(i,j) = fogvisbltymean(i,j) + vis(i,j)
+          END IF
+
+          ! tds
+          IF (tdsmin(i,j) > tds(i,j)) tdsmin(i,j) = tds(i,j)
+          IF (tdsmax(i,j) < tds(i,j)) tdsmax(i,j) = tds(i,j)
+          tdsmean(i,j) = tdsmean(i,j) + tds(i,j)
+
+          ! tws
+          IF (twsmin(i,j) > tws(i,j)) twsmin(i,j) = tws(i,j)
+          IF (twsmax(i,j) < tws(i,j)) twsmax(i,j) = tws(i,j)
+          twsmean(i,j) = twsmean(i,j) + tws(i,j)
 #endif
 
-#if CDXWRF>=2
+#if CDXWRF>=3
 
           IF (wbout == 1) THEN
             wbacdh(i,j) = wbacdh(i,j) + SUM(diabh(i,:,j))*dt
@@ -1828,26 +1860,8 @@ CONTAINS
               wbaczhv(i,j), wbaczhc(i,j), wbaczhr(i,j), wbaczhs(i,j), wbaczhi(i,j),                   &
               wbaczhg(i,j), wbaczhh(i,j))
           END IF
-
-          ! fog
-          IF (fog(i,j) == 1) THEN
-            tfog(i,j) = tfog(i,j) + dt
-            IF (fogvisbltymin(i,j) > vis(i,j)) fogvisbltymin(i,j) = vis(i,j)
-            IF (fogvisbltymax(i,j) < vis(i,j)) fogvisbltymax(i,j) = vis(i,j)
-            fogvisbltymean(i,j) = fogvisbltymean(i,j) + vis(i,j)
-          END IF
-
-          ! tds
-          IF (tdsmin(i,j) > tds(i,j)) tdsmin(i,j) = tds(i,j)
-          IF (tdsmax(i,j) < tds(i,j)) tdsmax(i,j) = tds(i,j)
-          tdsmean(i,j) = tdsmean(i,j) + tds(i,j)
-
-          ! tws
-          IF (twsmin(i,j) > tws(i,j)) twsmin(i,j) = tws(i,j)
-          IF (twsmax(i,j) < tws(i,j)) twsmax(i,j) = tws(i,j)
-          twsmean(i,j) = twsmean(i,j) + tws(i,j)
 #endif
-#if CDXWRF==3
+#if CDXWRF>=2
           ! temporal residence
           CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nhtasrng, Nhhursrng, tashrng, hurshrng,   &
             itas, ihurs)
@@ -1977,8 +1991,17 @@ CONTAINS
             END IF
             WRITE(msg,*) '    iutmean:', iutmean(i,j), ' ivtmean:', ivtmean(i,j)
             CALL wrf_debug(75,msg)            
+            WRITE(msg,*)'    fog:', fog(i,j), ' tfog:', tfog(i,j), ' vis:', vis(i,j), ' vismin:',     &
+              fogvisbltymin(i,j), ' vismax:', fogvisbltymax(i,j), ' vismean:', fogvisbltymean(i,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    tds:', tds(i,j), ' min:', tdsmin(i,j), ' max:', tdsmax(i,j),             &
+              ' mean:', tdsmean(i,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    tws:', tws(i,j), ' min:', twsmin(i,j), ' max:', twsmax(i,j),             &
+              ' mean:', twsmean(i,j)
+            CALL wrf_debug(75,msg)
 #endif
-#if CDXWRF>=2
+#if CDXWRF>=3
             WRITE(msg,*) '    diabh:', SUM(diabh(i,:,j))*dt, ' wbacdh:', wbacdh(i,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*) '      dhl:', wbacdhl(i,j), 'dhm:', wbacdhm(i,j), 'dhh:', wbacdhh(i,j)
@@ -1997,17 +2020,8 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'       qv: zh', varlmh(3), ' aczhv:', wbaczhv(i,j)
             CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    fog:', fog(i,j), ' tfog:', tfog(i,j), ' vis:', vis(i,j), ' vismin:',     &
-              fogvisbltymin(i,j), ' vismax:', fogvisbltymax(i,j), ' vismean:', fogvisbltymean(i,j)
-            CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    tds:', tds(i,j), ' min:', tdsmin(i,j), ' max:', tdsmax(i,j),             &
-              ' mean:', tdsmean(i,j)
-            CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    tws:', tws(i,j), ' min:', twsmin(i,j), ' max:', twsmax(i,j),             &
-              ' mean:', twsmean(i,j)
-            CALL wrf_debug(75,msg)
 #endif
-#if CDXWRF==3
+#if CDXWRF>=2
             WRITE(msg,*)'    tashurstreshighres: ',tashurstreshighres(i,INT(Nhtasrng/2*Nhhursrng/2),j),&
               ' tashurstreslowres: ', tashurstreslowres(i,INT(Nltasrng/2*Nlhursrng/2),j)
             CALL wrf_debug(75,msg)
@@ -2375,6 +2389,17 @@ CONTAINS
             WRITE(msg,*) '    cape:', cape(i,j), ' cin:', cin(i,j),' zlfc:', zlfc(i,j), ' plfc:',     &
               plfc(i,j), 'lidx:', lidx(i,j)
             CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    fog:', fog(i,j), ' tfog:', tfog(i,j), ' vis:', vis(i,j), ' vismin:',     &
+              fogvisbltymin(i,j), ' vismax:', fogvisbltymax(i,j), ' vismean:', fogvisbltymean(i,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    tds:', tds(i,j), ' min:', tdsmin(i,j), ' max:', tdsmax(i,j),             &
+              ' mean:', tdsmean(i,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    tws:', tws(i,j), ' min:', twsmin(i,j), ' max:', twsmax(i,j),             &
+              ' mean:', twsmean(i,j)
+            CALL wrf_debug(75,msg)
+#endif
+#if CDXWRF >=3
             WRITE(msg,*) '    acdh:', wbacdh(i,j), ' dhl:', wbacdhl(i,j), 'dhm:', wbacdhm(i,j),       &
               'dhh:', wbacdhh(i,j)
             CALL wrf_debug(75,msg)
@@ -2387,15 +2412,6 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*) '    WB acz:', wbacz(i,j), 'aczc:', wbaczc(i,j), 'aczr:', wbaczr(i,j),       &
               'acfs:', wbaczs(i,j), 'acfi:', wbaczi(i,j), 'aczg:', wbaczg(i,j), 'aczh:', wbaczh(i,j)
-            CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    fog:', fog(i,j), ' tfog:', tfog(i,j), ' vis:', vis(i,j), ' vismin:',     &
-              fogvisbltymin(i,j), ' vismax:', fogvisbltymax(i,j), ' vismean:', fogvisbltymean(i,j)
-            CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    tds:', tds(i,j), ' min:', tdsmin(i,j), ' max:', tdsmax(i,j),             &
-              ' mean:', tdsmean(i,j)
-            CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    tws:', tws(i,j), ' min:', twsmin(i,j), ' max:', twsmax(i,j),             &
-              ' mean:', twsmean(i,j)
             CALL wrf_debug(75,msg)
 #endif
 #endif
