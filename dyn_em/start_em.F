@@ -1280,6 +1280,15 @@ endif
                       ,grid%NC_CU, grid%NI_CU, grid%NR_CU, grid%NS_CU,grid%CCN_CU                    &
                       ,grid%alevsiz_cu,grid%num_months,grid%no_src_types_cu,grid%aeromcu             &
                       ,grid%aeropcu,grid%EFCG,grid%EFCS,grid%EFIG,grid%EFIS,grid%EFSG,grid%EFSS      &
+#ifdef CDXWRF
+                      ,grid%fracsoil10cm                                                             &
+#if CDXWRF>=2
+                      ,model_config_rec%nhtasrng, model_config_rec%nhhursrng                         &
+                      ,model_config_rec%nltasrng, model_config_rec%nlhursrng                         &
+                      ,grid%htasbins, grid%hhursbins, grid%ltasbins, grid%lhursbins                  &
+#endif
+#endif
+
                       )
        ENDDO ! loop of tiles for phy_init
 

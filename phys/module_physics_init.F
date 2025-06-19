@@ -283,6 +283,13 @@ CONTAINS
                          ,alevsiz_cu,num_months,no_src_types_cu,aeromcu,aeropcu   & ! PSH/TWG 06/10/16                         
                          ,EFCG,EFCS,EFIG,EFIS,EFSG,EFSS                           & ! TWG
 #endif
+#ifdef CDXWRF
+                         ,fracsoil10cm                                            &
+#if CDXWRF>=2
+                         ,nhtasrng, nhhursrng, nltasrng, nlhursrng                &
+                         ,htasbins, hhursbins, ltasbins, lhursbins                &
+#endif
+#endif
                           )
 
 !-----------------------------------------------------------------
@@ -859,6 +866,18 @@ CONTAINS
 
    REAL, OPTIONAL, DIMENSION( ims:ime , kms:kme , jms:jme ) , INTENT(OUT) :: &
              RDCASHTEN, RQCDCSHTEN
+
+#ifdef CDXWRF
+   REAL, DIMENSION(1:num_soil_layers), INTENT(out)       :: fracsoil10cm
+#if CDXWRF>=2
+   INTEGER, INTENT(in)                                   :: nhtasrng, nhhursrng, nltasrng, nlhursrng
+   REAL, DIMENSION(Nhtasrng), INTENT(out)                :: htasbins
+   REAL, DIMENSION(Nhhursrng), INTENT(out)               :: hhursbins
+   REAL, DIMENSION(Nltasrng), INTENT(out)                :: ltasbins
+   REAL, DIMENSION(Nlhursrng), INTENT(out)               :: lhursbins
+#endif
+#endif
+
 
 ! Local data
 
@@ -1757,6 +1776,21 @@ CHARACTER(LEN=8) :: name
       CALL wrf_debug(200 , 'phy_init: Before call to makelut_ccn_icn')
       call makelut_ccn_icn
    end if
+#endif
+
+#ifdef CDXWRF
+  CALL cdxwrf_init(config_flags%num_soil_layers, dzs                                                  &
+#if CDXWRF>=2
+    ,model_config_rec%nhtasrng, model_config_rec%nhhursrng                                            &
+    ,model_config_rec%nltasrng, model_config_rec%nlhursrng                                            &
+    ,model_config_rec%nhtashursrng, model_config_rec%nltashursrng                                     &
+    ,model_config_rec%htasrng, model_config_rec%hhursrng                                              &
+    ,model_config_rec%ltasrng, model_config_rec%lhursrng                                              &
+#endif
+#if CDXWRF>=2    
+    ,htasbins, hhursbins, ltasbins, lhursbins                                                         &
+#endif
+    ,fracsoil10cm)
 #endif
 
    END SUBROUTINE phy_init
@@ -5684,5 +5718,98 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
 #endif
 
   end subroutine compute_2d_dx_area
+
+#ifdef CDXWRF
+  SUBROUTINE cdxwrf_init(num_soil_layers, dzs                                                         &
+#if CDXWRF>=2
+    ,nhtasrng, nhhursrng                                                                              & 
+    ,nltasrng, nlhursrng                                                                              &
+    ,nhtashursrng, nltashursrng                                                                       &
+    ,htasrng, hhursrng, ltasrng, lhursrng                                                             &
+#endif
+    ! Output
+#if CDXWRF>=2    
+    ,htasbins, hhursbins, ltasbins, lhursbins                                                         &
+#endif
+    ,fracsoil10cm)  
+    ! Subroutine to initialize CDXWRF module
+    
+    IMPLICIT NONE
+
+    ! Input
+    INTEGER, INTENT(in)                                  :: num_soil_layers
+    REAL, DIMENSION(1:num_soil_layers), INTENT(in)       :: dzs
+    INTEGER, INTENT(in)                                  :: nhtasrng, nhhursrng, nltasrng, nlhursrng
+    INTEGER, INTENT(in)                                  :: nhtashursrng, nltashursrng
+    REAL, DIMENSION(Nhtasrng), INTENT(in)                :: htasrng
+    REAL, DIMENSION(Nhhursrng), INTENT(in)               :: hhursrng
+    REAL, DIMENSION(Nltasrng), INTENT(in)                :: ltasrng
+    REAL, DIMENSION(Nlhursrng), INTENT(in)               :: lhursrng
+    
+    ! Output
+    REAL, DIMENSION(1:num_soil_layers), INTENT(out)      :: fracsoil10cm
+    REAL, DIMENSION(Nhtasrng), INTENT(out)               :: htasbins
+    REAL, DIMENSION(Nhhursrng), INTENT(out)              :: hhursbins
+    REAL, DIMENSION(Nltasrng), INTENT(out)               :: ltasbins
+    REAL, DIMENSION(Nlhursrng), INTENT(out)              :: lhursbins
+    
+    ! Local
+    INTEGER                                              :: k
+    REAL                                                 :: inczsoil
+    CHARACTER (LEN=1000)                                 :: diag_message
+    
+    inczsoil = 0.
+    DO k=1, num_soil_layers
+      IF (inczsoil < 0.1) THEN
+        IF (inczsoil + dzs(k) <= 0.1) THEN
+          fracsoil10cm(k) = 1.
+        ELSE IF (inczsoil + dzs(k) > 0.1) THEN
+          fracsoil10cm(k) = (0.1 - inczsoil) / dzs(k)
+        ELSE
+          fracsoil10cm(k) = 0.
+        END IF
+      END IF
+      inczsoil = inczsoil + dzs(k)
+    END DO
+
+#if CDXWRF>=2
+    ! Consistency checks
+    IF ( nhtasrng*nhhursrng /= nhtashursrng) THEN
+      PRINT *, '  nhtasrng: ', nhtasrng, ' nhhursrng: ', nhhursrng, ' nhtashursrng: ', nhtashursrng
+      WRITE (diag_message , * ) &
+        "CORDEX: ERROR -- error -- ERROR -- error: individual ranges nhtasrng, nhhursrng " //         &
+        "and nhtashursrng do not coincide! nhtashursrng = nhtasrng*nhursrng"
+      CALL wrf_error_fatal ( diag_message )
+    END IF
+
+    IF ( nltasrng*nlhursrng /= nltashursrng) THEN
+      PRINT *, '  nltasrng: ', nltasrng, ' nlhursrng: ', nlhursrng, ' nltashursrng: ', nltashursrng
+      WRITE (diag_message , * ) &
+        "CORDEX: ERROR -- error -- ERROR -- error: individual ranges nltasrng, nlhursrng " //         &
+        "and nltashursrng do not coincide! nltashursrng = nltasrng*nlursrng"
+      CALL wrf_error_fatal ( diag_message )
+    END IF
+
+    ! Fillling up the bins
+    htasbins(1:nhtasrng-1) = htasrng(1:nhtasrng-1)
+    hhursbins(1:nhhursrng-1) = hhursrng(1:nhhursrng-1)
+    ltasbins(1:nltasrng-1) = ltasrng(1:nltasrng-1)
+    lhursbins(1:nlhursrng-1) = lhursrng(1:nlhursrng-1)
+           
+    WRITE(diag_message,*) '  high-res tas bins ', (htasbins(k), k=1, nhtasrng-1)
+    CALL wrf_debug(75,diag_message)
+    WRITE(diag_message,*) '  high-res hurs bins ', (hhursbins(k), k=1, nhhursrng-1)
+    CALL wrf_debug(75,diag_message)
+    WRITE(diag_message,*) '  low-res tas bins ', (ltasbins(k), k=1, nltasrng-1)
+    CALL wrf_debug(75,diag_message)
+    WRITE(diag_message,*) '  low-res tas bins ', (lhursbins(k), k=1, nlhursrng-1)
+    CALL wrf_debug(75,diag_message)
+
+#endif
+
+    RETURN
+  
+  END SUBROUTINE cdxwrf_init
+#endif
 
 END MODULE module_physics_init

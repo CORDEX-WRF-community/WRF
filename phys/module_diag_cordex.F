@@ -37,8 +37,6 @@ MODULE module_diag_cordex
 !!! zlfc: Height at LFC [m]
 !!! plfc: Pressure at LFC [Pa]
 !!! lidx: Lifted index [1]
-!!! mrso: total soil moisture content [kgm-2]
-!!! slw: total liquid water content [kgm-2]
 !!! zmla: pbl height following a generic method [m]
 !!! ws100: 100m wind speed [ms-1]
 !!! uz100: 100m wind x-direction [ms-1]
@@ -60,6 +58,10 @@ MODULE module_diag_cordex
 !!! ps: surface pressure [Pa]
 !!! ts: skin temperature [K]
 !!! zeroith: 0-isotherm [m]
+!!! mrsol: water content of soil layer [kgm-2]
+!!! mrsos: first layer soil moisture content (0-10 cm) [kgm-2]
+!!! mrso: total soil moisture content [kgm-2]
+!!! slw: total liquid water content [kgm-2]
 
 !! Accumulated or similar time dependency (computed at every time-step)
 !!!
@@ -100,7 +102,10 @@ MODULE module_diag_cordex
 !!! snd: mean snow depth [m]
 !!! mrros: mean surface Runoff [kgm-2s-1]
 !!! mrro: mean total  Runoff [kgm-2s-1]
-!!! mrsol: water content of soil layer [kgm-2]
+!!! mrsolmean: mean water content of soil layer [kgm-2]
+!!! mrsosmean: mean first layer soil moisture content (0-10 cm) [kgm-2]
+!!! mrsomean: mean total soil moisture content [kgm-2]
+!!! slwmean: mean total liquid water content [kgm-2]
 !!! flxpr: precipitation flux [kgm-2s-1]
 !!! flxprl: large scale precipitation flux [kgm-2s-1]
 !!! flxprc: convective precipitation flux [kgm-2s-1]
@@ -228,6 +233,7 @@ CONTAINS
                       ts, albedo, emiss,                                                              &
                       sr,                                                                             &
                       chs, cdm, br, zol,                                                              &
+                      fracsoil10cm,                                                                   &
 #ifdef CDXWRF
 #if CDXWRF>=1
 #endif
@@ -244,7 +250,6 @@ CONTAINS
                       prw, clwvi, clivi,                                                              &
                       uas, vas, wss, hurs, huss,                                                      &
                       psl,                                                                            &
-                      mrso, slw,                                                                      &
                       wsgsmax, ugsmax, vgsmax, percengust,                                            &
                       totwsgsmax, totugsmax, totvgsmax, totpercengust,                                &
                       wsz100, uz100wind, vz100wind,                                                   &
@@ -259,7 +264,8 @@ CONTAINS
                       cdcdx, cdgen,                                                                   &
                       snc, snd,                                                                       &
                       pmrros, pmrro,                                                                  &
-                      mrros, mrro, mrsol, mrsos,                                                      &
+                      mrros, mrro, mrso, mrsol, mrsos, slw,                                           &
+                      mrsomean, mrsolmean, mrsosmean, slwmean,                                        &
                       flxpr, flxprl, flxprc, flxprsh, flxprsn, snw,                                   &
                       rsdt, rsut, rlut,                                                               &
                       tas_hm, qvs_hm,                                                                 &
@@ -426,7 +432,7 @@ CONTAINS
 ! qsfc: specific humidity at the boundary [kgkg-1]
 ! hgt: orography [m]
 ! z: heights of the half levels [gpm]
-! dzs: depths of the soil levels
+! dzs: depths of the soil levels [m]
 ! smois: soil moisture [m3m-3]
 ! sh2o: liquid soil water content [m3m-3]
 ! rho: air density [kgm-3]
@@ -469,6 +475,7 @@ CONTAINS
 ! cdm: surface exchange coefficient for momentum [-]
 ! br: Bulk Richardson number [-]
 ! zol: Characteristic length (z/L) [-]
+! fracsoil10cm: fraction of the soil layer used to compute 0-10 vertical accumulations
 
 !-------- OUTPUT vars ------- [defined at registry.cordex] and included on Registry.EM_COMMON on auxhist9
 ! nsteps: counter of time-steps passed for computation of statistics
@@ -502,9 +509,14 @@ CONTAINS
 ! zlfc: Height at the Level of free convection [m]
 ! plfc: Pressure at the Level of free convection [Pa]
 ! lidx: Lifted index [1]
+! mrsol: water content of soil layer [kgm-2]
 ! mrso: total soil moisture content [kgm-2]
 ! mrsos: first layer soil moisture content (0-10 cm) [kgm-2]
 ! slw: total liquid water content [kgm-2]
+! mrsolmean: mean water content of soil layer [kgm-2]
+! mrsosmean: mean first layer soil moisture content (0-10 cm) [kgm-2]
+! mrsomean: mean total soil moisture content [kgm-2]
+! slwmean: mean total liquid water content [kgm-2]
 ! wbacpw, wbacpw[c/r/s/i/g/h]: Water-budget vertically integrated accumulated total tendency for water 
 !   vapour, cloud, rain, snow, ice, graupel, hail [mm]
 ! wbacf, wbacf[c/r/s/i/g/h]: Water-budget vertically integrated accumulated horizontal advection for 
@@ -550,7 +562,6 @@ CONTAINS
 ! pmrro: previous accumulated mean total  Runoff [kgm-2]
 ! mrros: mean surface Runoff [kgm-2s-1]
 ! mrro: mean total  Runoff [kgm-2s-1]
-! mrsol: total water content per soil layer [kgm-2]
 ! flxpr: precipitation flux [kgm-2s-1]
 ! flxprl: large scale precipitation flux [kgm-2s-1]
 ! flxprc: convective precipitation flux [kgm-2s-1]
@@ -672,7 +683,7 @@ CONTAINS
   REAL, INTENT(in)                                       :: dqv, dtheta
   INTEGER, INTENT(in)                                    :: convxtrm_diag
   INTEGER, INTENT(in)                                    :: visibility_diag, fogvars, zmlagen_diag
-  REAL, DIMENSION(1:num_soil_layers), INTENT(in)         :: dzs
+  REAL, DIMENSION(1:num_soil_layers), INTENT(in)         :: dzs, fracsoil10cm
 
   INTEGER, INTENT(inout)                                 :: nsteps
   REAL, DIMENSION(ims:ime,1:num_soil_layers,jms:jme),                                                 & 
@@ -735,7 +746,6 @@ CONTAINS
 #endif
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(out)          :: uas, vas, wss, hurs, huss
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(out)          :: psl
-  REAL, DIMENSION(ims:ime,jms:jme), INTENT(out)          :: slw
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: wsgsmax, ugsmax, vgsmax, percengust
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: totwsgsmax, totugsmax, totvgsmax,         &
     totpercengust
@@ -750,9 +760,12 @@ CONTAINS
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: cdgen, evspsblpot, evspsblpotgen
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: snc, snd
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: pmrros, pmrro
-  REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: mrros, mrro, mrsos, mrso
+  REAL, DIMENSION(ims:ime,jms:jme), INTENT(out)          :: mrros, mrro, mrsos, mrso, slw
   REAL, DIMENSION(ims:ime,1:num_soil_layers,jms:jme),                                                 &
-    INTENT(inout)                                        :: mrsol
+    INTENT(out)                                          :: mrsol
+  REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: mrsosmean, mrsomean, slwmean
+  REAL, DIMENSION(ims:ime,1:num_soil_layers,jms:jme),                                                 &
+    INTENT(inout)                                        :: mrsolmean
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: flxpr, flxprl, flxprc, flxprsh, flxprsn,  &
     snw
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: rsdt, rsut, rlut
@@ -1339,13 +1352,13 @@ CONTAINS
           pmrro(i,j) = sfcrunoff(i,j) + udrunoff(i,j)
 
           ! First layer soil
-          ! FROM: https://wcrp-cordex.github.io/cordex-cmip6-data-request/
-          mrsos(i,j) = smois(i,1,j)*dzs(1)
+          ! FROM: https://wcrp-cordex.github.io/cordex-cmip6-data-request/)
           DO k=1, num_soil_layers
-            mrso(i,j) = smois(i,k,j)*dzs(k)
-            mrsol(i,k,j) = sh2o(i,k,j)*dzs(k)*1000.
+            mrsosmean(i,j) = smois(i,k,j)*dzs(k)*fracsoil10cm(k)
+            mrsomean(i,j) = smois(i,k,j)*dzs(k)
+            mrsolmean(i,k,j) = sh2o(i,k,j)*dzs(k)*1000.
           END DO
-
+          
           ! Precipitations
           flxpr(i,j) = prc(i,j) + prnc(i,j) + prsh(i,j)
           flxprl(i,j) = prnc(i,j)
@@ -1564,7 +1577,7 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    udrunoff:', udrunoff(i,j), ' pmrro:', pmrro(i,j), ' mrro:', mrro(i,j)
             CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    smois:', smois(i,1,j), ' dzs:', dzs(1), ' mrsol:', mrsol(i,j)
+            WRITE(msg,*)'    smois:', smois(i,1,j), ' dzs:', dzs(1), ' mrsolmean:', mrsol(i,1,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    prc:', prc(i,j), ' prnc:', prnc(i,j), ' prsh:', prsh(i,j), ' flxpr:',    &
               flxpr(i,j), ' flxprl:', flxprl(i,j), ' flxprc:', flxprc(i,j), ' flxprsh:', flxprsh(i,j),&
@@ -1698,10 +1711,10 @@ CONTAINS
           mrro(i,j) = sfcrunoff(i,j) + udrunoff(i,j)
 
           ! Soil
-          mrsos(i,j) = mrsos(i,j) + smois(i,1,j)*dzs(1)
           DO k=1, num_soil_layers
-            mrso(i,j) = mrso(i,k,j) + smois(i,k,j)*dzs(k)
-            mrsol(i,k,j) = mrsol(i,k,j) + sh2o(i,k,j)*dzs(k)*1000
+            mrsosmean(i,j) = mrsosmean(i,j) + smois(i,k,j)*dzs(k)*fracsoil10cm(k)
+            mrsomean(i,j) = mrsomean(i,j) + smois(i,k,j)*dzs(k)
+            mrsolmean(i,k,j) = mrsolmean(i,k,j) + sh2o(i,k,j)*dzs(k)*1000
           END DO
 
           ! Precipitations
@@ -1955,7 +1968,7 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    udrunoff:', udrunoff(i,j), ' mrro:', mrro(i,j)
             CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    smois:', smois(i,1,j), ' dzs:', dzs(1), ' mrsol:', mrsol(i,j)
+            WRITE(msg,*)'    smois:', smois(i,1,j), ' dzs:', dzs(1), ' mrsolmean 1:', mrsolmean(i,1,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    prc:', prc(i,j), ' prnc:', prnc(i,j), ' prsh:', prsh(i,j), ' flxpr:',    &
               flxpr(i,j), ' flxprl:', flxprl(i,j), ' flxprc:', flxprc(i,j), ' flxprsh:', flxprsh(i,j),&
@@ -2145,6 +2158,11 @@ CONTAINS
           IF (ijdbg) CALL wrf_debug(50,msg)
           CALL var_vertint(sh2o(i,:,j), num_soil_layers, dzs(:), ABS(dzs(:)/dzs(:)), slw(i,j))
 
+          DO k=1, num_soil_layers
+            mrsos(i,j) = smois(i,k,j)*dzs(k)*fracsoil10cm(k)
+            mrsol(i,k,j) = sh2o(i,k,j)*dzs(k)*1000.
+          END DO
+
           ! tauu, tauv
           WRITE(msg,*) '  ' // TRIM(fname) // ': computing tauu,tauv diagnostic'
           IF (ijdbg) CALL wrf_debug(50,msg)
@@ -2198,7 +2216,10 @@ CONTAINS
           mrro(i,j) = (mrro(i,j)-pmrro(i,j))/(dt*nsteps)
 
           ! soil
-          mrsol(i,j) = mrsol(i,j)/nsteps
+          mrsomean(i,j) = mrsomean(i,j)/nsteps
+          mrsosmean(i,j) = mrsosmean(i,j)/nsteps
+          mrsolmean(i,:,j) = mrsolmean(i,:,j)/nsteps
+          slwmean(i,j) = slwmean(i,j)/nsteps
 
           ! Precipitations
           flxpr(i,j) = flxpr(i,j)/(dt*nsteps)
@@ -2355,7 +2376,7 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    udrunoff:', udrunoff(i,j), ' mrro:', mrro(i,j)
             CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    smois:', smois(i,1,j), ' dzs:', dzs(1), ' mrsol:', mrsol(i,j)
+            WRITE(msg,*)'    smois:', smois(i,1,j), ' dzs:', dzs(1), ' mrsol:', mrsol(i,1,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    prc:', prc(i,j), ' prnc:', prnc(i,j), ' prsh:', prsh(i,j), ' flxpr:',    &
               flxpr(i,j), ' flxprl:', flxprl(i,j), ' flxprc:', flxprc(i,j), ' flxprsh:', flxprsh(i,j),&

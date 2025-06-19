@@ -190,6 +190,7 @@ CONTAINS
         CurrTime, StartTime
       TYPE(WRFU_TimeInterval)                            :: dtint, histint, aux9int, aux23int
       CHARACTER(len=256)                                 :: message, timestr
+      REAL                                               :: inczsoil
 #ifdef CDXWRF
       INTEGER                                            :: i
       CHARACTER(len=1024)                                :: msg
@@ -1327,50 +1328,8 @@ CONTAINS
          END IF
 
          CALL wrf_debug ( 100 , '--> CALL DIAGNOSTICS PACKAGE: CORDEX DIAGNOSTICS' )
+         ! Do not forget, CDXWRF initialization in phys/module_physics_init.F at SUBROUTINE cdxwrf_init
          
-#ifdef CDXWRF
-#if CDXWRF>=2
-         ! Initialization (there might be a more correct way to do it)
-         !   Trying to imitate what is done for eta_levels in 'dyn_em/module_initialize_real.F'
-! Removing IF, might it work?
-!         IF (grid%xtime == 0) THEN
-           IF ( model_config_rec%nhtasrng*model_config_rec%nhhursrng /=                               &
-             model_config_rec%nhtashursrng) THEN
-             PRINT *, '  nhtasrng: ', model_config_rec%nhtasrng, ' nhhursrng: ',                      &
-              model_config_rec%nhhursrng, ' nhtashursrng: ', model_config_rec%nhtashursrng
-              WRITE (diag_message , * ) &
-              "CORDEX: ERROR -- error -- ERROR -- error: individual ranges nhtasrng, nhhursrng " //   &
-                "and nhtashursrng do not coincide! nhtashursrng = nhtasrng*nhursrng"
-              CALL wrf_error_fatal ( diag_message )
-           END IF
-           IF ( model_config_rec%nltasrng*model_config_rec%nlhursrng /=                               &
-             model_config_rec%nltashursrng) THEN
-             PRINT *, '  nltasrng: ', model_config_rec%nltasrng, ' nlhursrng: ',                      &
-               model_config_rec%nhhursrng, ' nltashursrng: ', model_config_rec%nltashursrng
-              WRITE (diag_message , * ) &
-              "CORDEX: ERROR -- error -- ERROR -- error: individual ranges nltasrng, nlhursrng " //   &
-                "and nltashursrng do not coincide! nltashursrng = nltasrng*nlursrng"
-              CALL wrf_error_fatal ( diag_message )
-           END IF
-           ! Fillling up the bins
-           grid%htasbins(1:model_config_rec%nhtasrng-1) = model_config_rec%htasrng(1:model_config_rec%nhtasrng-1)
-           grid%hhursbins(1:model_config_rec%nhhursrng-1) = model_config_rec%hhursrng(1:model_config_rec%nhhursrng-1)
-           grid%ltasbins(1:model_config_rec%nltasrng-1) = model_config_rec%ltasrng(1:model_config_rec%nltasrng-1)
-           grid%lhursbins(1:model_config_rec%nlhursrng-1) = model_config_rec%lhursrng(1:model_config_rec%nlhursrng-1)
-           
-           WRITE(msg,*) '  high-res tas bins ', (grid%htasbins(i), i=1, model_config_rec%nhtasrng-1)
-           CALL wrf_debug(75,msg)
-           WRITE(msg,*) '  high-res hurs bins ', (grid%hhursbins(i), i=1, model_config_rec%nhhursrng-1)
-           CALL wrf_debug(75,msg)
-           WRITE(msg,*) '  low-res tas bins ', (grid%ltasbins(i), i=1, model_config_rec%nltasrng-1)
-           CALL wrf_debug(75,msg)
-           WRITE(msg,*) '  low-res tas bins ', (grid%lhursbins(i), i=1, model_config_rec%nlhursrng-1)
-           CALL wrf_debug(75,msg)
-
-!         END IF
-#endif
-#endif
-
          ! From AFWA diagnostics ...
          CALL WRFU_ALARMGET( grid%alarms( HISTORY_ALARM ), prevringtime=hist_time,                    &
            ringinterval=histint)
@@ -1487,6 +1446,7 @@ CONTAINS
                     !   be used as
                     !      CDM = (ust/wss)**2
                     ,CHS=grid%ch, CDM=grid%cd, BR=grid%br, ZOL=grid%zol    &
+                    ,FRACSOIL10CM=grid%fracsoil10cm                        &
 #ifdef CDXWRF
 #if CDXWRF>=1
 
@@ -1514,7 +1474,6 @@ CONTAINS
                     ,UAS=grid%uas, VAS=grid%vas, WSS=grid%wss              &
                     ,HURS=grid%hurs ,HUSS=grid%huss                        &
                     ,PSL=grid%psl                                          &
-                    ,MRSO=grid%mrso, SLW=grid%slw                          &
                     ,WSGSMAX=grid%wsgsmax                                  & 
                     ,UGSMAX=grid%ugsmax, VGSMAX=grid%vgsmax                &
                     ,PERCENGUST=grid%wsgspercen                            &
@@ -1539,7 +1498,10 @@ CONTAINS
                     ,CDCDX=grid%cdcdx, CDGEN=grid%cdgen                    &
                     ,SNC=grid%snc, SND=grid%snd                            &
                     ,PMRROS=grid%pmrros, PMRRO=grid%pmrro                  &
-                    ,MRROS=grid%mrros, MRRO=grid%mrro, MRSOL=grid%mrsol    &
+                    ,MRROS=grid%mrros, MRRO=grid%mrro, MRSO=grid%mrso      &
+                    ,MRSOL=grid%mrsol, MRSOS=grid%mrsos, SLW=grid%slw      &
+                    ,MRSOMEAN=grid%mrsomean, MRSOLMEAN=grid%mrsolmean      &
+                    ,MRSOSMEAN=grid%mrsosmean, SLWMEAN=grid%slwmean        &
                     ,FLXPR=grid%pr, FLXPRL=grid%prl,FLXPRC=grid%prc        &
                     ,FLXPRSH=grid%prsh                                     &
                     ,FLXPRSN=grid%prsn                                     &

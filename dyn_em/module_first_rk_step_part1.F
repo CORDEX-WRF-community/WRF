@@ -594,7 +594,7 @@ BENCH_START(surf_driver_tim)
       do_meganfile = .false.
 #endif
 
-      ! Tgrid%urbanfirst initialized in dyn_em/start_em.F at phy_init
+      ! grid%urbanfirst initialized in dyn_em/start_em.F at phy_init
       IF (grid%urbanfirst == 0) THEN
         ! Filling urban_scalars
         ! distance [m] between vertical layers used by the urban module BEP
