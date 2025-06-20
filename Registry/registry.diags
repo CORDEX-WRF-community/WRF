@@ -12,9 +12,12 @@ dimspec    ht      2     namelist=nhtasrng                 c     nhtasrng
 dimspec    hh      2     namelist=nhhursrng                c     nhhursrng
 dimspec    lt      2     namelist=nltasrng                 c     nltasrng
 dimspec    lh      2     namelist=nlhursrng                c     nlhursrng
+dimspec    wd      2     namelist=nwdsrng                  c     nwdsrng
+dimspec    ws      2     namelist=nwssrng                  c     nwssrng
 ## L. Fita, so, WRF output will provide a (n[h/l]tasrng*n[h/l]hursrng) 3D variable instead
 dimspec    hth     2     namelist=nhtashursrng             z     nhtashursrng
 dimspec    lth     2     namelist=nltashursrng             z     nltashursrng
+dimspec    wds     2     namelist=nwdswssrng               z     nwdswssrng
 
 #  Namelist parameters
 
