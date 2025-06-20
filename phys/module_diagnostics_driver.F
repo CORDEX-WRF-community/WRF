@@ -1384,8 +1384,11 @@ CONTAINS
                     ,NHHURSRNG = config_flags%nhhursrng                    &
                     ,NLTASRNG = config_flags%nltasrng                      &
                     ,NLHURSRNG = config_flags%nlhursrng                    &
+                    ,NWDSRNG = config_flags%nwdsrng                        &
+                    ,NWSSRNG = config_flags%nwssrng                        &
                     ,NHTASHURSRNG = config_flags%nhtashursrng              &
                     ,NLTASHURSRNG = config_flags%nltashursrng              &
+                    ,NWDSWSSRNG = config_flags%nwdswssrng                  &
 ! Should I keep it this?
 !                    ,TASHRNG = grid%htasbins(1:model_config_rec%nhtasrng-1)    &
 !                    ,HURSHRNG = grid%hhursbins(1:model_config_rec%nhhursrng-1) &
@@ -1395,6 +1398,8 @@ CONTAINS
                     ,HURSHRNG = model_config_rec%hhursrng(1:model_config_rec%nhhursrng)             &
                     ,TASLRNG = model_config_rec%ltasrng(1:model_config_rec%nltasrng)                &
                     ,HURSLRNG = model_config_rec%lhursrng(1:model_config_rec%nlhursrng)             &
+                    ,WDSRNG = model_config_rec%wdsrng(1:model_config_rec%nwdsrng)                   &
+                    ,WSSRNG = model_config_rec%wssrng(1:model_config_rec%nwssrng)                   &
 #endif
 #endif
 
@@ -1593,6 +1598,7 @@ CONTAINS
 #if CDXWRF>=2
                     ,TASHURSTRESHIGHRES=grid%tashurstreshighres            &
                     ,TASHURSTRESLOWRES=grid%tashurstreslowres              &
+                    ,WDSWSSTRES=grid%wdswsstres                            &
 #endif
 #endif
          ! Dimension arguments
