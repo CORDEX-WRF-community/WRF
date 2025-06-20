@@ -1378,6 +1378,7 @@ CONTAINS
                     ,VISIBILITY_DIAG = config_flags%fogvisibility_diag     &
                     ,FOGVARS = config_flags%fogvars                        &
                     ,ZMLAGEN_DIAG = config_flags%zmlagen_diag              &
+                    ,TIMEDBG = config_flags%timedbg                        &
 #ifdef CDXWRF
 #if CDXWRF>=2
                     ,NHTASRNG = config_flags%nhtasrng                      &

@@ -203,12 +203,12 @@ CONTAINS
                       potevap_diag,                                                                   &
                       convxtrm_diag,                                                                  &
                       visibility_diag, fogvars, zmlagen_diag,                                         &
-
+                      timedbg,                                                                        &
 #ifdef CDXWRF
 #if CDXWRF>=2
-                      Nhtasrng, Nhhursrng, Nltasrng, Nlhursrng, Nwdsrng, Nwssrng                      &
-                      Nhtashursrng, Nltashursrng, Nwdswssrng                                          &
-                      tashrng, hurshrng, taslrng, hurslrng,  wdsrng, wssrng                           &
+                      Nhtasrng, Nhhursrng, Nltasrng, Nlhursrng, Nwdsrng, Nwssrng,                     &
+                      Nhtashursrng, Nltashursrng, Nwdswssrng,                                         &
+                      tashrng, hurshrng, taslrng, hurslrng,  wdsrng, wssrng,                          &
 #endif
 #endif
                    ! Input
@@ -236,7 +236,6 @@ CONTAINS
                       sr,                                                                             &
                       chs, cdm, br, zol,                                                              &
                       fracsoil10cm,                                                                   &
-                      timedbg,                                                                        &
 #ifdef CDXWRF
 #if CDXWRF>=1
 #endif
@@ -305,7 +304,7 @@ CONTAINS
                       wbacpwlh,wbacpwmh,wbacpwhh,wbacflh,wbacfmh, wbacfhh, wbaczlh, wbaczmh, wbaczhh, &
 #endif
 #if CDXWRF>=2
-                      tashurstreshighres, tashurstreslowres, wdswsstres                               &
+                      tashurstreshighres, tashurstreslowres, wdswsstres,                              &
 #endif
 #endif
                       ids,ide, jds,jde, kds,kde,                                                      &
@@ -834,7 +833,7 @@ CONTAINS
   INTEGER                                                :: i, j, k, m, its, ite, jts, jte, ij
   !INTEGER                                                :: i_s, i_e, j_s, j_e
   INTEGER                                                :: idp, jdp, dimz, dimz1, dz1
-  INTEGER                                                :: i1, i_1, j1, j_1, k2
+  INTEGER                                                :: i1, i_1, j1, j_1, k2, tdbg
   INTEGER, DIMENSION(num_tiles)                          :: i2, j2
 
   REAL                                                   :: xtimep
@@ -882,7 +881,7 @@ CONTAINS
 
   ! timedbg
   !  when time-debug in minutes
-  tdbg = MOD(xtime, timedbg)
+  tdbg = MOD(xtime, timedbg*1.)
 
   ! Getting the overall debug level
   CALL get_wrf_debug_level( dbg_level ) 
@@ -1221,12 +1220,12 @@ CONTAINS
 
         ! Computing wind direction from where it blows
         ! Towards it blows
-        wdsv = ARCTAN2(vas(i,j),uas(i,j))
+        wdsv = ATAN2(vas(i,j),uas(i,j))
         ! From where it blows
         wdsv = wdsv - piconst
         
         ! Wind speed
-        wssv = np.sqrt(uas(i,j)*uas(i,j) + vas(i,j)*vas(i,j))
+        wssv = SQRT(uas(i,j)*uas(i,j) + vas(i,j)*vas(i,j))
 
 #endif
 #if CDXWRF>=3
@@ -1918,7 +1917,7 @@ CONTAINS
           ! Checking consistency
           ! L. Fita, January 2024. Removed for efficiency
           !   If you encounter problems with the variable, remove it and re-compile without clean -a
-          IF (ijdbg .AND. tbdg==0) THEN
+          IF (ijdbg .AND. tdbg==0) THEN
             PRINT *,'  longitude:', lon(i,j),' latitude:',lat(i,j)
             PRINT *,'  highres i,j:', i,j, ' t2:', t2(i,j), ' ps:', ps(i,j), ' q2:', q2(i,j),         &
               '=> hurs:', hurs(i,j)
@@ -1938,7 +1937,7 @@ CONTAINS
           ! Checking consistency
           ! L. Fita, January 2024. Removed for efficiency
           !   If you encounter problems with the variable, remove it and re-compile without clean -a
-          IF (ijdbg .AND. tbdg==0) THEN
+          IF (ijdbg .AND. tdbg==0) THEN
             PRINT *,'  lowres i,j:', i,j, ' t2:', t2(i,j),' hurs:', hurs(i,j)
             PRINT *,'  lowres tas bin:', taslrng(itas-1), '- ', taslrng(itas)
             PRINT *,'  lowres hurs bin:', hurslrng(ihurs-1), '- ', hurslrng(ihurs)
@@ -1954,7 +1953,7 @@ CONTAINS
           CALL var_residencetime_2var2D(wdsv, wssv, Nwdsrng, Nwssrng, wdsrng, wssrng,                 &
             iwds,iwss)
           wdswsstres(i,(iwds-1)*Nwssrng+iwss,j) = wdswsstres(i,(iwds-1)*Nwssrng+iwss,j) + dt          
-          IF (ijdbg .AND. tbdg==0) THEN
+          IF (ijdbg .AND. tdbg==0) THEN
             PRINT *,'  i,j:', i,j, ' wds:', wdsv,' wss:', wssv
             PRINT *,'  wds bin:', wdsrng(iwds-1), '- ', wdsrng(iwds)
             PRINT *,'  wss bin:', wssrng(iwss-1), '- ', wssrng(iwss)
