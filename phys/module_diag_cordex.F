@@ -1231,7 +1231,7 @@ CONTAINS
         END IF
         
         ! Getting first bin [-pi/64, pi/64)
-        if wdsv(i,j) > piconst*(2.-1./64.) wdsv(i,j) = wdsv(i,j) - 2.*piconst
+        IF (wdsv(i,j) >= piconst*(2.-1./64.)) wdsv(i,j) = wdsv(i,j) - 2.*piconst
         
 #endif
 #if CDXWRF>=3
