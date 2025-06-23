@@ -1226,11 +1226,11 @@ CONTAINS
         IF (curr_secs2 > 0. ) THEN
           IF (wgsts_wdswsstres == 1) THEN
             ! Should it be totgustwind or gustwind (either Brasseur or heavy precipitation)? 
-            uuas = uas(i,j))+totugustwind(i,j)
-            vvas = vas(i,j))+totvgustwind(i,j)
+            uuas = uas(i,j)+totugustwind(i,j)
+            vvas = vas(i,j)+totvgustwind(i,j)
           ELSE
-            uuas = uas(i,j))+0.
-            vvas = vas(i,j))+0.          
+            uuas = uas(i,j)+0.
+            vvas = vas(i,j)+0.          
           END IF
           ! From where it blows
           wdsv(i,j) = ATAN2(-vvas,-uuas)
