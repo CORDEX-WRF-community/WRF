@@ -850,7 +850,7 @@ CONTAINS
 
 #endif
 #if CDXWRF>=2
-  REAL                                                   :: wdsv, wssv
+  REAL, DIMENSION(ims:ime,jms:jme)                       :: wdsv, wssv
 #endif
 #if CDXWRF>=3
   REAL, DIMENSION(kms:kme,n_moist)                       :: qvarttend, qvarhadv, qvarzadv
@@ -1218,15 +1218,21 @@ CONTAINS
           vis(i,j) = 0.
         END IF
 
-        ! Computing wind direction from where it blows
+        ! Computing wind direction from where it blows and speed
         ! Towards it blows
-        wdsv = ATAN2(vas(i,j),uas(i,j))
-        ! From where it blows
-        wdsv = wdsv - piconst
+        ! Avoiding seg faults
+        IF (curr_secs2 > 0. ) THEN
+          ! From where it blows
+          wdsv(i,j) = ATAN2(-vas(i,j),-uas(i,j))
+          wssv(i,j) = SQRT(uas(i,j)*uas(i,j) + vas(i,j)*vas(i,j))
+        ELSE
+          wdsv(i,j) = 0.
+          wssv(i,j) = 0.
+        END IF
         
-        ! Wind speed
-        wssv = SQRT(uas(i,j)*uas(i,j) + vas(i,j)*vas(i,j))
-
+        ! Getting first bin [-pi/64, pi/64)
+        if wdsv(i,j) > piconst*(2.-1./64.) wdsv(i,j) = wdsv(i,j) - 2.*piconst
+        
 #endif
 #if CDXWRF>=3
         ! Water budget
@@ -1542,7 +1548,7 @@ CONTAINS
           tashurstreslowres(i,(itas-1)*Nlhursrng+ihurs,j) = dt          
           
           ! wind direction and speed
-          CALL var_residencetime_2var2D(wdsv, wssv, Nwdsrng, Nwssrng, wdsrng, wssrng,                 &
+          CALL var_residencetime_2var2D(wdsv(i,j), wssv(i,j), Nwdsrng, Nwssrng, wdsrng, wssrng,       &
             iwds,iwss)
           wdswsstres(i,:,j) = 0.            
           wdswsstres(i,(iwds-1)*Nwssrng+iwss,j) = dt          
@@ -1950,11 +1956,11 @@ CONTAINS
             tashurstreslowres(i,(itas-1)*Nlhursrng+ihurs,j) + dt
 
           ! wind direction and speed
-          CALL var_residencetime_2var2D(wdsv, wssv, Nwdsrng, Nwssrng, wdsrng, wssrng,                 &
+          CALL var_residencetime_2var2D(wdsv(i,j), wssv(i,j), Nwdsrng, Nwssrng, wdsrng, wssrng,       &
             iwds,iwss)
           wdswsstres(i,(iwds-1)*Nwssrng+iwss,j) = wdswsstres(i,(iwds-1)*Nwssrng+iwss,j) + dt          
           IF (ijdbg .AND. tdbg==0) THEN
-            PRINT *,'  i,j:', i,j, ' wds:', wdsv,' wss:', wssv
+            PRINT *,'  i,j:', i,j, ' wds:', wdsv(i,j),' wss:', wssv(i,j)
             PRINT *,'  wds bin:', wdsrng(iwds-1), '- ', wdsrng(iwds)
             PRINT *,'  wss bin:', wssrng(iwss-1), '- ', wssrng(iwss)
             PRINT *,'  Nwdsrng:', Nwdsrng, ' Nwssrng:', Nwssrng
