@@ -5809,7 +5809,7 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     END IF
 
     IF ( nwdsrng*nwssrng /= nwdswssrng) THEN
-      PRINT *, '  nwdsrng: ', nwdsrng, ' nwssrng: ', nwssrng, ' nwdswssrng: ', nwdwssrng
+      PRINT *, '  nwdsrng: ', nwdsrng, ' nwssrng: ', nwssrng, ' nwdswssrng: ', nwdswssrng
       WRITE (diag_message , * ) &
         "CORDEX: ERROR -- error -- ERROR -- error: individual ranges nwdsrng, nwssrng " //            &
         "and nwdswssrng do not coincide! nwdswssrng = nwdsrng*nwssrng"
