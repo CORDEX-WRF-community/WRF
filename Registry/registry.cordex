@@ -20,6 +20,8 @@ rconfig   integer fogvisibility_diag      namelist,cordex       1              3
 rconfig   integer fogvars                 namelist,cordex       1              1       rh    "fogvars"                  "variables to use to diagnose fog (1: 3D, 2: sfc)"   ""
 rconfig   integer zmlagen_diag            namelist,cordex       1              2       rh    "zmlagen_diag"             "diagnostic of generic zmla: 1: Nielsen-Gammon et al. (2008), 2: bulk-Richardson (Vogelezang and Holtslag, 1996; Seidel et al., 2004)"   ""
 rconfig   integer timedbg                 namelist,cordex       1            720       rh    "timedbg"                  "frecuency in minutes of time-debugging"   ""
+rconfig   integer wgsts_wdswsstres        namelist,cordex       1              1       rh    "wgsts_wdswsstres"         "whether wind gusts should be used for wds-wss residence-time (0: no, 1: yes)"   ""
+
 ## L. Fita. This should work, but WRF is not prepared for 4D output variables like this
 ##CDXWRF2##rconfig   integer nhtasrng                namelist,cordex       1              38      rh    "nhtasrng"                 "amount + 1 of high-resolution bins for temporal residence of tas"   ""
 ##CDXWRF2##rconfig   integer nhhursrng               namelist,cordex       1              25      rh    "nhhursrng"                "amount + 1 of high-resolution bins for temporal residence of hurs"  ""
