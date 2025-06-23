@@ -1234,7 +1234,7 @@ CONTAINS
           END IF
           ! From where it blows
           wdsv(i,j) = ATAN2(-vvas,-uuas)
-          wssv(i,j) = SQRT(uuas*uuas) + vvas*vvas)
+          wssv(i,j) = SQRT(uuas*uuas + vvas*vvas)
         ELSE
           wdsv(i,j) = 0.
           wssv(i,j) = 0.
