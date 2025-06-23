@@ -287,7 +287,9 @@ CONTAINS
                          ,fracsoil10cm                                            &
 #if CDXWRF>=2
                          ,nhtasrng, nhhursrng, nltasrng, nlhursrng                &
+                         ,nwdsrng, wssrng                                         &
                          ,htasbins, hhursbins, ltasbins, lhursbins                &
+                         ,wdsbins, wssbins                                        &
 #endif
 #endif
                           )
@@ -871,10 +873,13 @@ CONTAINS
    REAL, DIMENSION(1:num_soil_layers), INTENT(out)       :: fracsoil10cm
 #if CDXWRF>=2
    INTEGER, INTENT(in)                                   :: nhtasrng, nhhursrng, nltasrng, nlhursrng
+   INTEGER, INTENT(in)                                   :: nwdsrng, nwssrng   
    REAL, DIMENSION(Nhtasrng), INTENT(out)                :: htasbins
    REAL, DIMENSION(Nhhursrng), INTENT(out)               :: hhursbins
    REAL, DIMENSION(Nltasrng), INTENT(out)                :: ltasbins
    REAL, DIMENSION(Nlhursrng), INTENT(out)               :: lhursbins
+   REAL, DIMENSION(Nwdsrng), INTENT(out)                 :: wdsbins
+   REAL, DIMENSION(Nwssrng), INTENT(out)                 :: wssbins
 #endif
 #endif
 
@@ -1783,12 +1788,16 @@ CHARACTER(LEN=8) :: name
 #if CDXWRF>=2
     ,model_config_rec%nhtasrng, model_config_rec%nhhursrng                                            &
     ,model_config_rec%nltasrng, model_config_rec%nlhursrng                                            &
+    ,model_config_rec%nwdsrng, model_config_rec%nwssrng                                               &
     ,model_config_rec%nhtashursrng, model_config_rec%nltashursrng                                     &
+    ,model_config_rec%nwdswssrng                                                                      &
     ,model_config_rec%htasrng, model_config_rec%hhursrng                                              &
     ,model_config_rec%ltasrng, model_config_rec%lhursrng                                              &
+    ,model_config_rec%wdsrng, model_config_rec%wssrng                                                 &
 #endif
 #if CDXWRF>=2    
     ,htasbins, hhursbins, ltasbins, lhursbins                                                         &
+    ,wdsbins, wssbins                                                                                 &
 #endif
     ,fracsoil10cm)
 #endif
@@ -5726,7 +5735,7 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     ,nltasrng, nlhursrng                                                                              &
     ,nwdsrng, nwssrng                                                                                 &
     ,nhtashursrng, nltashursrng                                                                       &
-    ,nwdswssrng,                                                                                      &
+    ,nwdswssrng                                                                                       &
     ,htasrng, hhursrng, ltasrng, lhursrng                                                             &
     ,wdsrng, wssrng                                                                                   &
 #endif
