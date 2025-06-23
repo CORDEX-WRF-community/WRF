@@ -287,7 +287,7 @@ CONTAINS
                          ,fracsoil10cm                                            &
 #if CDXWRF>=2
                          ,nhtasrng, nhhursrng, nltasrng, nlhursrng                &
-                         ,nwdsrng, wssrng                                         &
+                         ,nwdsrng, nwssrng                                        &
                          ,htasbins, hhursbins, ltasbins, lhursbins                &
                          ,wdsbins, wssbins                                        &
 #endif
@@ -5808,7 +5808,7 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
       CALL wrf_error_fatal ( diag_message )
     END IF
 
-    IF ( nwdsrng*nwssrng /= nwdswsssrng) THEN
+    IF ( nwdsrng*nwssrng /= nwdswssrng) THEN
       PRINT *, '  nwdsrng: ', nwdsrng, ' nwssrng: ', nwssrng, ' nwdswssrng: ', nwdwssrng
       WRITE (diag_message , * ) &
         "CORDEX: ERROR -- error -- ERROR -- error: individual ranges nwdsrng, nwssrng " //            &
