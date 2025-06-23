@@ -5724,12 +5724,15 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
 #if CDXWRF>=2
     ,nhtasrng, nhhursrng                                                                              & 
     ,nltasrng, nlhursrng                                                                              &
+    ,nwdsrng, nwssrng                                                                                 &
     ,nhtashursrng, nltashursrng                                                                       &
+    ,nwdswssrng,                                                                                      &
     ,htasrng, hhursrng, ltasrng, lhursrng                                                             &
+    ,wdsrng, wssrng                                                                                   &
 #endif
     ! Output
 #if CDXWRF>=2    
-    ,htasbins, hhursbins, ltasbins, lhursbins                                                         &
+    ,htasbins, hhursbins, ltasbins, lhursbins, wdsbins, wssbins                                       &
 #endif
     ,fracsoil10cm)  
     ! Subroutine to initialize CDXWRF module
@@ -5740,11 +5743,15 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     INTEGER, INTENT(in)                                  :: num_soil_layers
     REAL, DIMENSION(1:num_soil_layers), INTENT(in)       :: dzs
     INTEGER, INTENT(in)                                  :: nhtasrng, nhhursrng, nltasrng, nlhursrng
+    INTEGER, INTENT(in)                                  :: nwdsrng, nwssrng
     INTEGER, INTENT(in)                                  :: nhtashursrng, nltashursrng
+    INTEGER, INTENT(in)                                  :: nwdswssrng
     REAL, DIMENSION(Nhtasrng), INTENT(in)                :: htasrng
     REAL, DIMENSION(Nhhursrng), INTENT(in)               :: hhursrng
     REAL, DIMENSION(Nltasrng), INTENT(in)                :: ltasrng
     REAL, DIMENSION(Nlhursrng), INTENT(in)               :: lhursrng
+    REAL, DIMENSION(Nwdsrng), INTENT(in)                 :: wdsrng
+    REAL, DIMENSION(Nwssrng), INTENT(in)                 :: wssrng
     
     ! Output
     REAL, DIMENSION(1:num_soil_layers), INTENT(out)      :: fracsoil10cm
@@ -5752,6 +5759,8 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     REAL, DIMENSION(Nhhursrng), INTENT(out)              :: hhursbins
     REAL, DIMENSION(Nltasrng), INTENT(out)               :: ltasbins
     REAL, DIMENSION(Nlhursrng), INTENT(out)              :: lhursbins
+    REAL, DIMENSION(Nwdsrng), INTENT(out)                :: wdsbins
+    REAL, DIMENSION(Nwssrng), INTENT(out)                :: wssbins
     
     ! Local
     INTEGER                                              :: k
@@ -5790,11 +5799,21 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
       CALL wrf_error_fatal ( diag_message )
     END IF
 
+    IF ( nwdsrng*nwssrng /= nwdswsssrng) THEN
+      PRINT *, '  nwdsrng: ', nwdsrng, ' nwssrng: ', nwssrng, ' nwdswssrng: ', nwdwssrng
+      WRITE (diag_message , * ) &
+        "CORDEX: ERROR -- error -- ERROR -- error: individual ranges nwdsrng, nwssrng " //            &
+        "and nwdswssrng do not coincide! nwdswssrng = nwdsrng*nwssrng"
+      CALL wrf_error_fatal ( diag_message )
+    END IF
+
     ! Fillling up the bins
     htasbins(1:nhtasrng-1) = htasrng(1:nhtasrng-1)
     hhursbins(1:nhhursrng-1) = hhursrng(1:nhhursrng-1)
     ltasbins(1:nltasrng-1) = ltasrng(1:nltasrng-1)
     lhursbins(1:nlhursrng-1) = lhursrng(1:nlhursrng-1)
+    wdsbins(1:nwdsrng-1) = wdsrng(1:nwdsrng-1)
+    wssbins(1:nwssrng-1) = wssrng(1:nwssrng-1)
            
     WRITE(diag_message,*) '  high-res tas bins ', (htasbins(k), k=1, nhtasrng-1)
     CALL wrf_debug(75,diag_message)
@@ -5803,6 +5822,10 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     WRITE(diag_message,*) '  low-res tas bins ', (ltasbins(k), k=1, nltasrng-1)
     CALL wrf_debug(75,diag_message)
     WRITE(diag_message,*) '  low-res tas bins ', (lhursbins(k), k=1, nlhursrng-1)
+    CALL wrf_debug(75,diag_message)
+    WRITE(diag_message,*) '  wds bins ', (wdsbins(k), k=1, nwdsrng-1)
+    CALL wrf_debug(75,diag_message)
+    WRITE(diag_message,*) '  wss bins ', (wssbins(k), k=1, nwssrng-1)
     CALL wrf_debug(75,diag_message)
 
 #endif
