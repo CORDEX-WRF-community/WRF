@@ -203,7 +203,7 @@ CONTAINS
                       potevap_diag,                                                                   &
                       convxtrm_diag,                                                                  &
                       visibility_diag, fogvars, zmlagen_diag,                                         &
-                      timedbg,                                                                        &
+                      timedbg, wgsts_wdswsstres,                                                      &
 #ifdef CDXWRF
 #if CDXWRF>=2
                       Nhtasrng, Nhhursrng, Nltasrng, Nlhursrng, Nwdsrng, Nwssrng,                     &
@@ -479,6 +479,7 @@ CONTAINS
 ! zol: Characteristic length (z/L) [-]
 ! fracsoil10cm: fraction of the soil layer used to compute 0-10 vertical accumulations
 ! timedbg: frecuency in minutes of time debugging
+! wgsts_wdswsstres: whether wind gusts should be used for wds-wss residence-time (0: no, 1: yes)
 
 !-------- OUTPUT vars ------- [defined at registry.cordex] and included on Registry.EM_COMMON on auxhist9
 ! nsteps: counter of time-steps passed for computation of statistics
@@ -692,7 +693,7 @@ CONTAINS
   INTEGER, INTENT(in)                                    :: convxtrm_diag
   INTEGER, INTENT(in)                                    :: visibility_diag, fogvars, zmlagen_diag
   REAL, DIMENSION(1:num_soil_layers), INTENT(in)         :: dzs, fracsoil10cm
-  INTEGER, INTENT(in)                                    :: timedbg
+  INTEGER, INTENT(in)                                    :: timedbg, wgsts_wdswsstres
 
   INTEGER, INTENT(inout)                                 :: nsteps
   REAL, DIMENSION(ims:ime,1:num_soil_layers,jms:jme),                                                 & 
@@ -850,6 +851,7 @@ CONTAINS
 
 #endif
 #if CDXWRF>=2
+  REAL                                                   :: uuas, vvas
   REAL, DIMENSION(ims:ime,jms:jme)                       :: wdsv, wssv
 #endif
 #if CDXWRF>=3
@@ -1222,9 +1224,17 @@ CONTAINS
         ! Towards it blows
         ! Avoiding seg faults
         IF (curr_secs2 > 0. ) THEN
+          IF (wgsts_wdswsstres == 1) THEN
+            ! Should it be totgustwind or gustwind (either Brasseur or heavy precipitation)? 
+            uuas = uas(i,j))+totugustwind(i,j)
+            vvas = vas(i,j))+totvgustwind(i,j)
+          ELSE
+            uuas = uas(i,j))+0.
+            vvas = vas(i,j))+0.          
+          END IF
           ! From where it blows
-          wdsv(i,j) = ATAN2(-vas(i,j),-uas(i,j))
-          wssv(i,j) = SQRT(uas(i,j)*uas(i,j) + vas(i,j)*vas(i,j))
+          wdsv(i,j) = ATAN2(-vvas,-uuas)
+          wssv(i,j) = SQRT(uuas*uuas) + vvas*vvas)
         ELSE
           wdsv(i,j) = 0.
           wssv(i,j) = 0.
