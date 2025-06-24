@@ -44,10 +44,10 @@ use module_wrf_error
       parameter (ngb_u=10)
 !
       real dz_u                ! Urban grid resolution
-      parameter (dz_u=10.) !CORDEX
+      parameter (dz_u=5.) !CORDEX
 
       integer nbui_max         !maximum number of types of buildings in an urban class
-      parameter (nbui_max=1)   !CORDEX!must be less or equal than nz_um 
+      parameter (nbui_max=3)   !CORDEX!must be less or equal than nz_um 
 
 
       real h_water
