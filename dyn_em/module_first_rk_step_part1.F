@@ -595,93 +595,95 @@ BENCH_START(surf_driver_tim)
 #endif
 
       ! grid%urbanfirst initialized in dyn_em/start_em.F at phy_init
-      IF (grid%urbanfirst == 0) THEN
-        ! Filling urban_scalars
-        ! distance [m] between vertical layers used by the urban module BEP
-        urban_scalars%dz_urban = config_flags%dz_urban
-        ! number of panes in the windows (1,2 or 3)
-        urban_scalars%p_num = config_flags%p_num
-        ! category number for the windows (q_num= 4, standard glasses) [max=10]
-        urban_scalars%q_num = config_flags%q_num
-        ! mm of irrigation per hour
-        urban_scalars%h_water = config_flags%h_water
-        ! emissivity of the internal walls
-        urban_scalars%emins = config_flags%emins
-        ! albedo of the internal walls
-        urban_scalars%albins = config_flags%albins
-        ! thickness of the window [m]
-        urban_scalars%thickwin = config_flags%thickwin
-        ! Specific heat of the windows [J/(m3.K)]
-        urban_scalars%cswin = config_flags%cswin
-        ! power of the A.C. heating/cooling the indoor air [K/s]
-        urban_scalars%temp_rat = config_flags%temp_rat
-        ! power of the A.C. drying/moistening the indoor air [(Kg/kg)/s]
-        urban_scalars%hum_rat = config_flags%hum_rat
-        ! Efficiency of PV panels installed at the roofs, typical values [0.10,0.15]
-        urban_scalars%effpv = config_flags%effpv
-        ! First time in urban module
-        urban_scalars%urbanfirst = grid%urbanfirst
+      ! these derived types have to filled at all time-steps, since they
+      !   are not part of grid
+      !IF (grid%urbanfirst == 0) THEN
+      ! Filling urban_scalars
+      ! distance [m] between vertical layers used by the urban module BEP
+      urban_scalars%dz_urban = config_flags%dz_urban
+      ! number of panes in the windows (1,2 or 3)
+      urban_scalars%p_num = config_flags%p_num
+      ! category number for the windows (q_num= 4, standard glasses) [max=10]
+      urban_scalars%q_num = config_flags%q_num
+      ! mm of irrigation per hour
+      urban_scalars%h_water = config_flags%h_water
+      ! emissivity of the internal walls
+      urban_scalars%emins = config_flags%emins
+      ! albedo of the internal walls
+      urban_scalars%albins = config_flags%albins
+      ! thickness of the window [m]
+      urban_scalars%thickwin = config_flags%thickwin
+      ! Specific heat of the windows [J/(m3.K)]
+      urban_scalars%cswin = config_flags%cswin
+      ! power of the A.C. heating/cooling the indoor air [K/s]
+      urban_scalars%temp_rat = config_flags%temp_rat
+      ! power of the A.C. drying/moistening the indoor air [(Kg/kg)/s]
+      urban_scalars%hum_rat = config_flags%hum_rat
+      ! Efficiency of PV panels installed at the roofs, typical values [0.10,0.15]
+      urban_scalars%effpv = config_flags%effpv
+      ! First time in urban module
+      urban_scalars%urbanfirst = grid%urbanfirst
 
-        ! Filling irrigation_scalars
-        ! WATER AMOUNT [mm]
-        irrigation_scalars%irr_daily_amount = config_flags%irr_daily_amount
-        ! for packaging: 0=no irr; 1=drip; 2=sprinkler; 3=channel
-        irrigation_scalars%sf_surf_irr_scheme = config_flags%sf_surf_irr_scheme
-        ! local start hour
-        irrigation_scalars%irr_start_hour = config_flags%irr_start_hour  
-        ! Number of hours to irrigate
-        irrigation_scalars%irr_num_hours = config_flags%irr_num_hours
-        ! Julian day to start irrigation (included)
-        irrigation_scalars%irr_start_julianday = config_flags%irr_start_julianday
-        ! Julian day to end irrigation (not included)
-        irrigation_scalars%irr_end_julianday = config_flags%irr_end_julianday
-        ! frequency of irrigation in days
-        irrigation_scalars%irr_freq = config_flags%irr_freq
-        ! phase of irrigation, 0=in phase; 1=not in phase; 2=not in phase, random
-        irrigation_scalars%irr_ph = config_flags%irr_ph
+      ! Filling irrigation_scalars
+      ! WATER AMOUNT [mm]
+      irrigation_scalars%irr_daily_amount = config_flags%irr_daily_amount
+      ! for packaging: 0=no irr; 1=drip; 2=sprinkler; 3=channel
+      irrigation_scalars%sf_surf_irr_scheme = config_flags%sf_surf_irr_scheme
+      ! local start hour
+      irrigation_scalars%irr_start_hour = config_flags%irr_start_hour  
+      ! Number of hours to irrigate
+      irrigation_scalars%irr_num_hours = config_flags%irr_num_hours
+      ! Julian day to start irrigation (included)
+      irrigation_scalars%irr_start_julianday = config_flags%irr_start_julianday
+      ! Julian day to end irrigation (not included)
+      irrigation_scalars%irr_end_julianday = config_flags%irr_end_julianday
+      ! frequency of irrigation in days
+      irrigation_scalars%irr_freq = config_flags%irr_freq
+      ! phase of irrigation, 0=in phase; 1=not in phase; 2=not in phase, random
+      irrigation_scalars%irr_ph = config_flags%irr_ph
   
-        ! Filling cryosphere_scalars
-        ! Fractional sea-ice option: 0=OFF; 1=ON
-        cryosphere_scalars%fractional_seaice = config_flags%fractional_seaice
-        ! Avoid low ice temps when ice frac and Tsk are inconsistent
-        cryosphere_scalars%tice2tsk_if2cold = config_flags%tice2tsk_if2cold
-        ! Method for setting sea-ice thickness
-        cryosphere_scalars%seaice_albedo_opt = config_flags%seaice_albedo_opt
-        ! Default value for sea-ice thickness
-        cryosphere_scalars%seaice_albedo_default = config_flags%seaice_albedo_default
-        ! Method for setting sea-ice thickness
-        cryosphere_scalars%seaice_thickness_opt = config_flags%seaice_thickness_opt
-        ! Default value for sea-ice thickness
-        cryosphere_scalars%seaice_thickness_default = config_flags%seaice_thickness_default
-        ! Method for treating snow depth on sea ice
-        cryosphere_scalars%seaice_snowdepth_opt = config_flags%seaice_snowdepth_opt
-        ! Maximum allowed accumulation (m) of snow on sea ice
-        cryosphere_scalars%seaice_snowdepth_max = config_flags%seaice_snowdepth_max
-        ! Minimum snow depth (m) on sea ice
-        cryosphere_scalars%seaice_snowdepth_min = config_flags%seaice_snowdepth_min
-        ! ALBSI_LOGICAL
-        cryosphere_scalars%ifndalbsi = grid%ifndalbsi
-        ! ICEDEPTH_LOGICAL
-        cryosphere_scalars%ifndicedepth = grid%ifndicedepth
-        ! SNOWSH_LOGICAL
-        !cryosphere_scalars%ifndsnowsh = grid%ifndsnowsh
-        ! SNOWSI_LOGICAL
-        cryosphere_scalars%ifndsnowsi = grid%ifndsnowsi
+      ! Filling cryosphere_scalars
+      ! Fractional sea-ice option: 0=OFF; 1=ON
+      cryosphere_scalars%fractional_seaice = config_flags%fractional_seaice
+      ! Avoid low ice temps when ice frac and Tsk are inconsistent
+      cryosphere_scalars%tice2tsk_if2cold = config_flags%tice2tsk_if2cold
+      ! Method for setting sea-ice thickness
+      cryosphere_scalars%seaice_albedo_opt = config_flags%seaice_albedo_opt
+      ! Default value for sea-ice thickness
+      cryosphere_scalars%seaice_albedo_default = config_flags%seaice_albedo_default
+      ! Method for setting sea-ice thickness
+      cryosphere_scalars%seaice_thickness_opt = config_flags%seaice_thickness_opt
+      ! Default value for sea-ice thickness
+      cryosphere_scalars%seaice_thickness_default = config_flags%seaice_thickness_default
+      ! Method for treating snow depth on sea ice
+      cryosphere_scalars%seaice_snowdepth_opt = config_flags%seaice_snowdepth_opt
+      ! Maximum allowed accumulation (m) of snow on sea ice
+      cryosphere_scalars%seaice_snowdepth_max = config_flags%seaice_snowdepth_max
+      ! Minimum snow depth (m) on sea ice
+      cryosphere_scalars%seaice_snowdepth_min = config_flags%seaice_snowdepth_min
+      ! ALBSI_LOGICAL
+      cryosphere_scalars%ifndalbsi = grid%ifndalbsi
+      ! ICEDEPTH_LOGICAL
+      cryosphere_scalars%ifndicedepth = grid%ifndicedepth
+      ! SNOWSH_LOGICAL
+      !cryosphere_scalars%ifndsnowsh = grid%ifndsnowsh
+      ! SNOWSI_LOGICAL
+      cryosphere_scalars%ifndsnowsi = grid%ifndsnowsi
        
-        ! Filling surface perturbations
-        !  turn on stochastic perturbations tailored for solar energy applications
-        sfcperturb_scalars%multi_perturb = config_flags%multi_perturb
-        ! set to =.true. to activate perturbations to Noah LSM
-        sfcperturb_scalars%pert_noah = config_flags%pert_noah
-        ! perturb qv (water vapor mixing ratio)
-        sfcperturb_scalars%pert_noah_qv = config_flags%pert_noah_qv
-        ! perturb temperature
-        sfcperturb_scalars%pert_noah_t = config_flags%pert_noah_t
-        ! perturb smois (soil moisture)
-        sfcperturb_scalars%pert_noah_smois = config_flags%pert_noah_smois
-        ! perturb tslb (soil temperature)
-        sfcperturb_scalars%pert_noah_tslb = config_flags%pert_noah_tslb
-      END IF
+      ! Filling surface perturbations
+      !  turn on stochastic perturbations tailored for solar energy applications
+      sfcperturb_scalars%multi_perturb = config_flags%multi_perturb
+      ! set to =.true. to activate perturbations to Noah LSM
+      sfcperturb_scalars%pert_noah = config_flags%pert_noah
+      ! perturb qv (water vapor mixing ratio)
+      sfcperturb_scalars%pert_noah_qv = config_flags%pert_noah_qv
+      ! perturb temperature
+      sfcperturb_scalars%pert_noah_t = config_flags%pert_noah_t
+      ! perturb smois (soil moisture)
+      sfcperturb_scalars%pert_noah_smois = config_flags%pert_noah_smois
+      ! perturb tslb (soil temperature)
+      sfcperturb_scalars%pert_noah_tslb = config_flags%pert_noah_tslb
+      !END IF
 
 
       CALL surface_driver(                                                &
