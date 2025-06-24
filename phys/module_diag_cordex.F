@@ -1234,14 +1234,16 @@ CONTAINS
           END IF
           ! From where it blows
           wbdsv(i,j) = ATAN2(-vvas,-uuas)
+          ! From -pi,pi to 0,2pi
+          IF (wbdsv(i,j) < 0.) wbdsv(i,j) = 2*piconst+wbdsv(i,j)
           wssv(i,j) = SQRT(uuas*uuas + vvas*vvas)
         ELSE
           wbdsv(i,j) = 0.
           wssv(i,j) = 0.
         END IF
         
-        ! Getting first bin [-pi/(Nwbdsrng-1), pi/(Nwbdsrng-1))
-        IF (wbdsv(i,j) >= piconst*(2.-1./(Nwbdsrng-1))) wbdsv(i,j) = wbdsv(i,j) - 2.*piconst
+        ! Getting first bin [ -pi/(2(Nwbdsrng-1)), pi/(2(Nwbdsrng-1)) )
+        IF (wbdsv(i,j) >= piconst*(2.-1./(2.*(Nwbdsrng-1)))) wbdsv(i,j) = wbdsv(i,j) - 2.*piconst
         
 #endif
 #if CDXWRF>=3
