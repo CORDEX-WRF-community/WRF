@@ -1240,8 +1240,8 @@ CONTAINS
           wssv(i,j) = 0.
         END IF
         
-        ! Getting first bin [-pi/64, pi/64)
-        IF (wdsv(i,j) >= piconst*(2.-1./64.)) wdsv(i,j) = wdsv(i,j) - 2.*piconst
+        ! Getting first bin [-pi/(Nwdsrng-1), pi/(Nwdsrng-1))
+        IF (wdsv(i,j) >= piconst*(2.-1./(Nwdsrng-1))) wdsv(i,j) = wdsv(i,j) - 2.*piconst
         
 #endif
 #if CDXWRF>=3
