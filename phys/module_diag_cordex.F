@@ -146,7 +146,7 @@ MODULE module_diag_cordex
 !!!   and relative humidity
 !!! tashurstreslowres: low resolution of simultaneous temporal residence of 2-meter temperature 
 !!!   and relative humidity
-!!! wdswsstres: simultaneous temporal residence of 10-meter wind direction (from where it blows) 
+!!! wbdswsstres: simultaneous temporal residence of 10-meter wind direction (from where it blows) 
 !!!   and wind speed
 !!! wbacdh: Water-budget vertically integrated accumulated diabatic heating [K]
 !!! wbacpw, wbacpw[c/r/s/i/g/h]: Water-budget vertically integrated accumulated total tendency for water 
@@ -203,12 +203,12 @@ CONTAINS
                       potevap_diag,                                                                   &
                       convxtrm_diag,                                                                  &
                       visibility_diag, fogvars, zmlagen_diag,                                         &
-                      timedbg, wgsts_wdswsstres,                                                      &
+                      timedbg, wgsts_wbdswsstres,                                                     &
 #ifdef CDXWRF
 #if CDXWRF>=2
-                      Nhtasrng, Nhhursrng, Nltasrng, Nlhursrng, Nwdsrng, Nwssrng,                     &
-                      Nhtashursrng, Nltashursrng, Nwdswssrng,                                         &
-                      tashrng, hurshrng, taslrng, hurslrng,  wdsrng, wssrng,                          &
+                      Nhtasrng, Nhhursrng, Nltasrng, Nlhursrng, Nwbdsrng, Nwssrng,                    &
+                      Nhtashursrng, Nltashursrng, Nwbdswssrng,                                        &
+                      tashrng, hurshrng, taslrng, hurslrng,  wbdsrng, wssrng,                         &
 #endif
 #endif
                    ! Input
@@ -304,7 +304,7 @@ CONTAINS
                       wbacpwlh,wbacpwmh,wbacpwhh,wbacflh,wbacfmh, wbacfhh, wbaczlh, wbaczmh, wbaczhh, &
 #endif
 #if CDXWRF>=2
-                      tashurstreshighres, tashurstreslowres, wdswsstres,                              &
+                      tashurstreshighres, tashurstreslowres, wbdswsstres,                             &
 #endif
 #endif
                       ids,ide, jds,jde, kds,kde,                                                      &
@@ -479,7 +479,7 @@ CONTAINS
 ! zol: Characteristic length (z/L) [-]
 ! fracsoil10cm: fraction of the soil layer used to compute 0-10 vertical accumulations
 ! timedbg: frecuency in minutes of time debugging
-! wgsts_wdswsstres: whether wind gusts should be used for wds-wss residence-time (0: no, 1: yes)
+! wgsts_wbdswsstres: whether wind gusts should be used for wbds-wss residence-time (0: no, 1: yes)
 
 !-------- OUTPUT vars ------- [defined at registry.cordex] and included on Registry.EM_COMMON on auxhist9
 ! nsteps: counter of time-steps passed for computation of statistics
@@ -606,7 +606,7 @@ CONTAINS
 !   relative humidity
 ! tashurstreslowres: low-resolution of simultaneous temporal residence of 2-m temperature and 
 !   relative humidity
-! wdswsstres: simultaneous temporal residence of 10-m wind direction (from where it blows) and 
+! wbdswsstres: simultaneous temporal residence of 10-m wind direction (from where it blows) and 
 !   wind speed
 
 !!!!!!! Structure
@@ -648,13 +648,13 @@ CONTAINS
 #endif
 #if CDXWRF>=2
   INTEGER, INTENT(in)                                    :: Nhtasrng, Nhhursrng, Nltasrng, Nlhursrng, &
-    Nwdsrng, Nwssrng
-  INTEGER, INTENT(in)                                    :: Nhtashursrng, Nltashursrng, Nwdswssrng
+    Nwbdsrng, Nwssrng
+  INTEGER, INTENT(in)                                    :: Nhtashursrng, Nltashursrng, Nwbdswssrng
   REAL, DIMENSION(Nhtasrng), INTENT(in)                  :: tashrng
   REAL, DIMENSION(Nhhursrng), INTENT(in)                 :: hurshrng
   REAL, DIMENSION(Nltasrng), INTENT(in)                  :: taslrng
   REAL, DIMENSION(Nlhursrng), INTENT(in)                 :: hurslrng
-  REAL, DIMENSION(Nwdsrng), INTENT(in)                   :: wdsrng
+  REAL, DIMENSION(Nwbdsrng), INTENT(in)                   :: wbdsrng
   REAL, DIMENSION(Nwssrng), INTENT(in)                   :: wssrng
 #endif
 #endif
@@ -693,7 +693,7 @@ CONTAINS
   INTEGER, INTENT(in)                                    :: convxtrm_diag
   INTEGER, INTENT(in)                                    :: visibility_diag, fogvars, zmlagen_diag
   REAL, DIMENSION(1:num_soil_layers), INTENT(in)         :: dzs, fracsoil10cm
-  INTEGER, INTENT(in)                                    :: timedbg, wgsts_wdswsstres
+  INTEGER, INTENT(in)                                    :: timedbg, wgsts_wbdswsstres
 
   INTEGER, INTENT(inout)                                 :: nsteps
   REAL, DIMENSION(ims:ime,1:num_soil_layers,jms:jme),                                                 & 
@@ -750,8 +750,8 @@ CONTAINS
     INTENT(inout)                                        :: tashurstreshighres
   REAL, DIMENSION(ims:ime,Nltashursrng,jms:jme),                                                      &
     INTENT(inout)                                        :: tashurstreslowres
-  REAL, DIMENSION(ims:ime,Nwdswssrng,jms:jme),                                                        &
-    INTENT(inout)                                        :: wdswsstres
+  REAL, DIMENSION(ims:ime,Nwbdswssrng,jms:jme),                                                       &
+    INTENT(inout)                                        :: wbdswsstres
 #endif
 #else
   REAL, DIMENSION(ims:ime,kms:kme,jms:jme)               :: ta, press, zg
@@ -767,7 +767,7 @@ CONTAINS
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: wsz100max, uz100max, vz100max
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: sunshine
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: cdcdx, tauu, tauv, tauugen, tauvgen
-  REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: rsds, rlds, hfls, hfss, rsus, rlus,      &
+  REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: rsds, rlds, hfls, hfss, rsus, rlus,       &
     rsusgen, rlusgen, evspsbl
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: cdgen, evspsblpot, evspsblpotgen
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: snc, snd
@@ -822,7 +822,7 @@ CONTAINS
   REAL, DIMENSION(ims:ime,jms:jme)                       :: vis
   REAL, DIMENSION(ims:ime,jms:jme)                       :: tds
   REAL, DIMENSION(ims:ime,jms:jme)                       :: tws
-  INTEGER                                                :: itas, ihurs, iwds, iwss
+  INTEGER                                                :: itas, ihurs, iwbds, iwss
 #endif
 #if CDXWRF>=3
 #endif
@@ -852,7 +852,7 @@ CONTAINS
 #endif
 #if CDXWRF>=2
   REAL                                                   :: uuas, vvas
-  REAL, DIMENSION(ims:ime,jms:jme)                       :: wdsv, wssv
+  REAL, DIMENSION(ims:ime,jms:jme)                       :: wbdsv, wssv
 #endif
 #if CDXWRF>=3
   REAL, DIMENSION(kms:kme,n_moist)                       :: qvarttend, qvarhadv, qvarzadv
@@ -961,11 +961,11 @@ CONTAINS
           ! Total precipitation
           prv = prc(i,j) + prnc(i,j) + prsh(i,j)
           IF (ijdbg) THEN
-            WRITE(msg,*)'      gustwind_afwa values zagl k=1:', zagl(1), ' prv:', prv,            &
+            WRITE(msg,*)'      gustwind_afwa values zagl k=1:', zagl(1), ' prv:', prv,                &
               ' prate_mm_per_hr:', (prv/dt)*3600., ' ua 1:', unu(i,1,j), ' va 1:', unv(i,1,j)
             CALL wrf_debug(100,msg)
           END IF
-          CALL gustwind_afwa(dimz, dt, u10(i,j), v10(i,j), prv, zagl(:), unu(i,:,j), unv(i,:,j),  &
+          CALL gustwind_afwa(dimz, dt, u10(i,j), v10(i,j), prv, zagl(:), unu(i,:,j), unv(i,:,j),      &
             sina(i,j), cosa(i,j), ugustwind(i,j), vgustwind(i,j), gustpoint(i,j))
           ugustwindhp(i,j) = ugustwind(i,j)
           vgustwindhp(i,j) = vgustwind(i,j)
@@ -1224,7 +1224,7 @@ CONTAINS
         ! Towards it blows
         ! Avoiding seg faults
         IF (curr_secs2 > 0. ) THEN
-          IF (wgsts_wdswsstres == 1) THEN
+          IF (wgsts_wbdswsstres == 1) THEN
             ! Should it be totgustwind or gustwind (either Brasseur or heavy precipitation)? 
             uuas = uas(i,j)+totugustwind(i,j)
             vvas = vas(i,j)+totvgustwind(i,j)
@@ -1233,15 +1233,15 @@ CONTAINS
             vvas = vas(i,j)+0.          
           END IF
           ! From where it blows
-          wdsv(i,j) = ATAN2(-vvas,-uuas)
+          wbdsv(i,j) = ATAN2(-vvas,-uuas)
           wssv(i,j) = SQRT(uuas*uuas + vvas*vvas)
         ELSE
-          wdsv(i,j) = 0.
+          wbdsv(i,j) = 0.
           wssv(i,j) = 0.
         END IF
         
-        ! Getting first bin [-pi/(Nwdsrng-1), pi/(Nwdsrng-1))
-        IF (wdsv(i,j) >= piconst*(2.-1./(Nwdsrng-1))) wdsv(i,j) = wdsv(i,j) - 2.*piconst
+        ! Getting first bin [-pi/(Nwbdsrng-1), pi/(Nwbdsrng-1))
+        IF (wbdsv(i,j) >= piconst*(2.-1./(Nwbdsrng-1))) wbdsv(i,j) = wbdsv(i,j) - 2.*piconst
         
 #endif
 #if CDXWRF>=3
@@ -1267,7 +1267,7 @@ CONTAINS
             qvhadv(i,:,j), qchadv(i,:,j), qrhadv(i,:,j), qshadv(i,:,j), qihadv(i,:,j), qghadv(i,:,j), &
             qhhadv(i,:,j), qvarhadv)
           IF (ijdbg) THEN
-            WRITE(message,*)' 2 hadv: v', qvhadv(i,2,j), ' c', qchadv(i,2,j), ' r', qrhadv(i,2,j),   &
+            WRITE(message,*)' 2 hadv: v', qvhadv(i,2,j), ' c', qchadv(i,2,j), ' r', qrhadv(i,2,j),    &
               ' s', qshadv(i,2,j), ' i', qihadv(i,2,j), ' g', qghadv(i,2,j), ' h', qhhadv(i,2,j)
             CALL wrf_debug(100,message)
             WRITE(message,*)'qvarhadv:',  qvarhadv(2,:)
@@ -1558,10 +1558,10 @@ CONTAINS
           tashurstreslowres(i,(itas-1)*Nlhursrng+ihurs,j) = dt          
           
           ! wind direction and speed
-          CALL var_residencetime_2var2D(wdsv(i,j), wssv(i,j), Nwdsrng, Nwssrng, wdsrng, wssrng,       &
-            iwds,iwss)
-          wdswsstres(i,:,j) = 0.            
-          wdswsstres(i,(iwds-1)*Nwssrng+iwss,j) = dt          
+          CALL var_residencetime_2var2D(wbdsv(i,j), wssv(i,j), Nwbdsrng, Nwssrng, wbdsrng, wssrng,    &
+            iwbds,iwss)
+          wbdswsstres(i,:,j) = 0.            
+          wbdswsstres(i,(iwbds-1)*Nwssrng+iwss,j) = dt          
 
 #endif
 #endif
@@ -1685,7 +1685,7 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    tashurstreshighres: ',tashurstreshighres(i,INT(Nhtasrng/2*Nhhursrng/2),j),&
               ' tashurstreslowres: ', tashurstreslowres(i,INT(Nltasrng/2*Nlhursrng/2),j),              &
-              ' wdswsstres: ', wdswsstres(i,INT(Nwdsrng/2*Nwssrng/2),j)
+              ' wbdswsstres: ', wbdswsstres(i,INT(Nwbdsrng/2*Nwssrng/2),j)
             CALL wrf_debug(75,msg)
 #endif
 #endif
@@ -1966,16 +1966,16 @@ CONTAINS
             tashurstreslowres(i,(itas-1)*Nlhursrng+ihurs,j) + dt
 
           ! wind direction and speed
-          CALL var_residencetime_2var2D(wdsv(i,j), wssv(i,j), Nwdsrng, Nwssrng, wdsrng, wssrng,       &
-            iwds,iwss)
-          wdswsstres(i,(iwds-1)*Nwssrng+iwss,j) = wdswsstres(i,(iwds-1)*Nwssrng+iwss,j) + dt          
+          CALL var_residencetime_2var2D(wbdsv(i,j), wssv(i,j), Nwbdsrng, Nwssrng, wbdsrng, wssrng,    &
+            iwbds,iwss)
+          wbdswsstres(i,(iwbds-1)*Nwssrng+iwss,j) = wbdswsstres(i,(iwbds-1)*Nwssrng+iwss,j) + dt          
           IF (ijdbg .AND. tdbg==0) THEN
-            PRINT *,'  i,j:', i,j, ' wds:', wdsv(i,j),' wss:', wssv(i,j)
-            PRINT *,'  wds bin:', wdsrng(iwds-1), '- ', wdsrng(iwds)
+            PRINT *,'  i,j:', i,j, ' wbds:', wbdsv(i,j),' wss:', wssv(i,j)
+            PRINT *,'  wbds bin:', wbdsrng(iwbds-1), '- ', wbdsrng(iwbds)
             PRINT *,'  wss bin:', wssrng(iwss-1), '- ', wssrng(iwss)
-            PRINT *,'  Nwdsrng:', Nwdsrng, ' Nwssrng:', Nwssrng
-            PRINT *,'  iwds, iwss:', iwds, iwss, 'kwdswss:', (iwds-1)*Nwssrng+iwss
-            PRINT *,'  current value prior dt:', wdswsstres(i,(iwds-1)*Nwssrng+iwss,j)
+            PRINT *,'  Nwbdsrng:', Nwbdsrng, ' Nwssrng:', Nwssrng
+            PRINT *,'  iwbds, iwss:', iwbds, iwss, 'kwbdswss:', (iwbds-1)*Nwssrng+iwss
+            PRINT *,'  current value prior dt:', wbdswsstres(i,(iwbds-1)*Nwssrng+iwss,j)
 !            PRINT *,'  all values:', tashurstreslowres(i,:,j)
           END IF
 
@@ -2106,7 +2106,7 @@ CONTAINS
 #if CDXWRF>=2
             WRITE(msg,*)'    tashurstreshighres: ',tashurstreshighres(i,INT(Nhtasrng/2*Nhhursrng/2),j),&
               ' tashurstreslowres: ', tashurstreslowres(i,INT(Nltasrng/2*Nlhursrng/2),j),              &
-              ' wdswsstres: ', wdswsstres(i,INT(Nwdsrng/2*Nwssrng/2),j)
+              ' wbdswsstres: ', wbdswsstres(i,INT(Nwbdsrng/2*Nwssrng/2),j)
             CALL wrf_debug(75,msg)
 #endif
 #endif

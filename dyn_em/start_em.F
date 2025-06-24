@@ -1285,9 +1285,9 @@ endif
 #if CDXWRF>=2
                       ,model_config_rec%nhtasrng, model_config_rec%nhhursrng                         &
                       ,model_config_rec%nltasrng, model_config_rec%nlhursrng                         &
-                      ,model_config_rec%nwdsrng, model_config_rec%nwssrng                            &
+                      ,model_config_rec%nwbdsrng, model_config_rec%nwssrng                           &
                       ,grid%htasbins, grid%hhursbins, grid%ltasbins, grid%lhursbins                  &
-                      ,grid%wdsbins, grid%wssbins                                                    &
+                      ,grid%wbdsbins, grid%wssbins                                                   &
 #endif
 #endif
 

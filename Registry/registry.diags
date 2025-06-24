@@ -12,19 +12,19 @@ dimspec    ht      2     namelist=nhtasrng                 c     nhtasrng
 dimspec    hh      2     namelist=nhhursrng                c     nhhursrng
 dimspec    lt      2     namelist=nltasrng                 c     nltasrng
 dimspec    lh      2     namelist=nlhursrng                c     nlhursrng
-dimspec    wd      2     namelist=nwdsrng                  c     nwdsrng
+dimspec    wd      2     namelist=nwbdsrng                 c     nwbdsrng
 dimspec    ws      2     namelist=nwssrng                  c     nwssrng
 ## L. Fita, so, WRF output will provide a (n[h/l]tasrng*n[h/l]hursrng) 3D variable instead
 dimspec    hth     2     namelist=nhtashursrng             z     nhtashursrng
 dimspec    lth     2     namelist=nltashursrng             z     nltashursrng
-dimspec    wds     2     namelist=nwdswssrng               z     nwdswssrng
+dimspec    wds     2     namelist=nwbdswssrng              z     nwbdswssrng
 
 #  Namelist parameters
 
 rconfig   integer     p_lev_diags         namelist,diags   1            0   -    "flag to process vertical interp diagnostics: 0=nope, 1=yep" "flag"
 rconfig   integer     p_lev_diags_dfi     namelist,diags   1            0   -    "when doing p_level diags and dfi, turn off diags during 'non forecast'"
 rconfig   integer     num_press_levels    namelist,diags   1            0   -    "number of pressure levels to interpolate diagnostics to"    "index"
-rconfig   real            press_levels    namelist,diags   max_plevs    0   -    "array of pressure levels to interpolate diagnostics to"     "Pa"
+rconfig   real        press_levels        namelist,diags   max_plevs    0   -    "array of pressure levels to interpolate diagnostics to"     "Pa"
 rconfig   integer     use_tot_or_hyd_p    namelist,diags   1            2   -    "1=use total pressure, 2=use hydrostatic pressure"           "flag"
 rconfig   integer     extrap_below_grnd   namelist,diags   1            1   -    "1=no extrapolation, 2=extrapolate adiabatically"            "flag"
 rconfig   real        p_lev_missing       namelist,diags   1         -999   -    "missing values below ground, no extrapolation"              "constant"
