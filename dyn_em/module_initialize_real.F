@@ -3117,20 +3117,9 @@ integer::oops1,oops2
          DO j = jts , MIN(jde-1,jte)
             DO i = its , MIN(ide-1,ite)
                IF ( skip_middle_points_t ( ids , ide , jds , jde , i , j , em_width , hold_ups ) ) CYCLE
-!CORDEX
-!               DO k = 1, 15
-!                  grid%HI_URB2D(i,k,j)  = grid%URB_PARAM(i,k+117,j)
-!               END DO
-! force to one level
-               DO k = 1, 6!15
-                  grid%HI_URB2D(i,k,j)  =0.! grid%URB_PARAM(i,k+117,j)
+               DO k = 1, 15
+                  grid%HI_URB2D(i,k,j)  = grid%URB_PARAM(i,k+117,j)
                END DO
-               k=int(grid%HGT_URB2D(i,j)/10.)+1
-               if(k.lt.1)k=1
-               if(k.gt.4)k=4
-               grid%HI_URB2D(i,k,j)  =1.
-! force to one level
-
             END DO
          END DO
       ENDIF
