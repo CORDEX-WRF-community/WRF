@@ -941,6 +941,27 @@ CONTAINS
         ! 10m Earth rotated winds
         CALL var_uasvas(u10(i,j), v10(i,j), sina(i,j), cosa(i,j), uas(i,j), vas(i,j))
 
+        ! Not using var_vertint, since we have a full loop in soil_layers
+        !! mrso
+        !WRITE(msg,*) '  ' // TRIM(fname) // ': computing MRSO diagnostic'
+        !IF (ijdbg) CALL wrf_debug(50,msg)
+        !CALL var_vertint(smois(i,:,j), num_soil_layers, dzs(:), ABS(dzs(:)/dzs(:)), mrso(i,j))
+
+        !! slw
+        !WRITE(msg,*) '  ' // TRIM(fname) // ': computing SLW diagnostic'
+        !IF (ijdbg) CALL wrf_debug(50,msg)
+        !CALL var_vertint(sh2o(i,:,j), num_soil_layers, dzs(:), ABS(dzs(:)/dzs(:)), slw(i,j))
+
+        ! Land water
+        ! First layer soil
+        ! FROM: https://wcrp-cordex.github.io/cordex-cmip6-data-request/)
+        DO k=1, num_soil_layers
+          mrsos(i,j) = smois(i,k,j)*dzs(k)*fracsoil10cm(k)
+          mrso(i,j) = smois(i,k,j)*dzs(k)
+          mrsol(i,k,j) = sh2o(i,k,j)*dzs(k)*1000.
+          slw(i,j) = slw(i,j) + mrsol(i,k,j)
+        END DO
+        
         ! Wind-gust
 
         ! Avoiding seg faults
@@ -1395,14 +1416,6 @@ CONTAINS
           ! Run-off (already accumulations)
           pmrros(i,j) = sfcrunoff(i,j)
           pmrro(i,j) = sfcrunoff(i,j) + udrunoff(i,j)
-
-          ! First layer soil
-          ! FROM: https://wcrp-cordex.github.io/cordex-cmip6-data-request/)
-          DO k=1, num_soil_layers
-            mrsosmean(i,j) = smois(i,k,j)*dzs(k)*fracsoil10cm(k)
-            mrsomean(i,j) = smois(i,k,j)*dzs(k)
-            mrsolmean(i,k,j) = sh2o(i,k,j)*dzs(k)*1000.
-          END DO
           
           ! Precipitations
           flxpr(i,j) = prc(i,j) + prnc(i,j) + prsh(i,j)
@@ -1416,6 +1429,14 @@ CONTAINS
           rsdt(i,j) = swdnt(i,j)
           rsut(i,j) = swupt(i,j)
           rlut(i,j) = lwupt(i,j)
+
+          ! Soil
+          mrsosmean(i,j) = mrsos(i,j)
+          mrsomean(i,j) = mrso(i,j)
+          slwmean(i,j) = slw(i,j)
+          DO k=1, num_soil_layers
+            mrsolmean(i,k,j) = + mrsol(i,k,j)
+          END DO
 
 #ifdef CDXWRF
 #if CDXWRF>=1
@@ -1764,10 +1785,11 @@ CONTAINS
           mrro(i,j) = sfcrunoff(i,j) + udrunoff(i,j)
 
           ! Soil
+          mrsosmean(i,j) = mrsosmean(i,j) + mrsos(i,j)
+          mrsomean(i,j) = mrsomean(i,j) + mrso(i,j)
+          slwmean(i,j) = slwmean(i,j) + slw(i,j)
           DO k=1, num_soil_layers
-            mrsosmean(i,j) = mrsosmean(i,j) + smois(i,k,j)*dzs(k)*fracsoil10cm(k)
-            mrsomean(i,j) = mrsomean(i,j) + smois(i,k,j)*dzs(k)
-            mrsolmean(i,k,j) = mrsolmean(i,k,j) + sh2o(i,k,j)*dzs(k)*1000
+            mrsolmean(i,k,j) = mrsolmean(i,k,j) + mrsol(i,k,j)
           END DO
 
           ! Precipitations
@@ -2219,21 +2241,6 @@ CONTAINS
               CALL wrf_error_fatal(msg)
           END SELECT psldiag
           IF (ijdbg) CALL wrf_debug(100,msg)
-
-          ! mrso
-          WRITE(msg,*) '  ' // TRIM(fname) // ': computing MRSO diagnostic'
-          IF (ijdbg) CALL wrf_debug(50,msg)
-          CALL var_vertint(smois(i,:,j), num_soil_layers, dzs(:), ABS(dzs(:)/dzs(:)), mrso(i,j))
-
-          ! slw
-          WRITE(msg,*) '  ' // TRIM(fname) // ': computing SLW diagnostic'
-          IF (ijdbg) CALL wrf_debug(50,msg)
-          CALL var_vertint(sh2o(i,:,j), num_soil_layers, dzs(:), ABS(dzs(:)/dzs(:)), slw(i,j))
-
-          DO k=1, num_soil_layers
-            mrsos(i,j) = smois(i,k,j)*dzs(k)*fracsoil10cm(k)
-            mrsol(i,k,j) = sh2o(i,k,j)*dzs(k)*1000.
-          END DO
 
           ! tauu, tauv
           WRITE(msg,*) '  ' // TRIM(fname) // ': computing tauu,tauv diagnostic'
