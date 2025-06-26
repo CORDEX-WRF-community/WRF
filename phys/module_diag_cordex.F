@@ -968,7 +968,7 @@ CONTAINS
         IF (curr_secs2 > 0. ) THEN
           WRITE(msg,*) '  ' // TRIM(fname) // ': computing Wind-gust'
 
-          IF (ijdbg) CALL wrf_debug(50,msg)
+          IF (ijdbg .AND. tdbg==0) CALL wrf_debug(50,msg)
           ! Brasseur methodology 
           CALL gustwind_Brasseur01(dimz, geopoth(i,:,j), qv(i,:,j), qc(i,:,j), th(i,:,j), tke(i,:,j), &
             unu(i,:,j), unv(i,:,j), pblh(i,j), hgt(i,j), sina(i,j), cosa(i,j), ugustwind(i,j),        &
@@ -981,7 +981,7 @@ CONTAINS
           zagl = z(i,:,j)-hgt(i,j)
           ! Total precipitation
           prv = prc(i,j) + prnc(i,j) + prsh(i,j)
-          IF (ijdbg) THEN
+          IF (ijdbg .AND. tdbg==0) THEN
             WRITE(msg,*)'      gustwind_afwa values zagl k=1:', zagl(1), ' prv:', prv,                &
               ' prate_mm_per_hr:', (prv/dt)*3600., ' ua 1:', unu(i,1,j), ' va 1:', unv(i,1,j)
             CALL wrf_debug(100,msg)
@@ -1050,7 +1050,7 @@ CONTAINS
         ! Avoiding seg faults
         IF (curr_secs2 > 0. ) THEN
           WRITE(msg,*) '  ' // TRIM(fname) // ': computing z-wind at:', zhgtzw, ' m'
-          IF (ijdbg) CALL wrf_debug(50,msg)
+          IF (ijdbg .AND. tdbg==0) CALL wrf_debug(50,msg)
 
           ! Height above surface at half-mass levels
           zsfc = zg(i,:,j)-hgt(i,j)
@@ -1102,7 +1102,7 @@ CONTAINS
         ! Avoiding seg faults
         IF (curr_secs2 > 0. ) THEN
           WRITE(msg,*) '  ' // TRIM(fname) // ': computing z-wind at:', zhgtzw, ' m'
-          IF (ijdbg) CALL wrf_debug(50,msg)
+          IF (ijdbg .AND. tdbg==0) CALL wrf_debug(50,msg)
 
           ! Generic first-order approximation drag coefficient
           CALL Cdrag_0(ust(i,j), uas(i,j), vas(i,j), cdgen(i,j))
@@ -1149,10 +1149,10 @@ CONTAINS
         IF (convxtrm_diag == 1) THEN
           IF (curr_secs2 > 0. ) THEN
             WRITE(msg,*) '  ' // TRIM(fname) // ': computing z-wind at:', zhgtzw, ' m'
-            IF (ijdbg) CALL wrf_debug(50,msg)
+            IF (ijdbg .AND. tdbg==0) CALL wrf_debug(50,msg)
             ! cape (no need to reach top of atmosphere... dz1)
             WRITE(msg,*) '  ' // TRIM(fname) // ': computing CAPE diagnostic'
-            IF (ijdbg) CALL wrf_debug(50,msg)
+            IF (ijdbg .AND. tdbg==0) CALL wrf_debug(50,msg)
 
             CALL var_cape_afwa(dz1, t(i,1:dz1,j), hur(i,1:dz1,j)*100., p_phy(i,1:dz1,j), z(i,1:dz1,j),&
               1, cape(i,j), cin(i,j), zlfc(i,j), plfc(i,j), lidx(i,j), 3)
@@ -1191,7 +1191,7 @@ CONTAINS
         ! Avoiding seg faults
         IF (curr_secs2 > 0. ) THEN
           WRITE(msg,*) '  ' // TRIM(fname) // ': computing fog'
-          IF (ijdbg) CALL wrf_debug(50,msg)
+          IF (ijdbg .AND. tdbg==0) CALL wrf_debug(50,msg)
 
           ! fog
           fogdiag: SELECT CASE (visibility_diag)
@@ -1272,13 +1272,13 @@ CONTAINS
         IF (wbout == 1) THEN
           WRITE(msg,*)'    ' // TRIM(fname) // ' Water species: vapor:', m_qv,' cloud:', m_qc,        &
             ' rain:', m_qr, ' snow:', m_qs,' ice:', m_qi, ' graupel:', m_qg,' hail:', m_qh
-          IF (ijdbg) CALL wrf_debug(100,msg)
+          IF (ijdbg .AND. tdbg==0) CALL wrf_debug(100,msg)
 
           ! Grouping variables         
           CALL moist_group2D(n_moist, dimz, m_qv, m_qc, m_qr, m_qs, m_qi, m_qg, m_qh,                 &
             qvttend(i,:,j), qcttend(i,:,j), qrttend(i,:,j), qsttend(i,:,j), qittend(i,:,j),           &
             qgttend(i,:,j), qhttend(i,:,j), qvarttend)
-          IF (ijdbg) THEN
+          IF (ijdbg .AND. tdbg==0) THEN
             WRITE(message,*)'moist ttend 2: v', qvttend(i,2,j), ' c', qcttend(i,2,j), ' r',           &
               qrttend(i,2,j), ' s', qsttend(i,2,j), ' i', qittend(i,2,j), ' g', qgttend(i,2,j),       &
               ' h', qhttend(i,2,j)
@@ -1289,7 +1289,7 @@ CONTAINS
           CALL moist_group2D(n_moist, dimz, m_qv, m_qc, m_qr, m_qs, m_qi, m_qg, m_qh,                 &
             qvhadv(i,:,j), qchadv(i,:,j), qrhadv(i,:,j), qshadv(i,:,j), qihadv(i,:,j), qghadv(i,:,j), &
             qhhadv(i,:,j), qvarhadv)
-          IF (ijdbg) THEN
+          IF (ijdbg .AND. tdbg==0) THEN
             WRITE(message,*)' 2 hadv: v', qvhadv(i,2,j), ' c', qchadv(i,2,j), ' r', qrhadv(i,2,j),    &
               ' s', qshadv(i,2,j), ' i', qihadv(i,2,j), ' g', qghadv(i,2,j), ' h', qhhadv(i,2,j)
             CALL wrf_debug(100,message)
@@ -1435,7 +1435,7 @@ CONTAINS
           mrsomean(i,j) = mrso(i,j)
           slwmean(i,j) = slw(i,j)
           DO k=1, num_soil_layers
-            mrsolmean(i,k,j) = + mrsol(i,k,j)
+            mrsolmean(i,k,j) = mrsol(i,k,j)
           END DO
 
 #ifdef CDXWRF
@@ -1589,7 +1589,7 @@ CONTAINS
 #endif
 #endif
 
-          IF (dbg_level >= 75 .AND. ijdbg) THEN
+          IF (dbg_level >= 75 .AND. ijdbg .AND. tdbg==0) THEN
             WRITE(msg,*) '  ' // TRIM(fname) // ' ',i,' ,',j,' : first value checks _______' 
             CALL wrf_debug(75,msg)
             WRITE(msg,*) '    longitude:', lon(i,j),' latitude:',lat(i,j)
@@ -1645,6 +1645,14 @@ CONTAINS
             WRITE(msg,*)'    snowc:', snowc(i,j), ' snc:', snc(i,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    snowh:', snowh(i,j), ' snd:', snd(i,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j), &
+              mrsol(i,2,j), ' slw:', slw(i,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    fracsoil10cm (1,2):', fracsoil10cm(1), fracsoil10cm(2)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrsosmean:', mrsosmean(i,j), ' mrsomean:', mrsomean(i,j),                &
+              ' mrsolmean (1,2):', mrsolmean(i,1,j), mrsolmean(i,2,j), ' slwmean:', slwmean(i,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    sfcrunoff:', sfcrunoff(i,j), ' pmrros:', pmrros(i,j), ' mrros:', mrros(i,j)
             CALL wrf_debug(75,msg)
@@ -2006,7 +2014,7 @@ CONTAINS
 #endif
 #endif
 
-          IF (dbg_level >= 75 .AND. ijdbg) THEN
+          IF (dbg_level >= 75 .AND. ijdbg .AND. tdbg==0) THEN
             WRITE(msg,*) '  ' // TRIM(fname) // ' ',i,' ,',j,' : intermediate checks _______' 
             CALL wrf_debug(75,msg)
             WRITE(msg,*) '    longitude:', lon(i,j),' latitude:',lat(i,j)
@@ -2056,6 +2064,14 @@ CONTAINS
             WRITE(msg,*)'    snowc:', snowc(i,j), ' snc:', snc(i,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    snowh:', snowh(i,j), ' snd:', snd(i,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j), &
+              mrsol(i,2,j), ' slw:', slw(i,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    fracsoil10cm (1,2):', fracsoil10cm(1), fracsoil10cm(2)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrsosmean:', mrsosmean(i,j), ' mrsomean:', mrsomean(i,j),                &
+              ' mrsolmean (1,2):', mrsolmean(i,1,j), mrsolmean(i,2,j), ' slwmean:', slwmean(i,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    sfcrunoff:', sfcrunoff(i,j), ' mrros:', mrros(i,j)
             CALL wrf_debug(75,msg)
@@ -2219,7 +2235,7 @@ CONTAINS
 
           ! sea level pressure
           WRITE(msg,*) '  ' // TRIM(fname) // ': computing sea level pressure diagnostic'
-          IF (ijdbg) CALL wrf_debug(50,msg)
+          IF (ijdbg .AND. tdbg==0) CALL wrf_debug(50,msg)
           psldiag: SELECT CASE (psl_diag)
             CASE (dpslshuell)
               WRITE(msg,*) '  ' // TRIM(fname) // ': psl diagnostic= ', psl_diag, '  hydrostatic ' // &
@@ -2240,7 +2256,7 @@ CONTAINS
                  dpslecmwf,' : ecmwf '
               CALL wrf_error_fatal(msg)
           END SELECT psldiag
-          IF (ijdbg) CALL wrf_debug(100,msg)
+          IF (ijdbg .AND. tdbg==0) CALL wrf_debug(100,msg)
 
           ! tauu, tauv
           WRITE(msg,*) '  ' // TRIM(fname) // ': computing tauu,tauv diagnostic'
@@ -2324,10 +2340,10 @@ CONTAINS
 
           ! zmla_gen
           WRITE(msg,*) '  ' // TRIM(fname) // ': computing zmla generic diagnostic'
-          IF (ijdbg) CALL wrf_debug(50,msg)
+          IF (ijdbg .AND. tdbg==0) CALL wrf_debug(50,msg)
           IF (zmlagen_diag == zmlagenthetae) THEN
             WRITE(msg,*) '     use theta-based method (Nielsen-Gammon et al., 2008)'
-            IF (ijdbg) CALL wrf_debug(50,msg)      
+            IF (ijdbg .AND. tdbg==0) CALL wrf_debug(50,msg)      
             CALL var_zmla_generic(dimz, qv(i,:,j), th(i,:,j), z(i,:,j), hgt(i,j), dqv, dtheta,        &
               zmla(i,j))
           ELSE IF (zmlagen_diag == zmlagenbulk) THEN
@@ -2450,6 +2466,14 @@ CONTAINS
             WRITE(msg,*)'    snowc:', snowc(i,j), ' snc:', snc(i,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    snowh:', snowh(i,j), ' snd:', snd(i,j)
+            CALL wrf_debug(75,msg)
+             WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j), &
+              mrsol(i,2,j), ' slw:', slw(i,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    fracsoil10cm (1,2):', fracsoil10cm(1), fracsoil10cm(2)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrsosmean:', mrsosmean(i,j), ' mrsomean:', mrsomean(i,j),                &
+              ' mrsolmean (1,2):', mrsolmean(i,1,j), mrsolmean(i,2,j), ' slwmean:', slwmean(i,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    sfcrunoff:', sfcrunoff(i,j), ' mrros:', mrros(i,j)
             CALL wrf_debug(75,msg)
