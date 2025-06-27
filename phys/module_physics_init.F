@@ -286,7 +286,7 @@ CONTAINS
 #ifdef CDXWRF
                          ,fracsoil10cm                                            &
                          ,londbg, latdbg                                          &
-                         ,ibdg, jdbg                                              &
+                         ,idbg, jdbg                                              &
 #if CDXWRF>=2
                          ,nhtasrng, nhhursrng, nltasrng, nlhursrng                &
                          ,nwbdsrng, nwssrng                                       &

@@ -1283,7 +1283,7 @@ endif
 #ifdef CDXWRF
                       ,grid%fracsoil10cm                                                             &
                       ,model_config_rec%londbg, model_config_rec%latdbg                              &
-                      ,grid%ibdg, grid%jdbg                                                          &
+                      ,grid%idbg, grid%jdbg                                                          &
 
 #if CDXWRF>=2
                       ,model_config_rec%nhtasrng, model_config_rec%nhhursrng                         &
