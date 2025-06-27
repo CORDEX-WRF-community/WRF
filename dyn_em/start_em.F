@@ -1282,6 +1282,9 @@ endif
                       ,grid%aeropcu,grid%EFCG,grid%EFCS,grid%EFIG,grid%EFIS,grid%EFSG,grid%EFSS      &
 #ifdef CDXWRF
                       ,grid%fracsoil10cm                                                             &
+                      ,model_config_rec%londbg, model_config_rec%latdbg                              &
+                      ,grid%ibdg, grid%jdbg                                                          &
+
 #if CDXWRF>=2
                       ,model_config_rec%nhtasrng, model_config_rec%nhhursrng                         &
                       ,model_config_rec%nltasrng, model_config_rec%nlhursrng                         &

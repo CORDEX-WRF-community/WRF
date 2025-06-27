@@ -57,9 +57,8 @@ rconfig   integer wgsts_wbdswsstres       namelist,cordex       1              1
 
 # CORDEX variables
 state    integer  cdxnsteps      -      misc        -         -       r       "cdxnsteps"             "CORDEX Time Step Counter"                                ""
-state    integer  idbg           -      misc        -         -       r       "idbg"                  "i-grid point from londbg,latdbg for debugging"                                ""
-state    integer  jdbg           -      misc        -         -       r       "jdbg"                  "j-grid point from latdbgmlatdbg for debugging"                                ""
-state    integer  ijtile         -      misc        -         -       r       "ijtile"                "ij-tile point from londbg, latdbg for debugging"                                ""
+state    integer  idbg           -      misc        -         -     rh9       "idbg"                  "i-grid point from londbg,latdbg for debugging"                                ""
+state    integer  jdbg           -      misc        -         -     rh9       "jdbg"                  "j-grid point from latdbgmlatdbg for debugging"                                ""
 state    real  CDXLON           ij      misc        1         -      h9       "lon"                   "LONGITUDE"                                               "degrees_east"
 state    real  CDXLAT           ij      misc        1         -      h9       "lat"                   "LATITUDE"                                                "degrees_north"
 state    real  PCLT             ij      misc        1         -      r        "pclt"                  "PREVIOUS TOTAL CLOUDINESS"                               "%"

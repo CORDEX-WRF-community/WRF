@@ -285,6 +285,8 @@ CONTAINS
 #endif
 #ifdef CDXWRF
                          ,fracsoil10cm                                            &
+                         ,londbg, latdbg                                          &
+                         ,ibdg, jdbg                                              &
 #if CDXWRF>=2
                          ,nhtasrng, nhhursrng, nltasrng, nlhursrng                &
                          ,nwbdsrng, nwssrng                                       &
@@ -871,6 +873,9 @@ CONTAINS
 
 #ifdef CDXWRF
    REAL, DIMENSION(1:num_soil_layers), INTENT(out)       :: fracsoil10cm
+   REAL, INTENT(in)                                      :: londbg, latdbg
+   INTEGER, INTENT(out)                                  :: idbg, jdbg
+   
 #if CDXWRF>=2
    INTEGER, INTENT(in)                                   :: nhtasrng, nhhursrng, nltasrng, nlhursrng
    INTEGER, INTENT(in)                                   :: nwbdsrng, nwssrng   
@@ -1785,6 +1790,13 @@ CHARACTER(LEN=8) :: name
 
 #ifdef CDXWRF
   CALL cdxwrf_init(config_flags%num_soil_layers, dzs                                                  &
+    ,xlong, xlat                                                                                      &
+    ,londbg, latdbg                                                                                   &
+    ,idbg, jdbg                                                                                       &
+    ,ids, ide, jds, jde, kds, kde                                                                     &
+    ,ims, ime, jms, jme, kms, kme                                                                     &
+    ,its, ite, jts, jte, kts, kte                                                                     &
+
 #if CDXWRF>=2
     ,model_config_rec%nhtasrng, model_config_rec%nhhursrng                                            &
     ,model_config_rec%nltasrng, model_config_rec%nlhursrng                                            &
@@ -5730,6 +5742,13 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
 
 #ifdef CDXWRF
   SUBROUTINE cdxwrf_init(num_soil_layers, dzs                                                         &
+    ,xlong, xlat                                                                                      &
+    ,londbg, latdbg                                                                                   &
+    ,idbg, jdbg                                                                                       &
+    ,ids, ide, jds, jde, kds, kde                                                                     &
+    ,ims, ime, jms, jme, kms, kme                                                                     &
+    ,its, ite, jts, jte, kts, kte                                                                     &
+
 #if CDXWRF>=2
     ,nhtasrng, nhhursrng                                                                              & 
     ,nltasrng, nlhursrng                                                                              &
@@ -5751,6 +5770,11 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     ! Input
     INTEGER, INTENT(in)                                  :: num_soil_layers
     REAL, DIMENSION(1:num_soil_layers), INTENT(in)       :: dzs
+    INTEGER, INTENT(in)                                  :: ids, ide, jds, jde, kds, kde
+    INTEGER, INTENT(in)                                  :: ims, ime, jms, jme, kms, kme
+    INTEGER, INTENT(in)                                  :: its, ite, jts, jte, kts, kte
+    REAL, DIMENSION( ims:ime , jms:jme ), INTENT(in)     :: xlong, xlat
+    REAL, INTENT(in)                                     :: londbg, latdbg
     INTEGER, INTENT(in)                                  :: nhtasrng, nhhursrng, nltasrng, nlhursrng
     INTEGER, INTENT(in)                                  :: nwbdsrng, nwssrng
     INTEGER, INTENT(in)                                  :: nhtashursrng, nltashursrng
@@ -5763,6 +5787,7 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     REAL, DIMENSION(Nwssrng), INTENT(in)                 :: wssrng
     
     ! Output
+    INTEGER, INTENT(out)                                 :: idbg, jdbg
     REAL, DIMENSION(1:num_soil_layers), INTENT(out)      :: fracsoil10cm
     REAL, DIMENSION(Nhtasrng), INTENT(out)               :: htasbins
     REAL, DIMENSION(Nhhursrng), INTENT(out)              :: hhursbins
@@ -5772,10 +5797,47 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     REAL, DIMENSION(Nwssrng), INTENT(out)                :: wssbins
     
     ! Local
-    INTEGER                                              :: k
+    INTEGER                                              :: i,j,k
     REAL                                                 :: inczsoil
+    REAL                                                 :: mindist
+    REAL                                                 :: ddlon, ddlat, mindd
+    REAL, DIMENSION( ims:ime , jms:jme )                 :: dist, ddist, dlon, dlat
     CHARACTER (LEN=1000)                                 :: diag_message
+    LOGICAL                                              :: found
+
+    ! lon, lat debugging point
+    ! Minimum grid distance
+    dlon = 10000.
+    dlon(ims:ime-1,jms:jme) = xlong(ims:ime-1,jms:jme)-xlong(ims+1:ime,jms:jme)
     
+    dlat = 10000.
+    dlat(ims:ime,jms:jme-1) = xlat(ims:ime,jms:jme-1)-xlat(ims:ime,jms+1:jme)
+
+    ddist = 1000.
+    ddist = SQRT(dlon*dlon + dlat*dlat)
+    mindd = MINVAL(ddist)
+    
+    ! Minimum distance to the debugging point
+    dist = SQRT((xlong-londbg)**2+(xlat-latdbg)**2)
+    mindist = MINVAL(dist)
+    
+    found = .FALSE.
+    IF (mindist < mindd) THEN
+      DO i=its, ite
+        DO j=jts, jte
+
+          IF (dist(i,j) == mindist) THEN
+            idbg = i
+            jdbg = j
+            found = .TRUE.
+            EXIT
+          END IF
+        END DO
+        IF (found) EXIT
+      END DO
+    END IF 
+    
+    ! Soil layers to retrieve 10cm diagnostics
     inczsoil = 0.
     DO k=1, num_soil_layers
       IF (inczsoil < 0.1) THEN
@@ -5791,6 +5853,8 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     END DO
 
 #if CDXWRF>=2
+    ! Residence time
+
     ! Consistency checks
     IF ( nhtasrng*nhhursrng /= nhtashursrng) THEN
       PRINT *, '  nhtasrng: ', nhtasrng, ' nhhursrng: ', nhhursrng, ' nhtashursrng: ', nhtashursrng
