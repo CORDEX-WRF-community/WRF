@@ -204,6 +204,8 @@ CONTAINS
                       convxtrm_diag,                                                                  &
                       visibility_diag, fogvars, zmlagen_diag,                                         &
                       timedbg, wgsts_wbdswsstres,                                                     &
+                      londbg, latdbg,                                                                 &
+                      idbg, jdbg,                                                                     &
 #ifdef CDXWRF
 #if CDXWRF>=2
                       Nhtasrng, Nhhursrng, Nltasrng, Nlhursrng, Nwbdsrng, Nwssrng,                    &
@@ -479,6 +481,8 @@ CONTAINS
 ! zol: Characteristic length (z/L) [-]
 ! fracsoil10cm: fraction of the soil layer used to compute 0-10 vertical accumulations
 ! timedbg: frecuency in minutes of time debugging
+! londbg, latdbg: coordinates of the debugging grid point (-999. if not set-up)
+! idbg, jdbg: grid point coordinates of the debugging grid point
 ! wgsts_wbdswsstres: whether wind gusts should be used for wbds-wss residence-time (0: no, 1: yes)
 
 !-------- OUTPUT vars ------- [defined at registry.cordex] and included on Registry.EM_COMMON on auxhist9
@@ -694,6 +698,8 @@ CONTAINS
   INTEGER, INTENT(in)                                    :: visibility_diag, fogvars, zmlagen_diag
   REAL, DIMENSION(1:num_soil_layers), INTENT(in)         :: dzs, fracsoil10cm
   INTEGER, INTENT(in)                                    :: timedbg, wgsts_wbdswsstres
+  REAL, INTENT(in)                                       :: londbg, latdbg
+  INTEGER, INTENT(in)                                    :: idbg, jdbg
 
   INTEGER, INTENT(inout)                                 :: nsteps
   REAL, DIMENSION(ims:ime,1:num_soil_layers,jms:jme),                                                 & 
@@ -903,13 +909,23 @@ CONTAINS
   th = thp + 300.
 
   ! For test purposes
-  !$OMP PARALLEL DO   &
-  !$OMP PRIVATE ( ij )
-  DO ij = 1 , num_tiles
-    i2(ij) = INT(0.5*(i_start(ij) + i_end(ij)))
-    j2(ij) = INT(0.5*(j_start(ij) + j_end(ij)))
-  END DO
-  !$OMP END PARALLEL DO
+  IF ((londbg == -999.) .OR. (latdbg == -999.)) THEN
+    !$OMP PARALLEL DO   &
+    !$OMP PRIVATE ( ij )
+    DO ij = 1 , num_tiles
+      i2(ij) = INT(0.5*(i_start(ij) + i_end(ij)))
+      j2(ij) = INT(0.5*(j_start(ij) + j_end(ij)))
+    END DO
+    !$OMP END PARALLEL DO
+  ELSE
+    !$OMP PARALLEL DO   &
+    !$OMP PRIVATE ( ij )
+    DO ij = 1 , num_tiles
+      i2(ij) = idbg
+      j2(ij) = jdbg
+    END DO
+    !$OMP END PARALLEL DO
+  END IF
   k2 = 0.5*(kms+kme)
 
   ! Computing accumulative variables 

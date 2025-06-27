@@ -1379,6 +1379,9 @@ CONTAINS
                     ,FOGVARS = config_flags%fogvars                        &
                     ,ZMLAGEN_DIAG = config_flags%zmlagen_diag              &
                     ,TIMEDBG = config_flags%timedbg                        &
+                    ,LONDBG = config_flags%londbg                          &
+                    ,LATDBG = config_flags%latdbg                          &
+                    ,IDBG=grid%idbg, JDBG=grid%jdbg                        &
                     ,WGSTS_WBDSWSSTRES = config_flags%wgsts_wbdswsstres    &
 #ifdef CDXWRF
 #if CDXWRF>=2
