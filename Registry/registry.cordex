@@ -20,6 +20,8 @@ rconfig   integer fogvisibility_diag      namelist,cordex       1              3
 rconfig   integer fogvars                 namelist,cordex       1              1       rh    "fogvars"                  "variables to use to diagnose fog (1: 3D, 2: sfc)"   ""
 rconfig   integer zmlagen_diag            namelist,cordex       1              2       rh    "zmlagen_diag"             "diagnostic of generic zmla: 1: Nielsen-Gammon et al. (2008), 2: bulk-Richardson (Vogelezang and Holtslag, 1996; Seidel et al., 2004)"   ""
 rconfig   integer timedbg                 namelist,cordex       1            720       rh    "timedbg"                  "frecuency in minutes of time-debugging"   ""
+rconfig   real    londbg                  namelist,cordex       1           -999.      rh    "londbg"                   "longitude in degrees of grid-point debugging (-999., not used)"   ""
+rconfig   real    latdbg                  namelist,cordex       1           -999.      rh    "latdbg"                   "latitude in degrees of grid-point debugging (-999., not used)"   ""
 rconfig   integer wgsts_wbdswsstres       namelist,cordex       1              1       rh    "wgsts_wbdswsstres"        "whether wind gusts should be used for wbds-wss residence-time (0: no, 1: yes)"   ""
 
 ## L. Fita. This should work, but WRF is not prepared for 4D output variables like this
@@ -55,6 +57,9 @@ rconfig   integer wgsts_wbdswsstres       namelist,cordex       1              1
 
 # CORDEX variables
 state    integer  cdxnsteps      -      misc        -         -       r       "cdxnsteps"             "CORDEX Time Step Counter"                                ""
+state    integer  idbg           -      misc        -         -       r       "idbg"                  "i-grid point from londbg,latdbg for debugging"                                ""
+state    integer  jdbg           -      misc        -         -       r       "jdbg"                  "j-grid point from latdbgmlatdbg for debugging"                                ""
+state    integer  ijtile         -      misc        -         -       r       "ijtile"                "ij-tile point from londbg, latdbg for debugging"                                ""
 state    real  CDXLON           ij      misc        1         -      h9       "lon"                   "LONGITUDE"                                               "degrees_east"
 state    real  CDXLAT           ij      misc        1         -      h9       "lat"                   "LATITUDE"                                                "degrees_north"
 state    real  PCLT             ij      misc        1         -      r        "pclt"                  "PREVIOUS TOTAL CLOUDINESS"                               "%"
