@@ -971,9 +971,12 @@ CONTAINS
         ! Land water
         ! First layer soil
         ! FROM: https://wcrp-cordex.github.io/cordex-cmip6-data-request/)
+        mrsos(i,j) = 0.
+        mrso(i,j) = 0.
+        slw(i,j) = 0.
         DO k=1, num_soil_layers
-          mrsos(i,j) = smois(i,k,j)*dzs(k)*fracsoil10cm(k)
-          mrso(i,j) = smois(i,k,j)*dzs(k)
+          mrsos(i,j) = mrsos(i,j) + smois(i,k,j)*dzs(k)*fracsoil10cm(k)
+          mrso(i,j) = mrso(i,j) + smois(i,k,j)*dzs(k)
           mrsol(i,k,j) = sh2o(i,k,j)*dzs(k)*1000.
           slw(i,j) = slw(i,j) + mrsol(i,k,j)
         END DO
