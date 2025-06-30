@@ -1662,10 +1662,12 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    snowh:', snowh(i,j), ' snd:', snd(i,j)
             CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    smois (1,3):', smois(i,1,j), smois(i,2,j), smois(i,3,j)
+            CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j), &
               mrsol(i,2,j), ' slw:', slw(i,j)
             CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    fracsoil10cm (1,2):', fracsoil10cm(1), fracsoil10cm(2)
+            WRITE(msg,*)'    fracsoil10cm (1,3):', fracsoil10cm(1), fracsoil10cm(2), fracsoil10cm(3)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsosmean:', mrsosmean(i,j), ' mrsomean:', mrsomean(i,j),                &
               ' mrsolmean (1,2):', mrsolmean(i,1,j), mrsolmean(i,2,j), ' slwmean:', slwmean(i,j)
@@ -2081,10 +2083,12 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    snowh:', snowh(i,j), ' snd:', snd(i,j)
             CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    smois (1,3):', smois(i,1,j), smois(i,2,j), smois(i,3,j)
+            CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j), &
               mrsol(i,2,j), ' slw:', slw(i,j)
             CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    fracsoil10cm (1,2):', fracsoil10cm(1), fracsoil10cm(2)
+            WRITE(msg,*)'    fracsoil10cm (1,3):', fracsoil10cm(1), fracsoil10cm(2), fracsoil10cm(3)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsosmean:', mrsosmean(i,j), ' mrsomean:', mrsomean(i,j),                &
               ' mrsolmean (1,2):', mrsolmean(i,1,j), mrsolmean(i,2,j), ' slwmean:', slwmean(i,j)
@@ -2483,10 +2487,12 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    snowh:', snowh(i,j), ' snd:', snd(i,j)
             CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    smois (1,3):', smois(i,1,j), smois(i,2,j), smois(i,3,j)
+            CALL wrf_debug(75,msg)
              WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j), &
               mrsol(i,2,j), ' slw:', slw(i,j)
             CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    fracsoil10cm (1,2):', fracsoil10cm(1), fracsoil10cm(2)
+            WRITE(msg,*)'    fracsoil10cm (1,3):', fracsoil10cm(1), fracsoil10cm(2), fracsoil10cm(3)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsosmean:', mrsosmean(i,j), ' mrsomean:', mrsomean(i,j),                &
               ' mrsolmean (1,2):', mrsolmean(i,1,j), mrsolmean(i,2,j), ' slwmean:', slwmean(i,j)

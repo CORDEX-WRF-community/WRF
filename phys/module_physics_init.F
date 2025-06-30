@@ -874,7 +874,7 @@ CONTAINS
 #ifdef CDXWRF
    REAL, DIMENSION(1:num_soil_layers), INTENT(out)       :: fracsoil10cm
    REAL, INTENT(in)                                      :: londbg, latdbg
-   INTEGER, INTENT(out)                                  :: idbg, jdbg
+   REAL, INTENT(out)                                     :: idbg, jdbg
    
 #if CDXWRF>=2
    INTEGER, INTENT(in)                                   :: nhtasrng, nhhursrng, nltasrng, nlhursrng
@@ -5787,7 +5787,7 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     REAL, DIMENSION(Nwssrng), INTENT(in)                 :: wssrng
     
     ! Output
-    INTEGER, INTENT(out)                                 :: idbg, jdbg
+    REAL, INTENT(out)                                    :: idbg, jdbg
     REAL, DIMENSION(1:num_soil_layers), INTENT(out)      :: fracsoil10cm
     REAL, DIMENSION(Nhtasrng), INTENT(out)               :: htasbins
     REAL, DIMENSION(Nhhursrng), INTENT(out)              :: hhursbins
@@ -5828,10 +5828,15 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     !   L. Fita, UBA-CIMA-IFAECI. This should be done as in share/wrf_timeseries.F, but it uses 
     !     a lot of aditional modules, that might not be worth to mess with in the phys/ folder ¿?
     ! Minimum grid distance
-    dlon = 10000.
-    dlat = 10000.
-    dlon(ims:ime-1,jms:jme-1) = xlong(ims:ime-1,jms:jme-1)-xlong(ims+1:ime,jms+1:jme)   
-    dlat(ims:ime-1,jms:jme-1) = xlat(ims:ime-1,jms:jme-1)-xlat(ims+1:ime,jms+1:jme)
+    ! Filling matrices with absurd numbers
+    DO i=ims, ime
+      DO j=jms, jme
+        dlon(i,j) = 10000.*i + 10.*j
+        dlat(i,j) = 20000.*i + 10.*j
+      END DO
+    END DO
+    dlon(its:ite-1,jts:jte-1) = xlong(its:ite-1,jts:jte-1)-xlong(its+1:ite,jts+1:jte)   
+    dlat(its:ite-1,jts:jte-1) = xlat(its:ite-1,jts:jte-1)-xlat(its+1:ite,jts+1:jte)
 
     ddist = 1000.
     ddist = SQRT(dlon*dlon + dlat*dlat)
@@ -5842,14 +5847,14 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     mindist = MINVAL(dist)
     
     found = .FALSE.
-    PRINT *,'its,ite:', its,ite,' jts,jte:', jts,jte,'  mindist:', mindist
+    PRINT *,'its,ite:', its,ite,' jts,jte:', jts,jte,'  mindist:', mindist, ' mindd:', mindd
     IF (mindist < mindd) THEN
       DO i=its, ite
         DO j=jts, jte
 
           IF (dist(i,j) == mindist) THEN
-            idbg = i
-            jdbg = j
+            idbg = i*1.
+            jdbg = j*1.
             found = .TRUE.
             PRINT *,'  found debugging grid point _______' 
             PRINT *,'  lon,lat dbg: ', londbg, ' ,', latdbg,' mindist:', mindist
