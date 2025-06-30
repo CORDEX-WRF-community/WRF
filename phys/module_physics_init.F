@@ -1792,7 +1792,6 @@ CHARACTER(LEN=8) :: name
   CALL cdxwrf_init(config_flags%num_soil_layers, dzs                                                  &
     ,xlong, xlat                                                                                      &
     ,londbg, latdbg                                                                                   &
-    ,idbg, jdbg                                                                                       &
     ,ids, ide, jds, jde, kds, kde                                                                     &
     ,ims, ime, jms, jme, kms, kme                                                                     &
     ,its, ite, jts, jte, kts, kte                                                                     &
@@ -1807,6 +1806,7 @@ CHARACTER(LEN=8) :: name
     ,model_config_rec%ltasrng, model_config_rec%lhursrng                                              &
     ,model_config_rec%wbdsrng, model_config_rec%wssrng                                                &
 #endif
+    ,idbg, jdbg                                                                                       &
 #if CDXWRF>=2    
     ,htasbins, hhursbins, ltasbins, lhursbins                                                         &
     ,wbdsbins, wssbins                                                                                &
