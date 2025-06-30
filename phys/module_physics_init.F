@@ -5744,7 +5744,6 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
   SUBROUTINE cdxwrf_init(num_soil_layers, dzs                                                         &
     ,xlong, xlat                                                                                      &
     ,londbg, latdbg                                                                                   &
-    ,idbg, jdbg                                                                                       &
     ,ids, ide, jds, jde, kds, kde                                                                     &
     ,ims, ime, jms, jme, kms, kme                                                                     &
     ,its, ite, jts, jte, kts, kte                                                                     &
@@ -5759,6 +5758,7 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     ,wbdsrng, wssrng                                                                                  &
 #endif
     ! Output
+    ,idbg, jdbg                                                                                       &
 #if CDXWRF>=2    
     ,htasbins, hhursbins, ltasbins, lhursbins, wbdsbins, wssbins                                      &
 #endif
@@ -5805,13 +5805,33 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     CHARACTER (LEN=1000)                                 :: diag_message
     LOGICAL                                              :: found
 
-    ! lon, lat debugging point
+!!!!!!!! Variables
+! num_soil_layers: amount of soil layers 
+! dzs: depths of the soil layers [m]
+! xlong, xlat: matrices of longitudes and latitudes
+! londbg, latdbg: coordinates of the debugging grid point
+! ids, ide, jds, jde, kds, kde: extension of the matrices
+! ims, ime, jms, jme, kms, kme: extension of the matrices in memory
+! its, ite, jts, jte, kts, kte: extension of the martices by tile
+! nhtasrng, nhhursrng: range of the high-resolution temperature and relative humidity residence time
+! nltasrng, nlhursrng: range of the low-resolution temperature and relative humidity residence time
+! nwbdsrng, nwssrng: range of the blowing wind direction and wind speed residence time
+! nhtashursrng, nltashursrng: combined ranges of the high/low tas-hurs residence time
+! nwbdswssrng: combined ranges of the wbds-wss residence time
+! htasrng, hhursrng, ltasrng, lhursrng: individual ranges of the high/low tas-hurs residence time
+! wbdsrng, wssrng: individual ranges of the wbds-wss residence time
+! idbg, jdbg: point coordinates of the debugging point
+! htasbins, hhursbins, ltasbins, lhursbins, wbdsbins, wssbins: bins for the residence time
+! fracsoil10cm: fraction of the verical soil layer to use to compute 10cm depth soil values
+
+    ! lon, lat debugging point 
+    !   L. Fita, UBA-CIMA-IFAECI. This should be done as in share/wrf_timeseries.F, but it uses 
+    !     a lot of aditional modules, that might not be worth to mess with in the phys/ folder ¿?
     ! Minimum grid distance
     dlon = 10000.
-    dlon(ims:ime-1,jms:jme) = xlong(ims:ime-1,jms:jme)-xlong(ims+1:ime,jms:jme)
-    
     dlat = 10000.
-    dlat(ims:ime,jms:jme-1) = xlat(ims:ime,jms:jme-1)-xlat(ims:ime,jms+1:jme)
+    dlon(ims:ime-1,jms:jme-1) = xlong(ims:ime-1,jms:jme-1)-xlong(ims+1:ime,jms+1:jme)   
+    dlat(ims:ime-1,jms:jme-1) = xlat(ims:ime-1,jms:jme-1)-xlat(ims+1:ime,jms+1:jme)
 
     ddist = 1000.
     ddist = SQRT(dlon*dlon + dlat*dlat)
@@ -5822,6 +5842,7 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     mindist = MINVAL(dist)
     
     found = .FALSE.
+    PRINT *,'its,ite:', its,ite,' jts,jte:', jts,jte,'  mindist:', mindist
     IF (mindist < mindd) THEN
       DO i=its, ite
         DO j=jts, jte
@@ -5830,6 +5851,9 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
             idbg = i
             jdbg = j
             found = .TRUE.
+            PRINT *,'  found debugging grid point _______' 
+            PRINT *,'  lon,lat dbg: ', londbg, ' ,', latdbg,' mindist:', mindist
+            PRINT *,'  i,j dbg: ', idbg, jdbg
             EXIT
           END IF
         END DO
