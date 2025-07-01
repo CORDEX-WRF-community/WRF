@@ -286,7 +286,7 @@ CONTAINS
 #ifdef CDXWRF
                          ,fracsoil10cm                                            &
                          ,londbg, latdbg                                          &
-                         ,idbg, jdbg                                              &
+                         ,ijdbg                                                   &
 #if CDXWRF>=2
                          ,nhtasrng, nhhursrng, nltasrng, nlhursrng                &
                          ,nwbdsrng, nwssrng                                       &
@@ -874,7 +874,7 @@ CONTAINS
 #ifdef CDXWRF
    REAL, DIMENSION(1:num_soil_layers), INTENT(out)       :: fracsoil10cm
    REAL, INTENT(in)                                      :: londbg, latdbg
-   REAL, INTENT(out)                                     :: idbg, jdbg
+   INTEGER, DIMENSION(2), INTENT(out)                    :: ijdbg
    
 #if CDXWRF>=2
    INTEGER, INTENT(in)                                   :: nhtasrng, nhhursrng, nltasrng, nlhursrng
@@ -1806,7 +1806,7 @@ CHARACTER(LEN=8) :: name
     ,model_config_rec%ltasrng, model_config_rec%lhursrng                                              &
     ,model_config_rec%wbdsrng, model_config_rec%wssrng                                                &
 #endif
-    ,idbg, jdbg                                                                                       &
+    ,ijdbg                                                                                            &
 #if CDXWRF>=2    
     ,htasbins, hhursbins, ltasbins, lhursbins                                                         &
     ,wbdsbins, wssbins                                                                                &
@@ -5758,7 +5758,7 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     ,wbdsrng, wssrng                                                                                  &
 #endif
     ! Output
-    ,idbg, jdbg                                                                                       &
+    ,ijdbg                                                                                            &
 #if CDXWRF>=2    
     ,htasbins, hhursbins, ltasbins, lhursbins, wbdsbins, wssbins                                      &
 #endif
@@ -5787,7 +5787,7 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     REAL, DIMENSION(Nwssrng), INTENT(in)                 :: wssrng
     
     ! Output
-    REAL, INTENT(out)                                    :: idbg, jdbg
+    INTEGER, DIMENSION(2), INTENT(out)                   :: ijdbg
     REAL, DIMENSION(1:num_soil_layers), INTENT(out)      :: fracsoil10cm
     REAL, DIMENSION(Nhtasrng), INTENT(out)               :: htasbins
     REAL, DIMENSION(Nhhursrng), INTENT(out)              :: hhursbins
@@ -5798,6 +5798,7 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     
     ! Local
     INTEGER                                              :: i,j,k
+    INTEGER                                              :: idbg, jdbg
     REAL                                                 :: inczsoil
     REAL                                                 :: mindist
     REAL                                                 :: ddlon, ddlat, mindd
@@ -5853,12 +5854,14 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
         DO j=jts, jte
 
           IF (dist(i,j) == mindist) THEN
-            idbg = i*1.
-            jdbg = j*1.
+            idbg = i
+            jdbg = j
             found = .TRUE.
             PRINT *,'  found debugging grid point _______' 
             PRINT *,'  lon,lat dbg: ', londbg, ' ,', latdbg,' mindist:', mindist
             PRINT *,'  i,j dbg: ', idbg, jdbg
+            ijdbg(1) = idbg
+            ijdbg(2) = jdbg
             EXIT
           END IF
         END DO

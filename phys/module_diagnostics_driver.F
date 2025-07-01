@@ -1381,7 +1381,7 @@ CONTAINS
                     ,TIMEDBG = config_flags%timedbg                        &
                     ,LONDBG = config_flags%londbg                          &
                     ,LATDBG = config_flags%latdbg                          &
-                    ,IDBG=INT(grid%idbg), JDBG=INT(grid%jdbg)              &
+                    ,IDBG=grid%ijdbg(1), JDBG=grid%ijdbg(2)                &
                     ,WGSTS_WBDSWSSTRES = config_flags%wgsts_wbdswsstres    &
 #ifdef CDXWRF
 #if CDXWRF>=2

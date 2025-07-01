@@ -7,6 +7,8 @@
 dimspec    np      2     namelist=num_press_levels         z     num_press_levels
 ## L. Fita, CIMA. Feburary 2023
 #### Added for CORDEX!
+## L. Fita 2 grid coordinates for the londbg,latdbg
+dimspec    iit     2     constant=2                        z     iit
 ## L. Fita. This should work, but WRF is not prepared for 4D output variables like this
 dimspec    ht      2     namelist=nhtasrng                 c     nhtasrng
 dimspec    hh      2     namelist=nhhursrng                c     nhhursrng
