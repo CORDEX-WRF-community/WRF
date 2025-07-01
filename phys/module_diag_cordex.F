@@ -810,7 +810,7 @@ CONTAINS
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: mrsosmean, mrsomean, mrlsomean,           &
     mrlsosmean, mrfsomean, mrfsosmean
   REAL, DIMENSION(ims:ime,1:num_soil_layers,jms:jme),                                                 &
-    INTENT(inout)                                        :: mrsolmean, mrsflmean
+    INTENT(inout)                                        :: mrsolmean, mrsllmean, mrsflmean
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: flxpr, flxprl, flxprc, flxprsh, flxprsn,  &
     snw
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: rsdt, rsut, rlut
@@ -1008,10 +1008,10 @@ CONTAINS
           mrsol(i,k,j) = smois(i,k,j)*dzs(k)*1000.
           mrsos(i,j) = mrsos(i,j) + mrsol(i,k,j)*fracsoil10cm(k)
           mrso(i,j) = mrso(i,j) + mrsol(i,k,j)
-          mrsll(i,k,j) = sh20(i,k,j)*dzs(k)*1000.
+          mrsll(i,k,j) = sh2o(i,k,j)*dzs(k)*1000.
           mrlso(i,j) = mrlso(i,j) + mrsll(i,k,j)
           mrlsos(i,j) = mrlsos(i,j) + mrsll(i,k,j)*fracsoil10cm(k)
-          mrsfl(i,k,j) = (smois(i,k,j) - sh20(i,k,j))*dzs(k)*1000.
+          mrsfl(i,k,j) = (smois(i,k,j) - sh2o(i,k,j))*dzs(k)*1000.
           mrfso(i,j) = mrfso(i,j) + mrsfl(i,k,j)
           mrfsos(i,j) = mrfsos(i,j) + mrsfl(i,k,j)*fracsoil10cm(k)
         END DO
@@ -1709,12 +1709,16 @@ CONTAINS
             WRITE(msg,*)'    smois (1,3):', smois(i,1,j), smois(i,2,j), smois(i,3,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j), &
-              mrsol(i,2,j), ' slw:', slw(i,j)
+              mrsol(i,2,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrlso:', mrlso(i,j), ' mrlsos:', mrlsos(i,j), ' mrsll (1,2):', mrsll(i,1,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrfso:', mrfso(i,j), ' mrfsos:', mrfsos(i,j), ' mrsfl (1,2):', mrsfl(i,1,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    fracsoil10cm (1,3):', fracsoil10cm(1), fracsoil10cm(2), fracsoil10cm(3)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsosmean:', mrsosmean(i,j), ' mrsomean:', mrsomean(i,j),                &
-              ' mrsolmean (1,2):', mrsolmean(i,1,j), mrsolmean(i,2,j), ' slwmean:', slwmean(i,j)
+              ' mrsolmean (1,2):', mrsolmean(i,1,j), mrsolmean(i,2,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    sfcrunoff:', sfcrunoff(i,j), ' pmrros:', pmrros(i,j), ' mrros:', mrros(i,j)
             CALL wrf_debug(75,msg)
@@ -2134,13 +2138,12 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    smois (1,3):', smois(i,1,j), smois(i,2,j), smois(i,3,j)
             CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j), &
-              mrsol(i,2,j), ' slw:', slw(i,j)
+            WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    fracsoil10cm (1,3):', fracsoil10cm(1), fracsoil10cm(2), fracsoil10cm(3)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsosmean:', mrsosmean(i,j), ' mrsomean:', mrsomean(i,j),                &
-              ' mrsolmean (1,2):', mrsolmean(i,1,j), mrsolmean(i,2,j), ' slwmean:', slwmean(i,j)
+              ' mrsolmean (1,2):', mrsolmean(i,1,j), mrsolmean(i,2,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    sfcrunoff:', sfcrunoff(i,j), ' mrros:', mrros(i,j)
             CALL wrf_debug(75,msg)
@@ -2498,7 +2501,7 @@ CONTAINS
             WRITE(msg,*) '    uas', uas(i,j), ' vas:', vas(i,j), ' wss:', wss(i,j), ' wbds:',         &
               wbds(i,j), '  hurs', hurs(i,j), ' huss:', huss(i,j), ' psl:', psl(i,j)
             CALL wrf_debug(75,msg)
-            WRITE(msg,*) '    mrso:', mrso(i,j), ' slw:', slw(i,j)
+            WRITE(msg,*) '    mrso:', mrso(i,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    maximum surface wind gust:', wsgsmax(i,j), ' x-component:', ugsmax(i,j), &
               ' y-component:', vgsmax(i,j), ' %:', percengust(i,j)
@@ -2544,12 +2547,12 @@ CONTAINS
             WRITE(msg,*)'    smois (1,3):', smois(i,1,j), smois(i,2,j), smois(i,3,j)
             CALL wrf_debug(75,msg)
              WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j), &
-              mrsol(i,2,j), ' slw:', slw(i,j)
+              mrsol(i,2,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    fracsoil10cm (1,3):', fracsoil10cm(1), fracsoil10cm(2), fracsoil10cm(3)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsosmean:', mrsosmean(i,j), ' mrsomean:', mrsomean(i,j),                &
-              ' mrsolmean (1,2):', mrsolmean(i,1,j), mrsolmean(i,2,j), ' slwmean:', slwmean(i,j)
+              ' mrsolmean (1,2):', mrsolmean(i,1,j), mrsolmean(i,2,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    sfcrunoff:', sfcrunoff(i,j), ' mrros:', mrros(i,j)
             CALL wrf_debug(75,msg)
