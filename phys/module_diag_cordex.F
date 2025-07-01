@@ -1708,7 +1708,7 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    smois (1,3):', smois(i,1,j), smois(i,2,j), smois(i,3,j)
             CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    dzs (1,3):', dzs(i,1,j), dzs(i,2,j), dzs(i,3,j)
+            WRITE(msg,*)'    dzs (1,3):', dzs(1), dzs(2), dzs(3)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j), &
               mrsol(i,2,j)
@@ -1728,7 +1728,7 @@ CONTAINS
               ' mrsllmean (1,2):', mrsllmean(i,1,j), mrsllmean(i,2,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrfsomean:', mrfsomean(i,j), ' mrfsosmean:', mrfsosmean(i,j),            &
-              ' mrsflmean (1,2):', mrsflmean(i,1,j), mrsfmeanl(i,2,j)
+              ' mrsflmean (1,2):', mrsflmean(i,1,j), mrsflmeanl(i,2,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    sfcrunoff:', sfcrunoff(i,j), ' pmrros:', pmrros(i,j), ' mrros:', mrros(i,j)
             CALL wrf_debug(75,msg)
@@ -2146,7 +2146,7 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    smois (1,3):', smois(i,1,j), smois(i,2,j), smois(i,3,j)
             CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    dzs (1,3):', dzs(i,1,j), dzs(i,2,j), dzs(i,3,j)
+            WRITE(msg,*)'    dzs (1,3):', dzs(1), dzs(2), dzs(3)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j)
             CALL wrf_debug(75,msg)
@@ -2165,7 +2165,7 @@ CONTAINS
               ' mrsllmean (1,2):', mrsllmean(i,1,j), mrsllmean(i,2,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrfsomean:', mrfsomean(i,j), ' mrfsosmean:', mrfsosmean(i,j),            &
-              ' mrsflmean (1,2):', mrsflmean(i,1,j), mrsfmeanl(i,2,j)
+              ' mrsflmean (1,2):', mrsflmean(i,1,j), mrsflmeanl(i,2,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    sfcrunoff:', sfcrunoff(i,j), ' mrros:', mrros(i,j)
             CALL wrf_debug(75,msg)
@@ -2566,7 +2566,7 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    smois (1,3):', smois(i,1,j), smois(i,2,j), smois(i,3,j)
             CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    dzs (1,3):', dzs(i,1,j), dzs(i,2,j), dzs(i,3,j)
+            WRITE(msg,*)'    dzs (1,3):', dzs(1), dzs(2), dzs(3)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j), &
               mrsol(i,2,j)
@@ -2586,7 +2586,7 @@ CONTAINS
               ' mrsllmean (1,2):', mrsllmean(i,1,j), mrsllmean(i,2,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrfsomean:', mrfsomean(i,j), ' mrfsosmean:', mrfsosmean(i,j),            &
-              ' mrsflmean (1,2):', mrsflmean(i,1,j), mrsfmeanl(i,2,j)
+              ' mrsflmean (1,2):', mrsflmean(i,1,j), mrsflmeanl(i,2,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    sfcrunoff:', sfcrunoff(i,j), ' mrros:', mrros(i,j)
             CALL wrf_debug(75,msg)
