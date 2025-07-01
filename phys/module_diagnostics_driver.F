@@ -1481,7 +1481,8 @@ CONTAINS
                     ,CLTMEAN=grid%cltmean, CLLMEAN=grid%cllmean            &
                     ,CLMMEAN=grid%clmmean, CLHMEAN=grid%clhmean            &
                     ,PRW=grid%prw, CLWVI=grid%clwvi, CLIVI=grid%clivi      &
-                    ,UAS=grid%uas, VAS=grid%vas, WSS=grid%wss              &
+                    ,UAS=grid%uas, VAS=grid%vas                            &
+                    ,WSS=grid%wss, WBDS=grid%wbds                          &
                     ,HURS=grid%hurs ,HUSS=grid%huss                        &
                     ,PSL=grid%psl                                          &
                     ,WSGSMAX=grid%wsgsmax                                  & 
@@ -1509,9 +1510,15 @@ CONTAINS
                     ,SNC=grid%snc, SND=grid%snd                            &
                     ,PMRROS=grid%pmrros, PMRRO=grid%pmrro                  &
                     ,MRROS=grid%mrros, MRRO=grid%mrro, MRSO=grid%mrso      &
-                    ,MRSOL=grid%mrsol, MRSOS=grid%mrsos, SLW=grid%slw      &
+                    ,MRSOL=grid%mrsol, MRSOS=grid%mrsos                    &
+                    ,MRSLL=grid%mrsll, MRLSO=grid%mrlso,MRLSOS=grid%mrlsos &
+                    ,MRSFL=grid%mrsfl, MRFSO=grid%mrfso,MRFSOS=grid%mrfsos &
                     ,MRSOMEAN=grid%mrsomean, MRSOLMEAN=grid%mrsolmean      &
-                    ,MRSOSMEAN=grid%mrsosmean, SLWMEAN=grid%slwmean        &
+                    ,MRSOSMEAN=grid%mrsosmean                              &
+                    ,MRSLLMEAN=grid%mrsllmean, MRLSOMEAN=grid%mrlsomean    &
+                    ,MRLSOSMEAN=grid%mrlsosmean                            &
+                    ,MRSFLMEAN=grid%mrsflmean, MRFSOMEAN=grid%mrfsomean    &
+                    ,MRFSOSMEAN=grid%mrfsosmean                            &
                     ,FLXPR=grid%pr, FLXPRL=grid%prl,FLXPRC=grid%prc        &
                     ,FLXPRSH=grid%prsh                                     &
                     ,FLXPRSN=grid%prsn                                     &
