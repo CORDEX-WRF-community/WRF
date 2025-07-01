@@ -1708,23 +1708,31 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    smois (1,3):', smois(i,1,j), smois(i,2,j), smois(i,3,j)
             CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    dzs (1,3):', dzs(i,1,j), dzs(i,2,j), dzs(i,3,j)
+            CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j), &
               mrsol(i,2,j)
             CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    mrlso:', mrlso(i,j), ' mrlsos:', mrlsos(i,j), ' mrsll (1,2):', mrsll(i,1,j)
+            WRITE(msg,*)'    mrlso:', mrlso(i,j), ' mrlsos:', mrlsos(i,j), ' mrsll (1,2):',           &
+              mrsll(i,1,j), mrsll(i,2,j)
             CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    mrfso:', mrfso(i,j), ' mrfsos:', mrfsos(i,j), ' mrsfl (1,2):', mrsfl(i,1,j)
+            WRITE(msg,*)'    mrfso:', mrfso(i,j), ' mrfsos:', mrfsos(i,j), ' mrsfl (1,2):',           &
+              mrsfl(i,1,j), mrsfl(i,2,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    fracsoil10cm (1,3):', fracsoil10cm(1), fracsoil10cm(2), fracsoil10cm(3)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsosmean:', mrsosmean(i,j), ' mrsomean:', mrsomean(i,j),                &
               ' mrsolmean (1,2):', mrsolmean(i,1,j), mrsolmean(i,2,j)
             CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrlsomean:', mrlsomean(i,j), ' mrlsosmean:', mrlsosmean(i,j),            &
+              ' mrsllmean (1,2):', mrsllmean(i,1,j), mrsllmean(i,2,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrfsomean:', mrfsomean(i,j), ' mrfsosmean:', mrfsosmean(i,j),            &
+              ' mrsflmean (1,2):', mrsflmean(i,1,j), mrsfmeanl(i,2,j)
+            CALL wrf_debug(75,msg)
             WRITE(msg,*)'    sfcrunoff:', sfcrunoff(i,j), ' pmrros:', pmrros(i,j), ' mrros:', mrros(i,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    udrunoff:', udrunoff(i,j), ' pmrro:', pmrro(i,j), ' mrro:', mrro(i,j)
-            CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    smois:', smois(i,1,j), ' dzs:', dzs(1), ' mrsolmean:', mrsol(i,1,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    prc:', prc(i,j), ' prnc:', prnc(i,j), ' prsh:', prsh(i,j), ' flxpr:',    &
               flxpr(i,j), ' flxprl:', flxprl(i,j), ' flxprc:', flxprc(i,j), ' flxprsh:', flxprsh(i,j),&
@@ -2138,18 +2146,30 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    smois (1,3):', smois(i,1,j), smois(i,2,j), smois(i,3,j)
             CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    dzs (1,3):', dzs(i,1,j), dzs(i,2,j), dzs(i,3,j)
+            CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrlso:', mrlso(i,j), ' mrlsos:', mrlsos(i,j), ' mrsll (1,2):',           &
+              mrsll(i,1,j), mrsll(i,2,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrfso:', mrfso(i,j), ' mrfsos:', mrfsos(i,j), ' mrsfl (1,2):',           &
+              mrsfl(i,1,j), mrsfl(i,2,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    fracsoil10cm (1,3):', fracsoil10cm(1), fracsoil10cm(2), fracsoil10cm(3)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsosmean:', mrsosmean(i,j), ' mrsomean:', mrsomean(i,j),                &
               ' mrsolmean (1,2):', mrsolmean(i,1,j), mrsolmean(i,2,j)
             CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrlsomean:', mrlsomean(i,j), ' mrlsosmean:', mrlsosmean(i,j),            &
+              ' mrsllmean (1,2):', mrsllmean(i,1,j), mrsllmean(i,2,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrfsomean:', mrfsomean(i,j), ' mrfsosmean:', mrfsosmean(i,j),            &
+              ' mrsflmean (1,2):', mrsflmean(i,1,j), mrsfmeanl(i,2,j)
+            CALL wrf_debug(75,msg)
             WRITE(msg,*)'    sfcrunoff:', sfcrunoff(i,j), ' mrros:', mrros(i,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    udrunoff:', udrunoff(i,j), ' mrro:', mrro(i,j)
-            CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    smois:', smois(i,1,j), ' dzs:', dzs(1), ' mrsolmean 1:', mrsolmean(i,1,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    prc:', prc(i,j), ' prnc:', prnc(i,j), ' prsh:', prsh(i,j), ' flxpr:',    &
               flxpr(i,j), ' flxprl:', flxprl(i,j), ' flxprc:', flxprc(i,j), ' flxprsh:', flxprsh(i,j),&
@@ -2546,19 +2566,31 @@ CONTAINS
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    smois (1,3):', smois(i,1,j), smois(i,2,j), smois(i,3,j)
             CALL wrf_debug(75,msg)
-             WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j), &
+            WRITE(msg,*)'    dzs (1,3):', dzs(i,1,j), dzs(i,2,j), dzs(i,3,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrsos:', mrsos(i,j), ' mrso:', mrso(i,j), ' mrsol (1,2):', mrsol(i,1,j), &
               mrsol(i,2,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrlso:', mrlso(i,j), ' mrlsos:', mrlsos(i,j), ' mrsll (1,2):',           &
+              mrsll(i,1,j), mrsll(i,2,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrfso:', mrfso(i,j), ' mrfsos:', mrfsos(i,j), ' mrsfl (1,2):',           &
+              mrsfl(i,1,j), mrsfl(i,2,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    fracsoil10cm (1,3):', fracsoil10cm(1), fracsoil10cm(2), fracsoil10cm(3)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    mrsosmean:', mrsosmean(i,j), ' mrsomean:', mrsomean(i,j),                &
               ' mrsolmean (1,2):', mrsolmean(i,1,j), mrsolmean(i,2,j)
             CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrlsomean:', mrlsomean(i,j), ' mrlsosmean:', mrlsosmean(i,j),            &
+              ' mrsllmean (1,2):', mrsllmean(i,1,j), mrsllmean(i,2,j)
+            CALL wrf_debug(75,msg)
+            WRITE(msg,*)'    mrfsomean:', mrfsomean(i,j), ' mrfsosmean:', mrfsosmean(i,j),            &
+              ' mrsflmean (1,2):', mrsflmean(i,1,j), mrsfmeanl(i,2,j)
+            CALL wrf_debug(75,msg)
             WRITE(msg,*)'    sfcrunoff:', sfcrunoff(i,j), ' mrros:', mrros(i,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    udrunoff:', udrunoff(i,j), ' mrro:', mrro(i,j)
-            CALL wrf_debug(75,msg)
-            WRITE(msg,*)'    smois:', smois(i,1,j), ' dzs:', dzs(1), ' mrsol:', mrsol(i,1,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    prc:', prc(i,j), ' prnc:', prnc(i,j), ' prsh:', prsh(i,j), ' flxpr:',    &
               flxpr(i,j), ' flxprl:', flxprl(i,j), ' flxprc:', flxprc(i,j), ' flxprsh:', flxprsh(i,j),&
