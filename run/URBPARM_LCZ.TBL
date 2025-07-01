@@ -546,9 +546,9 @@ BUILDING HEIGHTS: 1
 
 #     height   Percentage
 #      [m]       [%]
-      45.0      32.
-      50.0      36.
-      55.0      32.
+      45.0      38.
+      50.0      24.
+      55.0      38.
 END BUILDING HEIGHTS
 
 BUILDING HEIGHTS: 2
@@ -574,9 +574,9 @@ BUILDING HEIGHTS: 4
 
 #     height   Percentage
 #      [m]       [%]
-      45.0      32.
-      50.0      36.
-      55.0      32.
+      45.0      38.
+      50.0      24.
+      55.0      38.
 END BUILDING HEIGHTS
 
 BUILDING HEIGHTS: 5
