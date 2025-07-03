@@ -5848,7 +5848,8 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     mindist = MINVAL(dist)
     
     found = .FALSE.
-    PRINT *,'its,ite:', its,ite,' jts,jte:', jts,jte,'  mindist:', mindist, ' mindd:', mindd
+    WRITE(diag_message,*)'its,ite:', its,ite,' jts,jte:', jts,jte,'  mindist:', mindist, ' mindd:', mindd
+    CALL wrf_debug(75,diag_message)
     IF (mindist < mindd) THEN
       DO i=its, ite
         DO j=jts, jte
@@ -5857,9 +5858,12 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
             idbg = i
             jdbg = j
             found = .TRUE.
-            PRINT *,'  found debugging grid point _______' 
-            PRINT *,'  lon,lat dbg: ', londbg, ' ,', latdbg,' mindist:', mindist
-            PRINT *,'  i,j dbg: ', idbg, jdbg
+            WRITE(diag_message,*)'  found debugging grid point _______' 
+            CALL wrf_debug(75,diag_message)
+            WRITE(diag_message,*)'  lon,lat dbg: ', londbg, ' ,', latdbg,' mindist:', mindist
+            CALL wrf_debug(75,diag_message)
+            WRITE(diag_message,*)'  i,j dbg: ', idbg, jdbg
+            CALL wrf_debug(75,diag_message)
             ijdbg(1) = idbg
             ijdbg(2) = jdbg
             EXIT
