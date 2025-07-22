@@ -5775,6 +5775,7 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     INTEGER, INTENT(in)                                  :: its, ite, jts, jte, kts, kte
     REAL, DIMENSION( ims:ime , jms:jme ), INTENT(in)     :: xlong, xlat
     REAL, INTENT(in)                                     :: londbg, latdbg
+#if CDXWRF>=3    
     INTEGER, INTENT(in)                                  :: nhtasrng, nhhursrng, nltasrng, nlhursrng
     INTEGER, INTENT(in)                                  :: nwbdsrng, nwssrng
     INTEGER, INTENT(in)                                  :: nhtashursrng, nltashursrng
@@ -5785,16 +5786,19 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     REAL, DIMENSION(Nlhursrng), INTENT(in)               :: lhursrng
     REAL, DIMENSION(Nwbdsrng), INTENT(in)                :: wbdsrng
     REAL, DIMENSION(Nwssrng), INTENT(in)                 :: wssrng
+#endif
     
     ! Output
     INTEGER, DIMENSION(2), INTENT(out)                   :: ijdbg
     REAL, DIMENSION(1:num_soil_layers), INTENT(out)      :: fracsoil10cm
+#if CDXWRF>=3    
     REAL, DIMENSION(Nhtasrng), INTENT(out)               :: htasbins
     REAL, DIMENSION(Nhhursrng), INTENT(out)              :: hhursbins
     REAL, DIMENSION(Nltasrng), INTENT(out)               :: ltasbins
     REAL, DIMENSION(Nlhursrng), INTENT(out)              :: lhursbins
     REAL, DIMENSION(Nwbdsrng), INTENT(out)               :: wbdsbins
     REAL, DIMENSION(Nwssrng), INTENT(out)                :: wssbins
+#endif
     
     ! Local
     INTEGER                                              :: i,j,k
