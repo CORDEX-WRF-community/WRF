@@ -1285,7 +1285,7 @@ endif
                       ,model_config_rec%londbg, model_config_rec%latdbg                              &
                       ,grid%ijdbg                                                                    &
 
-#if CDXWRF>=2
+#if CDXWRF>=3
                       ,model_config_rec%nhtasrng, model_config_rec%nhhursrng                         &
                       ,model_config_rec%nltasrng, model_config_rec%nlhursrng                         &
                       ,model_config_rec%nwbdsrng, model_config_rec%nwssrng                           &

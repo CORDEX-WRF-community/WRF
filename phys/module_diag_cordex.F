@@ -218,7 +218,7 @@ CONTAINS
                       londbg, latdbg,                                                                 &
                       idbg, jdbg,                                                                     &
 #ifdef CDXWRF
-#if CDXWRF>=2
+#if CDXWRF>=3
                       Nhtasrng, Nhhursrng, Nltasrng, Nlhursrng, Nwbdsrng, Nwssrng,                    &
                       Nhtashursrng, Nltashursrng, Nwbdswssrng,                                        &
                       tashrng, hurshrng, taslrng, hurslrng,  wbdsrng, wssrng,                         &
@@ -253,7 +253,7 @@ CONTAINS
 #if CDXWRF>=1
 #endif
 
-#if CDXWRF>=3
+#if CDXWRF>=4
                       diabh,                                                                          &
                       qvttend, qcttend, qrttend, qsttend, qittend, qgttend, qhttend,                  &
                       qvhadv, qchadv, qrhadv, qshadv, qihadv, qghadv, qhhadv,                         &
@@ -305,7 +305,7 @@ CONTAINS
                       tdsmin, tdsmax, tdsmean,                                                        &
                       twsmin, twsmax, twsmean,                                                        &
 #endif
-#if CDXWRF>=3
+#if CDXWRF>=4
                    ! Water-budget
                       wbacdh,                                                                         &
                       wbacpw, wbacpwc, wbacpwr, wbacpws, wbacpwi, wbacpwg, wbacpwh,                   &
@@ -320,7 +320,7 @@ CONTAINS
                       wbacpwlg,wbacpwmg,wbacpwhg,wbacflg,wbacfmg, wbacfhg, wbaczlg, wbaczmg, wbaczhg, &
                       wbacpwlh,wbacpwmh,wbacpwhh,wbacflh,wbacfmh, wbacfhh, wbaczlh, wbaczmh, wbaczhh, &
 #endif
-#if CDXWRF>=2
+#if CDXWRF>=3
                       tashurstreshighres, tashurstreslowres, wbdswsstres,                             &
 #endif
 #endif
@@ -666,7 +666,7 @@ CONTAINS
 #if CDXWRF>=1
 #endif
 
-#if CDXWRF>=3
+#if CDXWRF>=4
   REAL, DIMENSION(ims:ime,kms:kme,jms:jme), INTENT(in)   :: diabh
   REAL, DIMENSION(ims:ime,kms:kme,jms:jme), INTENT(in)   :: qvttend, qcttend, qrttend, qsttend,       &
     qittend, qgttend, qhttend
@@ -675,7 +675,7 @@ CONTAINS
   REAL, DIMENSION(ims:ime,kms:kme,jms:jme), INTENT(in)   :: qvzadv, qczadv, qrzadv, qszadv, qizadv,   &
     qgzadv, qhzadv
 #endif
-#if CDXWRF>=2
+#if CDXWRF>=3
   INTEGER, INTENT(in)                                    :: Nhtasrng, Nhhursrng, Nltasrng, Nlhursrng, &
     Nwbdsrng, Nwssrng
   INTEGER, INTENT(in)                                    :: Nhtashursrng, Nltashursrng, Nwbdswssrng
@@ -753,7 +753,7 @@ CONTAINS
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: tdsmin, tdsmax, tdsmean
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: twsmin, twsmax, twsmean
 #endif
-#if CDXWRF>=3
+#if CDXWRF>=4
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: wbacdh
   REAL, DIMENSION(ims:ime,jms:jme), INTENT(inout)        :: wbacpw, wbacpwc, wbacpwr, wbacpws,        &
     wbacpwi, wbacpwg, wbacpwh
@@ -772,7 +772,7 @@ CONTAINS
     wbaczlc, wbaczmc, wbaczhc, wbaczlr, wbaczmr, wbaczhr, wbaczls, wbaczms, wbaczhs,                  &
     wbaczli, wbaczmi, wbaczhi, wbaczlg, wbaczmg, wbaczhg, wbaczlh, wbaczmh, wbaczhh
 #endif
-#if CDXWRF>=2
+#if CDXWRF>=3
 !  REAL, DIMENSION(ims:ime,jms:jme,Nhtasrng,Nhhursrng),                                                &
 !    INTENT(inout)                                        :: tashurstreshighres
 !  REAL, DIMENSION(ims:ime,jms:jme,Nltasrng,Nlhursrng),                                                &
@@ -859,6 +859,8 @@ CONTAINS
 #endif
 #if CDXWRF>=3
 #endif
+#if CDXWRF>=4
+#endif
 #endif
 !! End of INSTVALS
 
@@ -887,7 +889,7 @@ CONTAINS
   REAL                                                   :: uuas, vvas
   REAL, DIMENSION(ims:ime,jms:jme)                       :: wbdsv, wssv
 #endif
-#if CDXWRF>=3
+#if CDXWRF>=4
   REAL, DIMENSION(kms:kme,n_moist)                       :: qvarttend, qvarhadv, qvarzadv
   REAL, DIMENSION(ims:ime,kms:kme,jms:jme,n_moist)       :: pwqvar, fqvar, zqvar
   REAL, DIMENSION(n_moist)                               :: acpwqvar, acfqvar, aczqvar
@@ -1295,6 +1297,8 @@ CONTAINS
           vis(i,j) = 0.
         END IF
 
+#endif
+#if CDXWRF>=3
         ! Computing wind direction from where it blows and speed
         ! Towards it blows
         ! Avoiding seg faults
@@ -1322,7 +1326,7 @@ CONTAINS
         IF (wbdsv(i,j) >= piconst*(2.-1./(2.*(Nwbdsrng-1)))) wbdsv(i,j) = wbdsv(i,j) - 2.*piconst
         
 #endif
-#if CDXWRF>=3
+#if CDXWRF>=4
         ! Water budget
         IF (wbout == 1) THEN
           WRITE(msg,*)'    ' // TRIM(fname) // ' Water species: vapor:', m_qv,' cloud:', m_qc,        &
@@ -1547,7 +1551,7 @@ CONTAINS
           twsmean(i,j) = tws(i,j)
 #endif
 
-#if CDXWRF>=3
+#if CDXWRF>=4
           IF (wbout == 1) THEN
             wbacdh(i,j) = SUM(diabh(i,:,j))*dt
             ! Vertical intervals
@@ -1616,7 +1620,7 @@ CONTAINS
           END IF
 
 #endif
-#if CDXWRF>=2
+#if CDXWRF>=3
           ! temporal residence
           ! Checking consistency
           ! L. Fita, January 2024. Removed for efficiency
@@ -1765,7 +1769,7 @@ CONTAINS
               ' mean:', twsmean(i,j)
 #endif
 
-#if CDXWRF>=3
+#if CDXWRF>=4
             WRITE(msg,*) '    diabh:', SUM(diabh(i,:,j))*dt, ' wbacdh:', wbacdh(i,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*) '      dhl:', wbacdhl(i,j), 'dhm:', wbacdhm(i,j), 'dhh:', wbacdhh(i,j)
@@ -1786,7 +1790,7 @@ CONTAINS
             CALL wrf_debug(75,msg)
 
 #endif
-#if CDXWRF>=2
+#if CDXWRF>=3
             CALL wrf_debug(75,msg)
             WRITE(msg,*)'    tashurstreshighres: ',tashurstreshighres(i,INT(Nhtasrng/2*Nhhursrng/2),j),&
               ' tashurstreslowres: ', tashurstreslowres(i,INT(Nltasrng/2*Nlhursrng/2),j),              &
@@ -1936,7 +1940,7 @@ CONTAINS
           twsmean(i,j) = twsmean(i,j) + tws(i,j)
 #endif
 
-#if CDXWRF>=3
+#if CDXWRF>=4
 
           IF (wbout == 1) THEN
             wbacdh(i,j) = wbacdh(i,j) + SUM(diabh(i,:,j))*dt
@@ -2036,7 +2040,7 @@ CONTAINS
               wbaczhg(i,j), wbaczhh(i,j))
           END IF
 #endif
-#if CDXWRF>=2
+#if CDXWRF>=3
           ! temporal residence
           ! High res tas, hurs
           CALL var_residencetime_2var2D(t2(i,j), hurs(i,j), Nhtasrng, Nhhursrng, tashrng, hurshrng,   &
@@ -2215,7 +2219,7 @@ CONTAINS
               ' mean:', twsmean(i,j)
             CALL wrf_debug(75,msg)
 #endif
-#if CDXWRF>=3
+#if CDXWRF>=4
             WRITE(msg,*) '    diabh:', SUM(diabh(i,:,j))*dt, ' wbacdh:', wbacdh(i,j)
             CALL wrf_debug(75,msg)
             WRITE(msg,*) '      dhl:', wbacdhl(i,j), 'dhm:', wbacdhm(i,j), 'dhh:', wbacdhh(i,j)
@@ -2235,7 +2239,7 @@ CONTAINS
             WRITE(msg,*)'       qv: zh', varlmh(3), ' aczhv:', wbaczhv(i,j)
             CALL wrf_debug(75,msg)
 #endif
-#if CDXWRF>=2
+#if CDXWRF>=3
             WRITE(msg,*)'    tashurstreshighres: ',tashurstreshighres(i,INT(Nhtasrng/2*Nhhursrng/2),j),&
               ' tashurstreslowres: ', tashurstreslowres(i,INT(Nltasrng/2*Nlhursrng/2),j),              &
               ' wbdswsstres: ', wbdswsstres(i,INT(Nwbdsrng/2*Nwssrng/2),j)
@@ -2634,7 +2638,7 @@ CONTAINS
               ' mean:', twsmean(i,j)
             CALL wrf_debug(75,msg)
 #endif
-#if CDXWRF >=3
+#if CDXWRF >=4
             WRITE(msg,*) '    acdh:', wbacdh(i,j), ' dhl:', wbacdhl(i,j), 'dhm:', wbacdhm(i,j),       &
               'dhh:', wbacdhh(i,j)
             CALL wrf_debug(75,msg)

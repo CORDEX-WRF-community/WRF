@@ -287,7 +287,7 @@ CONTAINS
                          ,fracsoil10cm                                            &
                          ,londbg, latdbg                                          &
                          ,ijdbg                                                   &
-#if CDXWRF>=2
+#if CDXWRF>=3
                          ,nhtasrng, nhhursrng, nltasrng, nlhursrng                &
                          ,nwbdsrng, nwssrng                                       &
                          ,htasbins, hhursbins, ltasbins, lhursbins                &
@@ -876,7 +876,7 @@ CONTAINS
    REAL, INTENT(in)                                      :: londbg, latdbg
    INTEGER, DIMENSION(2), INTENT(out)                    :: ijdbg
    
-#if CDXWRF>=2
+#if CDXWRF>=3
    INTEGER, INTENT(in)                                   :: nhtasrng, nhhursrng, nltasrng, nlhursrng
    INTEGER, INTENT(in)                                   :: nwbdsrng, nwssrng   
    REAL, DIMENSION(Nhtasrng), INTENT(out)                :: htasbins
@@ -1796,7 +1796,7 @@ CHARACTER(LEN=8) :: name
     ,ims, ime, jms, jme, kms, kme                                                                     &
     ,its, ite, jts, jte, kts, kte                                                                     &
 
-#if CDXWRF>=2
+#if CDXWRF>=3
     ,model_config_rec%nhtasrng, model_config_rec%nhhursrng                                            &
     ,model_config_rec%nltasrng, model_config_rec%nlhursrng                                            &
     ,model_config_rec%nwbdsrng, model_config_rec%nwssrng                                              &
@@ -1807,7 +1807,7 @@ CHARACTER(LEN=8) :: name
     ,model_config_rec%wbdsrng, model_config_rec%wssrng                                                &
 #endif
     ,ijdbg                                                                                            &
-#if CDXWRF>=2    
+#if CDXWRF>=3    
     ,htasbins, hhursbins, ltasbins, lhursbins                                                         &
     ,wbdsbins, wssbins                                                                                &
 #endif
@@ -5748,7 +5748,7 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
     ,ims, ime, jms, jme, kms, kme                                                                     &
     ,its, ite, jts, jte, kts, kte                                                                     &
 
-#if CDXWRF>=2
+#if CDXWRF>=3
     ,nhtasrng, nhhursrng                                                                              & 
     ,nltasrng, nlhursrng                                                                              &
     ,nwbdsrng, nwssrng                                                                                &
@@ -5759,7 +5759,7 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
 #endif
     ! Output
     ,ijdbg                                                                                            &
-#if CDXWRF>=2    
+#if CDXWRF>=3    
     ,htasbins, hhursbins, ltasbins, lhursbins, wbdsbins, wssbins                                      &
 #endif
     ,fracsoil10cm)  
@@ -5888,7 +5888,7 @@ subroutine interp_vec_cu(locvec,locwant,periodic,loc1,loc2,wght1,wght2)
       inczsoil = inczsoil + dzs(k)
     END DO
 
-#if CDXWRF>=2
+#if CDXWRF>=3
     ! Residence time
 
     ! Consistency checks

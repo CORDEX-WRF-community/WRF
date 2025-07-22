@@ -1348,7 +1348,7 @@ CONTAINS
            grid%cdxps = grid%psfc
            grid%cdxts = grid%tsk
 #ifdef CDXWRF
-#if CDXWRF>=2
+#if CDXWRF>=4
       !! INSTVALS: Instantaneous values (uncomment and re-compile)
 !           grid%cdxdiabh = grid%diab_h
 #endif
@@ -1384,7 +1384,7 @@ CONTAINS
                     ,IDBG=grid%ijdbg(1), JDBG=grid%ijdbg(2)                &
                     ,WGSTS_WBDSWSSTRES = config_flags%wgsts_wbdswsstres    &
 #ifdef CDXWRF
-#if CDXWRF>=2
+#if CDXWRF>=3
                     ,NHTASRNG = config_flags%nhtasrng                      &
                     ,NHHURSRNG = config_flags%nhhursrng                    &
                     ,NLTASRNG = config_flags%nltasrng                      &
@@ -1460,7 +1460,7 @@ CONTAINS
 #ifdef CDXWRF
 #if CDXWRF>=1
 
-#elif CDXWRF>=3
+#elif CDXWRF>=4
                     ,DIABH=grid%h_diabatic                                 &
                     ,QVTTEND=grid%qvttend, QCTTEND=grid%qcttend            & 
                     ,QRTTEND=grid%qrttend, QSTTEND=grid%qsttend            &
@@ -1553,7 +1553,7 @@ CONTAINS
                     ,TWSMIN=grid%twsmin, TWSMAX=grid%twsmax                &
                     ,TWSMEAN=grid%twsmean                                  &
 #endif
-#if CDXWRF>=3
+#if CDXWRF>=4
                     !! Water-budget
                     ,WBACDH=grid%wbacdiabh                                 & 
                     ,WBACPW=grid%wbacpw, WBACPWC=grid%wbacpwc              &
@@ -1607,10 +1607,10 @@ CONTAINS
                     ,WBACZLH=grid%wbaczlh, WBACZMH=grid%wbaczmh            &
                     ,WBACZHH=grid%wbaczhh                                  &
 #endif
-#if CDXWRF>=2
+#if CDXWRF>=3
                     ,TASHURSTRESHIGHRES=grid%tashurstreshighres            &
                     ,TASHURSTRESLOWRES=grid%tashurstreslowres              &
-                    ,WBDSWSSTRES=grid%wbdswsstres                           &
+                    ,WBDSWSSTRES=grid%wbdswsstres                          &
 #endif
 #endif
          ! Dimension arguments
