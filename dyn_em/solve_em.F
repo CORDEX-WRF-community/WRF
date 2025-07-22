@@ -2197,7 +2197,7 @@ BENCH_END(small_step_finish_tim)
 
 #ifdef CORDEXDIAG
 #ifdef CDXWRF
-#if CDXWRF>=3
+#if CDXWRF>=4
 
        ! L. Fita, CIMA. Feb. 2018
        ! Initializing values it gives unitialize values on that unconsidered
@@ -2249,7 +2249,7 @@ BENCH_END(small_step_finish_tim)
                CALL wrf_debug ( 200 , ' call rk_scalar_tend' )
 #ifdef CORDEXDIAG
 #ifdef CDXWRF
-#if CDXWRF>=3
+#if CDXWRF>=4
                tenddec = .true.
 #endif
 #endif
@@ -2351,7 +2351,7 @@ BENCH_END(rlx_bdy_scalar_tim)
                CALL wrf_debug ( 200 , ' call rk_update_scalar' )
 #ifdef CORDEXDIAG
 #ifdef CDXWRF
-#if CDXWRF>=3
+#if CDXWRF>=4
                tenddec = .true.
 #endif
 #endif
@@ -2366,7 +2366,7 @@ BENCH_START(update_scal_tim)
                                sc_tend=moist_tend(ims,kms,jms,im),                     &
 #ifdef CORDEXDIAG
 #ifdef CDXWRF
-#if CDXWRF>=3
+#if CDXWRF>=4
                                advh_t=advh_t(ims:ime,kms:kme,jms:jme,1),               &
                                advz_t=advz_t(ims:ime,kms:kme,jms:jme,1),               &
 #endif
@@ -2400,7 +2400,7 @@ BENCH_START(update_scal_tim)
                ENDIF
 #ifdef CORDEXDIAG
 #ifdef CDXWRF
-#if CDXWRF>=3
+#if CDXWRF>=4
                IF (rk_step .eq. config_flags%rk_ord .AND. curr_secs2 > 0. .AND.  &
                  config_flags%output_cordex == 1 .AND. config_flags%output_wb == 1) THEN
 ! L. Fita, January 2018. CIMA
@@ -4892,7 +4892,7 @@ BENCH_END(bc_2d_tim)
 
 #ifdef CORDEXDIAG
 #ifdef CDXWRF
-#if CDXWRF>=3
+#if CDXWRF>=4
 ! Getting some variables for the Water budget
    IF (config_flags%output_wb == 1 .AND. curr_secs2 > 0.) THEN
      !!i2 = (ime+ims)/2
