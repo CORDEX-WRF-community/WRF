@@ -30,7 +30,11 @@ MODULE module_initialize_real
                           ,HALO_EM_INIT_6_sub   &
                           ,HALO_EM_VINTERP_UV_1_sub
 #endif
-
+!CORDEX
+   use module_sf_bep_bem, ONLY : nbui_max
+   integer ikmin,kk
+   real hmin,htot              
+!CORDEX
    REAL , SAVE :: p_top_save
    INTEGER :: internal_time_loop
 
@@ -3097,11 +3101,11 @@ integer::oops1,oops2
                       (grid%ivgtyp(i,j).NE.13 .AND. grid%ivgtyp(i,j).NE.24 .AND. grid%ivgtyp(i,j).NE.25 .AND. grid%ivgtyp(i,j).NE.26 .AND. grid%ivgtyp(i,j).LT.30)) grid%ivgtyp(i,j)=13
               ELSE IF ( MMINLU == "USGS" ) THEN
                   IF ( grid%FRC_URB2D(i,j) .GE. 0.5 .AND.  &
-                       grid%ivgtyp(i,j).NE.1 .AND. grid%ivgtyp(i,j).LT.30) grid%ivgtyp(i,j)=1
+                       grid%ivgtyp(i,j).NE.1 ) grid%ivgtyp(i,j)=1
               ENDIF
 
               IF ( grid%FRC_URB2D(i,j) == 0. ) THEN
-                 IF ( (MMINLU == 'NLCD40') .AND. &
+                 IF ( (MMINLU == 'NLCD40' .OR. MMINLU == 'MODIFIED_IGBP_MODIS_NOAH') .AND. &
                    (grid%ivgtyp(i,j)==24 .OR. grid%ivgtyp(i,j)==25 .OR. grid%ivgtyp(i,j)==26 .OR. grid%ivgtyp(i,j)==13) ) grid%FRC_URB2D(i,j) = 0.9
                  IF ( MMINLU == 'USGS' .AND. grid%ivgtyp(i,j)==1 ) grid%FRC_URB2D(i,j) = 0.9
               ENDIF
@@ -3117,9 +3121,39 @@ integer::oops1,oops2
          DO j = jts , MIN(jde-1,jte)
             DO i = its , MIN(ide-1,ite)
                IF ( skip_middle_points_t ( ids , ide , jds , jde , i , j , em_width , hold_ups ) ) CYCLE
+!CORDEX
+               icount=0
                DO k = 1, 15
                   grid%HI_URB2D(i,k,j)  = grid%URB_PARAM(i,k+117,j)
+                  if(grid%HI_URB2D(i,k,j).gt.0)icount=icount+1
                END DO
+               write(*,*)'NBUI_MAX=',nbui_max
+              if(icount.gt.nbui_max)then
+!                  do kk=1,icount-nbui_max
+333              continue
+                   ikmin=0 
+                   hmin=10000.
+                   do k=1,15
+                    if(grid%HI_URB2D(i,k,j).lt.hmin.and.grid%HI_URB2D(i,k,j).gt.0)then
+                            hmin=grid%HI_URB2D(i,k,j)
+                            ikmin=k
+                    endif
+                   enddo
+                   grid%HI_URB2D(i,ikmin,j)=0
+!                  enddo
+                  htot=0
+                  do k=1,15
+                   htot=htot+grid%HI_URB2D(i,k,j)
+                  enddo
+                  grid%HI_URB2D(i,:,j)=grid%HI_URB2D(i,:,j)/htot*100
+               icount=0
+               DO k = 1, 15
+                  if(grid%HI_URB2D(i,k,j).gt.0)icount=icount+1
+               END DO
+               if(icount.gt.nbui_max)go to 333
+              endif
+!CORDEX                 
+
             END DO
          END DO
       ENDIF
