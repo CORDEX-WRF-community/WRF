@@ -1233,7 +1233,11 @@ BENCH_START(surf_driver_tim)
 
 
       ! Avoiding multiple redefinitions
-      IF (grid%urbanfirst == 0 .AND. urban_scalars%urbanfirst == 1) grid%urbanfirst = 1
+      !   This might be wise to make it domain dependent...
+      IF (grid%urbanfirst*grid%id == 0 .AND. urban_scalars%urbanfirst == 1) THEN
+        PRINT *,'  domain: ', grid%id, ' passing for first time for the urban environment !'
+        grid%urbanfirst = 1
+      END IF
 
 
 #ifdef WRF_HYDRO

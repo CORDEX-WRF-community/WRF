@@ -194,6 +194,7 @@ state    real      QCAN_URB2D     ij     misc        1         -     rh{12}     
 
 # State variales inside urban module
 #  remove ##urban_state## and introduce in configure.wrf -DURBANSTATE
+##urban_state##state    real   URBHGTS         {umap_1}     misc       1         Z     h{12}       "URBHGTS"              "HEIGHTS WITHIN URBAN CANOPY"                              "m"
 ##urban_state##state    real   THAURB          i{umap_1}j   misc       1         Z     h{12}       "THAURB"               "POTENTIAL TEMPERATURE WITHIN URBAN CANOPY"                "K"
 ##urban_state##state    real   THA0URB         i{umap_1}j   misc       1         Z     h{12}       "THA0URB"              "REFERENCE POTENTIAL TEMPERATURE WITHIN URBAN CANOPY"                "K"
 ##urban_state##state    real   UAURB           i{umap_1}j   misc       1         Z     h{12}       "UAURB"                "WESTWARD WIND SPEED WITHIN URBAN CANOPY"                "ms-1"

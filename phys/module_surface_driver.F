@@ -1151,6 +1151,7 @@ CONTAINS
 
 #ifdef URBANSTATE
 ! Data interpolated from the "mesoscale grid" to the "urban grid" (num_urban_nz)
+! z_u3D: heights within the urban grid [z] (defined in phys/module_physics_init.F)
 ! ua_u3D: Wind speed in the x direction [ms-1]
 ! va_u3D: Wind speed in the y direction [ms-1]
 ! pt_u3D: Potential temperature [K]

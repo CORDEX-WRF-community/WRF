@@ -679,7 +679,9 @@ use module_wrf_error
       enddo
 
 
+      PRINT *, '  Do we Initialize urban matrices?', first, 'urbanfirst', urbanfirst
       if (first .AND. urbanfirst == 0) then                           ! True only on first call
+         PRINT *, '    Yes we Initialize urban matrices ...', first, 'urbanfirst', urbanfirst
          ! L. Fita, UBA-CIMA-IFAECI
          !  Initializing time_bep
          time_bep = 0
@@ -697,6 +699,11 @@ use module_wrf_error
 !Initialisation of the urban parameters and calculation of the view factor
         call icBEP(nd_u,h_b,d_b,ss_u,pb_u,nz_u,z_u,                               &
                       nurbm, ndm, nz_um, dz_u)
+
+        PRINT *, '  checking values of histograms ______'
+        DO ibui=1, nbui_max
+          PRINT *,'    read nbui:', ibui, (h_b(iz,ibui), iz=1, nz_um)
+        END DO
    
         first=.false.
         urbanfirst = 1
@@ -727,20 +734,27 @@ use module_wrf_error
             IF (hi_urb1D(iz_u) > 0. .AND. hi_urb1D(iz_u) < bldheightn) THEN
               bldheightn  = hi_urb(ix,iz_u,iy)
               found = .TRUE.
+              EXIT
             END IF
             IF (h_b(iz_u,iurb) > 0. .AND. h_b(iz_u,iurb) < bldheightn) THEN
               bldheightn  = h_b(iz_u,iurb)
               found = .TRUE.
+              EXIT
             END IF
          enddo
          IF (.NOT.found) THEN
            PRINT *,'  NUDAPT iz; hi_urb1D:', (iz, ' :', hi_urb1D(iz), iz=1,nz_um)
-           PRINT *,'  URBPARM_LCZ; LCZ=', iurb, ' iz: h_b:', (iz, ' :', h_b(iz,iurb), iz=1,nz_um)
+           PRINT *,'  Histogram of heights read from URBPARM_LCZ.TBL _______'
+           PRINT *,'    nbui: % heights _______'
+           DO iii=1, nurbmax
+             PRINT *,'       ',iii, ': ', (h_b(iz,iii), ' ', iz=1,nz_um)
+           END DO
+           PRINT *,'  LCZ nbui at grid point=', iurb
            WRITE(S4a,'(I4)')ix
            WRITE(S4b,'(I4)')iy
            WRITE(S6a,'(F6.4)')FRC_URB2D(ix,iy)
            errmsg = 'At module_sf_bep_bem: No building found at point i,j=' // S4a // ', ' // S4b //  &
-             'urban fraction: ' // S6a
+             ' urban fraction: ' // S6a
            FATAL_ERROR(errmsg)
          END IF
 

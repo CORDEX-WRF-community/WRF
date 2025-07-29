@@ -2539,6 +2539,9 @@ ENDIF
 #endif
 
                              FRC_URB2D, UTYPE_URB2D,USE_WUDAPT_LCZ,        &                         ! inout
+#ifdef URBANSTATE
+                             num_urban_nz, urban_dz, u_z3D,                &
+#endif
                              urbanfirst)
    IMPLICIT NONE
 
@@ -2660,6 +2663,14 @@ ENDIF
 !
    REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: FRC_URB2D
    INTEGER, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: UTYPE_URB2D
+#ifdef URBANSTATE
+   INTEGER, OPTIONAL, INTENT(in)                         :: num_urban_nz
+   REAL, OPTIONAL, INTENT(in)                            :: urban_dz
+   REAL, OPTIONAL, DIMENSION(1:num_urban_nz ),                                                        &
+     INTENT(INOUT)                                       :: z_u3D
+   ! Local
+   INTEGER                                               :: iz
+#endif
    
    INTEGER, INTENT(inout)                                :: urbanfirst
 
@@ -2769,6 +2780,9 @@ ENDIF
 
    CHECK = 0
    
+   DO iz=1, num_urban_nz
+     z_u3D(iz) = iz*urban_dz
+   END DO
    urbanfirst = 0
 
 #ifdef URBANCOLAPSE                      

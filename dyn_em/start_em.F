@@ -1145,6 +1145,10 @@ endif
                       grid%TRL_URB3D, grid%TBL_URB3D, grid%TGL_URB3D,        & !Optional urban
                       grid%SH_URB2D, grid%LH_URB2D, grid%G_URB2D, grid%RN_URB2D,  & !Optional urban
                       grid%TS_URB2D, grid%FRC_URB2D, grid%UTYPE_URB2D,      & !Optional urban
+#ifdef URBANSTATE
+                      config_flags%num_urban_nz, config_flags%dz_urban,     &
+                      grid%z_u3D,                                           &
+#endif
                       grid%urbanfirst,                                      &
                       grid%CMCR_URB2D,grid%TGR_URB2D,grid%TGRL_URB3D,grid%SMR_URB3D, & !Optional urban   
                       grid%DRELR_URB2D,grid%DRELB_URB2D,grid%DRELG_URB2D,    & !Optional urban

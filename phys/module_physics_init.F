@@ -154,6 +154,9 @@ CONTAINS
                          TRL_URB3D, TBL_URB3D, TGL_URB3D,        & !Optional urban
                          SH_URB2D, LH_URB2D, G_URB2D, RN_URB2D,  & !Optional urban
                          TS_URB2D, FRC_URB2D, UTYPE_URB2D,       & !Optional urban
+#ifdef URBANSTATE
+                         num_urban_nz, urban_dz, z_u3D,          &
+#endif
                          urbanfirst,                             &
                          CMCR_URB2D,TGR_URB2D,TGRL_URB3D,SMR_URB3D, & !Optional urban
                          DRELR_URB2D,DRELB_URB2D,DRELG_URB2D,    & !Optional urban
@@ -690,6 +693,13 @@ CONTAINS
    INTEGER , INTENT(IN)        :: urban_map_fbd
    INTEGER , INTENT(IN)        :: urban_map_zgrd
    INTEGER , INTENT(IN)        :: num_urban_hi
+
+#ifdef URBANSTATE
+   INTEGER, OPTIONAL, INTENT(in)                         :: num_urban_nz
+   REAL, OPTIONAL, INTENT(in)                            :: urban_dz
+   REAL, OPTIONAL, DIMENSION(1:num_urban_nz ),                                                        &
+     INTENT(INOUT)                                       :: z_u3D 
+#endif
    REAL, OPTIONAL, DIMENSION( ims:ime, 1:urban_map_zrd, jms:jme ), INTENT(INOUT) :: TRB_URB4D ! multi-layer UCM
    REAL, OPTIONAL, DIMENSION( ims:ime, 1:urban_map_zwd, jms:jme ), INTENT(INOUT) :: TW1_URB4D ! multi-layer UCM
    REAL, OPTIONAL, DIMENSION( ims:ime, 1:urban_map_zwd, jms:jme ), INTENT(INOUT) :: TW2_URB4D ! multi-layer UCM
@@ -1532,6 +1542,9 @@ CHARACTER(LEN=8) :: name
                 TRL_URB3D, TBL_URB3D, TGL_URB3D,                & !Optional urban
                 SH_URB2D, LH_URB2D, G_URB2D, RN_URB2D,          & !Optional urban
                 TS_URB2D, FRC_URB2D, UTYPE_URB2D,               & 
+#ifdef URBANSTATE
+                num_urban_nz, urban_dz, z_u3D,                  &
+#endif
                 urbanfirst,                                     &
                 SF_URBAN_PHYSICS,                               & !Optional urban
                 CMCR_URB2D,TGR_URB2D,TGRL_URB3D,SMR_URB3D,      & !Optional urban
@@ -2598,6 +2611,9 @@ CHARACTER(LEN=8) :: name
                 TRL_URB3D, TBL_URB3D, TGL_URB3D,                & !Optional urban
                 SH_URB2D,LH_URB2D,G_URB2D,RN_URB2D,             & !Optional urban
                 TS_URB2D, FRC_URB2D, UTYPE_URB2D,               &
+#ifdef URBANSTATE
+                num_urban_nz, urban_dz, z_u3D,                  &
+#endif
                 urbanfirst,                                     &
                 SF_URBAN_PHYSICS,                               & !Optional urban
                 CMCR_URB2D,TGR_URB2D,TGRL_URB3D,SMR_URB3D,      & !Optional urban
@@ -2966,6 +2982,12 @@ CHARACTER(LEN=8) :: name
     REAL, OPTIONAL, DIMENSION( ims:ime, 1:num_soil_layers, jms:jme ), INTENT(INOUT) :: TGL_URB3D !Optional urban
     REAL, OPTIONAL, DIMENSION( ims:ime, 1:num_soil_layers, jms:jme ), INTENT(INOUT) :: TGRL_URB3D !Optional urban
     REAL, OPTIONAL, DIMENSION( ims:ime, 1:num_soil_layers, jms:jme ), INTENT(INOUT) :: SMR_URB3D !Optional urban
+#ifdef URBANSTATE
+    INTEGER, OPTIONAL, INTENT(in)                        :: num_urban_nz
+    REAL, OPTIONAL, INTENT(in)                           :: urban_dz
+    REAL, OPTIONAL, DIMENSION(1:num_urban_nz ),                                                        &
+      INTENT(INOUT)                                      :: z_u3D 
+#endif
     INTEGER, INTENT(inout)                               :: urbanfirst
 
     INTEGER , INTENT(IN)        ::     num_urban_ndm
@@ -3411,6 +3433,9 @@ CHARACTER(LEN=8) :: name
                               B_T_BEP,B_Q_BEP,B_E_BEP,DLG_BEP,                 & !multi-layer urban
                               DL_U_BEP,SF_BEP,VL_BEP,                          & !multi-layer urban
                               FRC_URB2D, UTYPE_URB2D,config_flags%use_wudapt_lcz,&  !urban
+#ifdef URBANSTATE
+                              num_urban_nz, urban_dz, z_u3D,                   &
+#endif
                               urbanfirst)
           
 
@@ -3554,6 +3579,9 @@ CALL lsm_mosaic_init(IVGTYP,config_flags%ISWATER,config_flags%ISURBAN,config_fla
                               B_T_BEP,B_Q_BEP,B_E_BEP,DLG_BEP,                 & !multi-layer urban
                               DL_U_BEP,SF_BEP,VL_BEP,                          & !multi-layer urban
                               FRC_URB2D, UTYPE_URB2D,config_flags%use_wudapt_lcz,& !urban
+#ifdef URBANSTATE
+                              num_urban_nz, urban_dz, z_u3D,                   &
+#endif
                               urbanfirst)
 
                max_utype_urb2d = maxval(UTYPE_URB2D)*1.0
