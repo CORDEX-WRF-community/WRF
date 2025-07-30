@@ -695,10 +695,9 @@ CONTAINS
    INTEGER , INTENT(IN)        :: num_urban_hi
 
 #ifdef URBANSTATE
-   INTEGER, OPTIONAL, INTENT(in)                         :: num_urban_nz
-   REAL, OPTIONAL, INTENT(in)                            :: urban_dz
-   REAL, OPTIONAL, DIMENSION(1:num_urban_nz ),                                                        &
-     INTENT(INOUT)                                       :: z_u3D 
+   INTEGER, INTENT(in)                                   :: num_urban_nz
+   REAL, INTENT(in)                                      :: urban_dz
+   REAL, DIMENSION(1:num_urban_nz ), INTENT(INOUT)       :: z_u3D 
 #endif
    REAL, OPTIONAL, DIMENSION( ims:ime, 1:urban_map_zrd, jms:jme ), INTENT(INOUT) :: TRB_URB4D ! multi-layer UCM
    REAL, OPTIONAL, DIMENSION( ims:ime, 1:urban_map_zwd, jms:jme ), INTENT(INOUT) :: TW1_URB4D ! multi-layer UCM
@@ -2983,10 +2982,9 @@ CHARACTER(LEN=8) :: name
     REAL, OPTIONAL, DIMENSION( ims:ime, 1:num_soil_layers, jms:jme ), INTENT(INOUT) :: TGRL_URB3D !Optional urban
     REAL, OPTIONAL, DIMENSION( ims:ime, 1:num_soil_layers, jms:jme ), INTENT(INOUT) :: SMR_URB3D !Optional urban
 #ifdef URBANSTATE
-    INTEGER, OPTIONAL, INTENT(in)                        :: num_urban_nz
-    REAL, OPTIONAL, INTENT(in)                           :: urban_dz
-    REAL, OPTIONAL, DIMENSION(1:num_urban_nz ),                                                        &
-      INTENT(INOUT)                                      :: z_u3D 
+    INTEGER, INTENT(in)                                  :: num_urban_nz
+    REAL, INTENT(in)                                     :: urban_dz
+    REAL, DIMENSION(1:num_urban_nz), INTENT(INOUT)       :: z_u3D 
 #endif
     INTEGER, INTENT(inout)                               :: urbanfirst
 

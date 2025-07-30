@@ -679,9 +679,8 @@ use module_wrf_error
       enddo
 
 
-      PRINT *, '  Do we Initialize urban matrices?', first, 'urbanfirst', urbanfirst
-      if (first .AND. urbanfirst == 0) then                           ! True only on first call
-         PRINT *, '    Yes we Initialize urban matrices ...', first, 'urbanfirst', urbanfirst
+      if (urbanfirst == 0) then                           ! True only on first call
+         PRINT *, '    Initializing urban matrices ...', 'urbanfirst', urbanfirst
          ! L. Fita, UBA-CIMA-IFAECI
          !  Initializing time_bep
          time_bep = 0

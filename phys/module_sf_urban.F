@@ -2540,7 +2540,7 @@ ENDIF
 
                              FRC_URB2D, UTYPE_URB2D,USE_WUDAPT_LCZ,        &                         ! inout
 #ifdef URBANSTATE
-                             num_urban_nz, urban_dz, u_z3D,                &
+                             num_urban_nz, urban_dz, z_u3D,                &
 #endif
                              urbanfirst)
    IMPLICIT NONE
@@ -2664,10 +2664,9 @@ ENDIF
    REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: FRC_URB2D
    INTEGER, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: UTYPE_URB2D
 #ifdef URBANSTATE
-   INTEGER, OPTIONAL, INTENT(in)                         :: num_urban_nz
-   REAL, OPTIONAL, INTENT(in)                            :: urban_dz
-   REAL, OPTIONAL, DIMENSION(1:num_urban_nz ),                                                        &
-     INTENT(INOUT)                                       :: z_u3D
+   INTEGER, INTENT(in)                                   :: num_urban_nz
+   REAL, INTENT(in)                                      :: urban_dz
+   REAL, DIMENSION(1:num_urban_nz), INTENT(INOUT)        :: z_u3D
    ! Local
    INTEGER                                               :: iz
 #endif
