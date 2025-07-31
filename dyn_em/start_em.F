@@ -1147,7 +1147,7 @@ endif
                       grid%TS_URB2D, grid%FRC_URB2D, grid%UTYPE_URB2D,      & !Optional urban
 #ifdef URBANSTATE
                       config_flags%num_urban_nz, config_flags%dz_urban,     &
-                      grid%z_u3D,                                           &
+                      grid%URBHGTS,                                         &
 #endif
                       grid%urbanfirst,                                      &
                       grid%CMCR_URB2D,grid%TGR_URB2D,grid%TGRL_URB3D,grid%SMR_URB3D, & !Optional urban   
