@@ -232,7 +232,6 @@ state    real  qvs_hm           ij      misc        1         -      rh{19}   "q
 ##CDXWRF3##state    real  tashurstreslowres  i{lth}j  misc  1         -      rh{19}   "tashurstreslowres"        "low-resolution of simultaneous temporal residence of 2-m temperature and relative humidity" "second"
 ##CDXWRF3##state    real  wbdswsstres        i{wds}j  misc  1         -      rh{19}   "wbdswsstres"              "simultaneous temporal residence of 10-m earth rotated blowing wind direction (from where it blows) and wind speed" "second"
 
-
 # Uncomment this section to get these variables (replace '##CDXWRF4##state', by 'state')
 # Only work if one includes in configure.wrf '-DCDXWRF=4' (following line after '-DCORDEXDIAG')
 #   1.- Remove ##CDXWRF4##
