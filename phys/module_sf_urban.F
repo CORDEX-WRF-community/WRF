@@ -2778,6 +2778,9 @@ ENDIF
    INTEGER :: I,J,K,CHECK
 
    CHECK = 0
+
+   ! Initilalizing
+   HI_URB2D = 0.
    
    DO iz=1, num_urban_nz
      z_u3D(iz) = iz*urban_dz

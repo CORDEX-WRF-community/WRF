@@ -3141,10 +3141,28 @@ integer::oops1,oops2
          END DO
       ENDIF
 
+!      ! Testing
+!      PRINT *,'   *** BEFORE ***'
+!      IF ( ( config_flags%sf_urban_physics == 2 ) .OR. ( config_flags%sf_urban_physics == 3 ) ) THEN
+!         DO j = jts , MIN(jde-1,jte)
+!            DO i = its , MIN(ide-1,ite)
+!               PRINT *,'    dyn_em/module_initialize_real i,j:', i,j, '|', skip_middle_points_t ( ids,ide,jds,jde,i,j,em_width,hold_ups)
+!               PRINT *,'      grid%URB_PARAM:', (grid%URB_PARAM(i,kk+117,j), kk=1,       &
+!                 config_flags%num_urban_hi)
+!            END DO
+!         END DO
+!      END IF
+!      CALL SLEEP(300)
+!      PRINT *,'   *** AFTER ***'
+
       IF ( ( config_flags%sf_urban_physics == 2 ) .OR. ( config_flags%sf_urban_physics == 3 ) ) THEN
+         grid%HI_URB2D = 0.
          first_urbanij = .TRUE.
          DO j = jts , MIN(jde-1,jte)
             DO i = its , MIN(ide-1,ite)
+!               PRINT *,'    dyn_em/module_initialize_real i,j:', i,j, '|', skip_middle_points_t ( ids,ide,jds,jde,i,j,em_width,hold_ups)
+!               PRINT *,'      grid%URB_PARAM:', (grid%URB_PARAM(i,kk+117,j), kk=1,       &
+!                 config_flags%num_urban_hi)
                IF ( skip_middle_points_t ( ids , ide , jds , jde , i , j , em_width , hold_ups ) ) CYCLE
                IF (config_flags%num_urban_hi /= 15) THEN
                  IF (first_urbanij) THEN
@@ -3177,6 +3195,15 @@ integer::oops1,oops2
                ELSE
                  DO k = 1, config_flags%num_urban_hi
                    grid%HI_URB2D(i,k,j)  = grid%URB_PARAM(i,k+117,j)
+                   IF (first_urbanij) THEN
+                     IF (grid%URB_PARAM(i,k+117,j) /= 0.) THEN
+                       PRINT *,'  in dyn_em/module_initialize_real.F, getting HI_URB2D from ' //      &
+                         'URB_PARAM(,k+>117,) at point:', i, ' ,', j 
+                       PRINT *,'    grid%URB_PARAM(i,:,j):', (grid%URB_PARAM(i,kk+117,j), kk=1,       &
+                         config_flags%num_urban_hi)
+                       first_urbanij = .FALSE.
+                     END IF
+                   END IF
                  END DO
                END IF
             END DO
