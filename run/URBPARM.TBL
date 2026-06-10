@@ -124,7 +124,7 @@ CH_SCHEME: 2
 #      (sf_urban_physics=1)
 #
 
-TS_SCHEME: 1
+TS_SCHEME: 2
 
 #
 # AHOPTION [ 0: No anthropogenic heating,  1: Anthropogenic heating will be added to sensible heat flux term ]
